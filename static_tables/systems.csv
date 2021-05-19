@@ -1,0 +1,10 @@
+id,name,redi_repair_sequence,priority,workers_per_sqft,workers_per_comp,max_workers_per_system_small,max_workers_per_system_large,num_du_per_crew,max_crews_per_comp_type
+1,structural,s,1,0.002,NaN,15,45,10,10
+2,exterior,b,5,0.001,NaN,15,45,10,2
+3,interior,a,9,0.001,NaN,15,45,999,1
+4,stairs,f,2,NaN,2,6,18,999,1
+5,elevators,e,7,NaN,2,6,18,999,1
+6,plumbing,a,3,0.001,NaN,15,45,999,1
+7,electrical,d,4,NaN,3,9,27,999,1
+8,hvac,c,6,NaN,3,9,27,999,1
+9,fire,a,8,0.001,NaN,15,45,999,1
