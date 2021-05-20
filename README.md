@@ -18,7 +18,29 @@ The method is built using Matlab v2017a; running this implementation using other
 ## Example Inputs
 Several example input Matlab data files are provided to help illustrate both the construction of the inputs file and the implementation. These files are located in the inputs/example_inputs directory and can be run through the assessment by setting the variable names accordingly in **step 2** above.
 
-## Definition of Inputs
+## Definition of I/O
+A breif description of the various input and output variables are provided below. A detailed schema of all expected input and output subfields is provided in the PBEE-Recovery/schema directory.
 
+### Inputs
+ - **analysis_options**: [_struct_]
+   data structure containing recovery time optional method inputs for various limit state thresholds
+ - **building_model**: [_struct_]
+   data structure containing general information about the building such as the number of stories and the building area
+ - **damage**: [_struct_]
+   data structure containing simulated damage, simulated repair time, and compoennt attribute data associated with each component's damages state in the building
+ - **damage_consequences**: [_struct_]
+   data structure containing simulated building consequences, such as red tags and repair costs ratios
+ - **functionality.utilities**: [_struct_]
+   data structure containing simulated utility downtimes
+ - **impedance_options**: [_struct_]
+   data structure containing general impedance assessment inputs such as mitigation factors
 
-## Definition of Outputs
+### Outputs
+ - **functionality.recovery**: [_struct_]
+   data structure containing the simulated tenant- and building-level functional recovery and reoccupancy outcomes
+ - **functionality.building_repair_schedule**: [_struct_]
+   data structure containing the simulated building repair schedule
+ - **functionality.worker_data**: [_struct_]
+   data structure containing the simulation of allocated workers throught the repair process
+ - **functionality.impeding_factors**: [_struct_]
+   data structure containing the simulated impeding factors delaying the start of system repair
