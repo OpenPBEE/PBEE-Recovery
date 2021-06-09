@@ -1,0 +1,382 @@
+{
+  "definitions": {
+    "numberOrNaN": {
+      "oneOf": [
+        { 
+          "type": "number"
+        },
+        { 
+          "type": "string",
+          "pattern": "NaN"
+        }
+      ]
+    },
+    "arrayOfNumbers": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "arrayOfNumbersOrNaN": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/numberOrNaN"
+      }
+    },
+    "arrayOfStrings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "arrayOfArraysOfNumbers": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/arrayOfNumbers"
+      }
+    },
+    "arrayOfArraysOfNumbersOrNaN": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/arrayOfNumbersOrNaN"
+      }
+    },
+    "anyDimensionalArray": {
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/definitions/arrayOfArraysOfNumbers"
+          },
+          {
+            "$ref": "#/definitions/arrayOfNumbers"
+          },
+          {
+            "type": "number"
+          }
+        ]
+      }
+    },
+    "summaryImpedingFactors": {
+      "type": "object",
+      "properties": {
+        "start_day": {
+          "$ref": "#/definitions/arrayOfArraysOfNumbers"
+        },
+        "complete_day": {
+          "$ref": "#/definitions/arrayOfArraysOfNumbers"
+        }
+      }
+    },
+    "summaryImpedingFactorsSystem": {
+      "type": "object",
+      "properties": {
+        "structural": {
+          "$ref": "#/definitions/summaryImpedingFactors"
+        },
+        "exterior": {
+          "$ref": "#/definitions/summaryImpedingFactors"
+        },
+        "interior": {
+          "$ref": "#/definitions/summaryImpedingFactors"
+        },
+        "stairs": {
+          "$ref": "#/definitions/summaryImpedingFactors"
+        },
+        "elevators": {
+          "$ref": "#/definitions/summaryImpedingFactors"
+        },
+        "plumbing": {
+          "$ref": "#/definitions/summaryImpedingFactors"
+        },
+        "electrical": {
+          "$ref": "#/definitions/summaryImpedingFactors"
+        },
+        "hvac": {
+          "$ref": "#/definitions/summaryImpedingFactors"
+        },
+        "fire": {
+          "$ref": "#/definitions/summaryImpedingFactors"
+        }
+      },
+      "required": [
+        "structural",
+        "exterior",
+        "stairs"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "functionality": {
+      "type": "object",
+	  "description": "simulated outputs of the performance based functional recovery methodology",
+      "properties": {
+        "recovery": {
+          "type": "object",
+		  "description": "simulated tenant- and building-level functional recovery and reoccupancy outcomes",
+          "properties": {
+            "reoccupancy": {
+              "type": "object",
+			  "description": "simulated tenant- and building-level reoccupancy outcomes",
+              "properties": {
+					"type": "object",
+					"description": "simulated building-level reoccupancy outcomes",
+					"properties": {
+						"recovery_day": {
+							"description": "simulated building reoccupancy time, in days",
+							"$ref": "#/definitions/arrayOfNumbers"
+						},
+						"initial_percent_affected": {
+							"description": "simulated portion of building that is non-occupiable, initially after the earthquake",
+							"$ref": "#/definitions/arrayOfNumbers"
+						}
+					}
+                },
+                "tenant_unit": {
+                  "type": "object",
+				  "description": "simulated tenant-unit-level reoccupancy outcomes",
+                  "properties": {
+                    "recovery_day": {
+						"description": "simulated reoccupancy time, in days, for each tenant-unit in the building",
+						$ref": "#/definitions/arrayOfArraysOfNumbers"
+                    }
+                  }
+                },
+                "recovery_trajectory": {
+                  "type": "object",
+				  "description": "simulated recovery trajectory vectors; tracks the recovery of occupancy over time",
+                  "properties": {
+                    "recovery_day": {
+						"description": "simulated reoccupancy time, in days, for each step of the recovery trajectory (x-axis)",
+						"$ref": "#/definitions/arrayOfArraysOfNumbers"
+                    },
+					"percent_recovered": {
+						"description": "each step of the recovery trajectory; step increment is equal to the inverse of the number of tenant-units in the building",
+						"$ref": "#/definitions/arrayOfNumbers"
+					}
+                  }
+                },
+                "breakdowns": {
+					"type": "object",
+					"description": "deagregated reoccupancy times for various recovery targets (in days)",
+					"properties": {
+					  "system_breakdowns": {
+						"description": "fraction of realization affected by loss of reoccupancy anywhere in the building, broken down by systems-level fault tree events",
+						"$ref": "#/definitions/arrayOfArraysOfNumbers"
+					  },
+					  "component_breakdowns": {
+						"description": "fraction of realization affected by loss of reoccupancy anywhere in the building, broken down by component",
+						"$ref": "#/definitions/arrayOfArraysOfNumbers"
+					  },
+					  "perform_targ_days": {
+						"description": "recovery targets of interest(in days)",
+						"$ref": "#/definitions/arrayOfNumbers"
+					  },
+					  "system_names": {
+						"description": "names of each of the systems in the systems_breakdowns field",
+						"$ref": "#/definitions/arrayOfStrings"
+					  },
+					  "comp_names": {
+						"description": "names of each of the components in the component_breakdowns field",
+						"$ref": "#/definitions/arrayOfStrings"
+					  }
+					}
+                }
+              }
+            },
+            "functional": {
+              "type": "object",
+			  "description": "simulated tenant- and building-level functional recovery outcomes",
+              "properties": {
+                "building": {
+                  "type": "object",
+				  "description": "simulated tenant- and building-level functional recovery outcomes",
+                  "properties": {
+                    "recovery_day": {
+						"description": "simulated building functional recovery time, in days",
+						"$ref": "#/definitions/arrayOfNumbers"
+                    },
+                    "initial_percent_affected": {
+						"description": "simulated portion of building that is non-functional, initially after the earthquake",
+						"$ref": "#/definitions/arrayOfNumbers"
+                    }
+                  }
+                },
+                "tenant_unit": {
+                  "type": "object",
+				  "description": "simulated tenant-unit-level functional recovery outcomes",
+                  "properties": {
+                    "recovery_day": {
+						"description": "simulated functional recovery time, in days, for each tenant-unit in the building",
+						"$ref": "#/definitions/arrayOfArraysOfNumbers"
+                    }
+                  }
+                },
+                "recovery_trajectory": {
+                  "type": "object",
+				  "description": "simulated recovery trajectory vectors; tracks the recovery of function over time",
+                  "properties": {
+                    "recovery_day": {
+						"description": "simulated functional recovery time, in days, for each step of the recovery trajectory (x-axis)",
+						"$ref": "#/definitions/arrayOfArraysOfNumbers"
+                    },
+					"percent_recovered": {
+						"description": "each step of the recovery trajectory; step increment is equal to the inverse of the number of tenant-units in the building",
+						"$ref": "#/definitions/arrayOfNumbers"
+					}
+                  }
+                },
+                "breakdowns": {
+                    "type": "object",
+					"description": "deagregated functional recovery times for various recovery targets (in days)",
+                    "properties": {
+                      "system_breakdowns": {
+						"description": "fraction of realization affected by loss of function anywhere in the building, broken down by systems-level fault tree events",
+                        "$ref": "#/definitions/arrayOfArraysOfNumbers"
+                      },
+                      "component_breakdowns": {
+						"description": "fraction of realization affected by loss of function anywhere in the building, broken down by component",
+                        "$ref": "#/definitions/arrayOfArraysOfNumbers"
+                      },
+                      "perform_targ_days": {
+						"description": "recovery targets of interest(in days)",
+                        "$ref": "#/definitions/arrayOfNumbers"
+                      },
+                      "system_names": {
+						"description": "names of each of the systems in the systems_breakdowns field",
+                        "$ref": "#/definitions/arrayOfStrings"
+                      },
+                      "comp_names": {
+						"description": "names of each of the components in the component_breakdowns field",
+                        "$ref": "#/definitions/arrayOfStrings"
+                      }
+                    }
+                }
+              }
+            }
+          }
+        },
+        "building_repair_schedule": {
+          "type": "object",
+		  "description": "simulated building repair schedule",
+          "properties": {
+            "repair_start_day": {
+			  "type": "object",
+			  "description": "the day after the earthquake that each repair starts",
+			  "properties":{
+				"per_component":{
+					"description": "repair start day of each component",
+					"$ref": "#/definitions/arrayOfArraysOfNumbersOrNaN"
+				},
+				"per_story":{
+					"description": "repair start day of each story",
+					"$ref": "#/definitions/arrayOfArraysOfNumbersOrNaN"
+				},
+				"per_system":{
+					"description": "repair start day of each system",
+					"$ref": "#/definitions/arrayOfArraysOfNumbersOrNaN"
+				},
+				"per_system_story":{
+					"description": "repair start day of each story within each system",
+					"$ref": "#/definitions/arrayOfArraysOfNumbersOrNaN"
+				},
+				"per_story_system":{
+					"description": "repair start day of each system on each story",
+					"$ref": "#/definitions/arrayOfArraysOfNumbersOrNaN"
+				}
+			  }
+			},
+            "repair_complete_day": {
+			  "type": "object",
+			  "description": "the day after the earthquake that each repair is finished",
+			  "properties":{
+				"per_component":{
+					"description": "repair complete day of each component",
+					"$ref": "#/definitions/arrayOfArraysOfNumbersOrNaN"
+				},
+				"per_story":{
+					"description": "repair complete day of each story",
+					"$ref": "#/definitions/arrayOfArraysOfNumbersOrNaN"
+				},
+				"per_system":{
+					"description": "repair complete day of each system",
+					"$ref": "#/definitions/arrayOfArraysOfNumbersOrNaN"
+				},
+				"per_system_story":{
+					"description": "repair complete day of each story within each system",
+					"$ref": "#/definitions/arrayOfArraysOfNumbersOrNaN"
+				},
+				"per_story_system":{
+					"description": "repair complete day of each system on each story",
+					"$ref": "#/definitions/arrayOfArraysOfNumbersOrNaN"
+				}
+			  }
+			},
+            "component_names": {
+				"description": "names of each of the components in the per_component breakdown field",
+				"$ref": "#/definitions/arrayOfStrings"
+            },
+            "system_names": {
+				"description": "names of each of the systems in the per_system breakdown field",
+                "$ref": "#/definitions/arrayOfStrings"
+            }
+          }
+        },
+        "worker_data": {
+          "type": "object",
+		  "description": "simulated worker allocations throughout the repair schedule",
+          "properties": {
+            "total_workers": {
+				"description": "simulated worker allocated in the building for any repair at various time steps",
+                "$ref": "#/definitions/arrayOfArraysOfNumbers"
+            },
+            "day_vector": {
+				"description": "various time steps, in days after the earthquake, associated with the total_workers field",
+                "$ref": "#/definitions/arrayOfArraysOfNumbers"
+            }
+          }
+        },
+        "impeding_factors": {
+          "type": "object",
+		  "description": "simulated impeding factor times",
+          "properties": {
+			"time_sys"{
+				"description": "simulated total impeding time for each system",
+				"$ref": "#/definitions/arrayOfArraysOfNumbers"
+			},
+			"breakdowns: {
+				"type": "object"
+				"description": "simulated impeding factor times broken down by factor",
+				"properties: {
+					"inspection": {
+						"description": "simulated inpsection time",
+						"$ref": "#/definitions/summaryImpedingFactors"
+					},
+					"financing": {
+						"description": "simulated financing time",
+						"$ref": "#/definitions/summaryImpedingFactors"
+					},
+					"eng_mob": {
+						"description": "simulated engineering mobilization time for each system",
+						"$ref": "#/definitions/summaryImpedingFactorsSystem"
+					},
+					"design": {
+						"description": "simulated engineering design time for each system",
+						"$ref": "#/definitions/summaryImpedingFactorsSystem"
+					},
+					"permitting": {
+						"description": "simulated permitting time for each system",
+						"$ref": "#/definitions/summaryImpedingFactorsSystem"
+					},
+					"contractor_mob": {
+						"description": "simulated contractor mobilization time for each system",
+						"$ref": "#/definitions/summaryImpedingFactorsSystem"
+					}
+				}
+			}
+          }
+        }
+      }
+    }
+  }
+}
