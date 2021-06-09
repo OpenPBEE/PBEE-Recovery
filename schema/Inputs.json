@@ -1,0 +1,486 @@
+{
+  "definitions": {
+    "numberOrNaN": {
+      "oneOf": [
+        { 
+          "type": "number"
+        },
+        { 
+          "type": "string",
+          "pattern": "NaN"
+        }
+      ]
+    },
+    "arrayOfNumbers": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "arrayOfNumbersOrNaN": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/numberOrNaN"
+      }
+    },
+    "arrayOfStrings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "arrayOfArraysOfNumbers": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/arrayOfNumbers"
+      }
+    },
+    "arrayOfArraysOfNumbersOrNaN": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/arrayOfNumbersOrNaN"
+      }
+    },
+    "anyDimensionalArray": {
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/definitions/arrayOfArraysOfNumbers"
+          },
+          {
+            "$ref": "#/definitions/arrayOfNumbers"
+          },
+          {
+            "type": "number"
+          }
+        ]
+      }
+    },
+    "summaryImpedingFactors": {
+      "type": "object",
+      "properties": {
+        "start_day": {
+          "$ref": "#/definitions/arrayOfArraysOfNumbers"
+        },
+        "complete_day": {
+          "$ref": "#/definitions/arrayOfArraysOfNumbers"
+        }
+      }
+    },
+    "summaryImpedingFactorsSystem": {
+      "type": "object",
+      "properties": {
+        "structural": {
+          "$ref": "#/definitions/summaryImpedingFactors"
+        },
+        "exterior": {
+          "$ref": "#/definitions/summaryImpedingFactors"
+        },
+        "interior": {
+          "$ref": "#/definitions/summaryImpedingFactors"
+        },
+        "stairs": {
+          "$ref": "#/definitions/summaryImpedingFactors"
+        },
+        "elevators": {
+          "$ref": "#/definitions/summaryImpedingFactors"
+        },
+        "plumbing": {
+          "$ref": "#/definitions/summaryImpedingFactors"
+        },
+        "electrical": {
+          "$ref": "#/definitions/summaryImpedingFactors"
+        },
+        "hvac": {
+          "$ref": "#/definitions/summaryImpedingFactors"
+        },
+        "fire": {
+          "$ref": "#/definitions/summaryImpedingFactors"
+        }
+      },
+      "required": [
+        "structural",
+        "exterior",
+        "stairs"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "analysis_options": {
+      "type": "object",
+	  "description": "recovery time optional method inputs for various limit state thresholds",
+      "properties": {
+        "door_racking_repair_day": {
+			"type": "number",
+			"description": "days after the earthquake required to repaired all racked doorways"
+		},
+		"egrees_threshold": {
+			"type": "number",
+			"description": "ratio of building egress paths required for building safety and access, assuming an operational fire suppression system"
+		},
+		"egrees_threshold_wo_fs": {
+			"type": "number",
+			"description": "ratio of building egress paths required for building safety and access, assuming an non-operational fire suppression system"
+		},
+		"required_ratio_operating_hvac_main": {
+			"type": "number",
+			"description": "ratio of hvac units, which service the entire building, required to maintain an operational hvac system"
+		},
+		"required_ratio_operating_hvac_unit": {
+			"type": "number",
+			"description": "ratio of hvac units, which service an individual tenant unit, required to maintain an operational hvac system"
+		},
+		"required_ratio_operating_fs_drops": {
+			"type": "number",
+			"description": "ratio of fire sprinkler drops, in a given tenant unit, required to maintain an operational hvac system"
+		},
+		"exterior_safety_threshold": {
+			"type": "number",
+			"description": "damage theshold that triggers an exterior safety issue; threshold is defined in terms of the ratio of damaged area to perimeter area of a given tenant unit"
+		},
+		"interior_safety_threshold": {
+			"type": "number",
+			"description": "damage theshold that triggers an interior safety issue; threshold is defined in terms of the ratio of damaged area to interior area of a given tenant unit"
+		},
+		"door_access_width_ft": {
+			"type": "number",
+			"description": "width of door access zone, centerlined on the doorway, required for safe access. A safe door access zone must be free of falling hazards"
+		}
+      }
+    },
+	"building_model": {
+		"type": "object",
+		"description": "general information about the building such as the number of stories and the building area",
+		"properties": {
+			"num_stories": {
+				"type": "number",
+				"description": "number of stories in the building, does not include basement levels"
+			},
+			"total_area_sf": {
+				"type": "number",
+				"description": "total interior area, in square feet, of the entire building"
+			},
+			"area_per_story_sf": {
+				"type": "arrayOfNumbers",
+				"description": "interior area, in square feet, for each story in the building, starting from the lowest level"
+			},
+			"ht_per_story_ft": {
+				"type": "arrayOfNumbers",
+				"description": "elevation height, in feet, for each story in the building, starting from the lowest level"
+			},
+			"edge_lengths": {
+				"type": "arrayOfArraysOfNumbers",
+				"description": "external length of two orthogonal sides of the building, in feet, for each story in the building, starting from the lowest level"
+			},
+			"struct_bay_area_per_story": {
+				"type": "arrayOfNumbers",
+				"description": "length of the typical structural bay, from centerline to centerline, in feet, for each story in the building, starting from the lowest level"
+			},
+			"num_entry_doors": {
+				"type": "number",
+				"description": "number of external building exits/entrances"
+			},
+			"replacement_time_days": {
+				"type": "number",
+				"description": "days after the earthquake required to replace the entire building, including impedance time"
+			},
+			"num_elevators": {
+				"type": "number",
+				"description": "number of elevator shafts in the building"
+			},
+			"stairs_per_story": {
+				"type": "arrayOfNumbers",
+				"description": "number of stairways on each story in the building, starting from the lowest level"
+			},
+			"tenant_unit": {
+				"type": "table",
+				"description": "days after the earthquake required to repaired all racked doorways"
+				"properties": {
+					"id": {
+						"type": "number"
+						"description": "tenant unit unique id"
+					},
+					"story": {
+						"type": "number"
+						"description": "story where each tenant unit is located"
+					},
+					"area": {
+						"type": "number"
+						"description": "floor area, in square feet, of the tenant unit"
+					},
+					"perim_area": {
+						"type": "number"
+						"description": "perimeter area, in square feet, of the tenant unit"
+					},
+					"tenant_function_id": {
+						"type": "number"
+						"description": "unique id key linking each tenant unit to its associated tenant function requirements"
+					},
+					"occupants": {
+						"type": "number"
+						"description": "number of occupants in each tenant unit"
+					},
+					"rent_per_day": {
+						"type": "number"
+						"description": "rental cost, in USD, per day for each tenant unit"
+					},
+					"function_requirements": {
+						"type": "table"
+						"description": "damage requirements for tenant unit to function"
+						"properties": {
+							"id": {
+								"type": "number"
+								"description": "default tenant unit requirements unique id"
+							},
+							"occupancy_id": {
+								"type": "number"
+								"description": "occupancy id key assicated with this default tenant requirements"
+							},
+							"ext_falling": {
+								"type": "number"
+								"description": "ratio of perimeter area of the tenant-unit with falling hazards that triggers loss of function"
+							},
+							"int_falling": {
+								"type": "number"
+								"description": "ratio of interior area of the tenant-unit with falling hazards that triggers loss of function"
+							},
+							"exterior": {
+								"type": "number"
+								"description": "ratio of perimeter area of the tenant-unit with severe exterior damage that triggers loss of function"
+							},
+							"interior": {
+								"type": "number"
+								"description":  "ratio of interior area of the tenant-unit with falling hazards that triggers loss of function"
+							},
+							"occ_per_elev": {
+								"type": "number"
+								"description": "max number of occupants per elevator required for function"
+							},
+							"elevator_story": {
+								"type": "number"
+								"description": "max story where elevators are not required"
+							},
+							"electrical": {
+								"type": "logical"
+								"description": "is an operational electrical system required for tenant function"
+							},
+							"water": {
+								"type": "logical"
+								"description": "is an operational plumbing system required for tenant function"
+							},
+							"hvac": {
+								"type": "logical"
+								"description": "is an operational hvac system required for tenant function"
+							}
+						}
+					}
+				}
+			},
+			"total_num_occupants": {
+				"type": "number",
+				"description": "total number of occuapnts (persons) that occupy this building"
+			},
+			"occupants_per_story": {
+				"type": "arrayOfNumbers",
+				"description": "total number of occuapnts (persons) that occupy each story of this building, starting from the lowest level"
+			}
+		}
+	},
+	"damage": {
+		"type": "object",
+		"description": "simulated damage, simulated repair time, and compoennt attribute data associated with each component's damages state in the building",
+		"properties": {
+			"comp_ds_info": {
+				"type": "object",
+				"description": "various component attributes by damage state"
+			},
+			"fnc_filters": {
+				"type": "object",
+				"description": "logical filters for various component attributes"
+			},
+			"story": {
+				"type": "array",
+				"description": "simulated component damage, broken down by each tenant unit in the building",
+				"items": {
+					"type": "object",
+					"properties": {
+						"qnt_damaged": {
+							"description": "simulation of the quantity of damaged components in each component damage state"
+							"$ref": "#/definitions/arrayOfArraysOfNumbers"
+						},
+						"cost": {
+							"description": "simulated repair cost of each component's damage state"
+							"$ref": "#/definitions/arrayOfArraysOfNumbers"
+						},
+						"worker_days": {
+							"description": "simulated worker days required to repair each component's damage state"
+							"$ref": "#/definitions/arrayOfArraysOfNumbers"
+						},
+						"area_down": {
+							"description": "simulated area affected by each component's damage state"
+							"$ref": "#/definitions/arrayOfArraysOfNumbers"
+						},
+						"num_comps": {
+							"description": "simulated number of components associated with each component's damage state"
+							"$ref": "#/definitions/arrayOfArraysOfNumbers"
+						},
+						"qnt_damaged_side_1": {
+							"description": "simulated number of damaged component damage states associated with side 1"
+							"$ref": "#/definitions/arrayOfArraysOfNumbers"
+						},
+						"qnt_damaged_side_2": {
+							"description": "simulated number of damaged component damage states associated with side 2"
+							"$ref": "#/definitions/arrayOfArraysOfNumbers"
+						},
+						"qnt_damaged_side_3": {
+							"description": "simulated number of damaged component damage states associated with side 3"
+							"$ref": "#/definitions/arrayOfArraysOfNumbers"
+						},
+						"qnt_damaged_side_4": {
+							"description": "simulated number of damaged component damage states associated with side 4"
+							"$ref": "#/definitions/arrayOfArraysOfNumbers"
+						},
+						"repair_start_day": {
+							"description": "simulated days after the earthquake that repairs start on each component's damage state"
+							"$ref": "#/definitions/arrayOfArraysOfNumbers"
+						},
+						"repair_complete_day": {
+							"description": "simulated days after the earthquake that repairs finish on each component's damage state"
+							"$ref": "#/definitions/arrayOfArraysOfNumbers"
+						}
+					}
+				}
+			}
+		}
+	},
+	"damage_consequences": {
+		"type": "object",
+		"description": "general impedance assessment inputs such as mitigation factors",
+		"properties": {
+			"red_tag": {
+				"description": "simulated logical of red tags, TRUE = building is red tagged", 
+				"$ref": "#/definitions/arrayOfNumbers"
+			},
+			"global_fail": {
+				"description": "simulated logical of global building failure, typically from excessive residual or collapse, TRUE = building has global failure", 
+				"$ref": "#/definitions/arrayOfNumbers"
+			},
+			"racked_stair_doors_per_story": {
+				"description": "simulated number of racked stairway doors per story", 
+				"$ref": "#/definitions/arrayOfArraysOfNumbers"
+			},
+			"racked_entry_doors_side_1": {
+				"description": "simulated number of racked entry doors on one side of the building", 
+				"$ref": "#/definitions/arrayOfNumbers"
+			},
+			"racked_entry_doors_side_2": {
+				"description": "simulated number of racked entry doors on one side of the building", 
+				"$ref": "#/definitions/arrayOfNumbers"
+			},
+			"inpsection_trigger": {
+				"description": "simulated logical of inspection triggers, TRUE = building requires inspection", 
+				"$ref": "#/definitions/arrayOfNumbers"
+			},
+			"repair_cost_ratio": {
+				"description": "simulated building repair cost normalized by the replacement value", 
+				"$ref": "#/definitions/arrayOfNumbers"
+			}
+		}
+	},
+	"functionality": {
+		"type": "object",
+		"description": "simulated outputs of the performance based functional recovery methodology",
+		"properties": {
+			"utilities": {
+				"type": "object",
+				"description": "simulated utility downtimes at this building site",
+				"properties": {
+					"electrical": {
+						"description": "simulated electrical power network downtime", 
+						"$ref": "#/definitions/arrayOfNumbers"
+					},
+					"water": {
+						"description": "simulated water network downtime", 
+						"$ref": "#/definitions/arrayOfNumbers"
+					},
+					"gas": {
+						"description": "simulated natural gas network downtime", 
+						"$ref": "#/definitions/arrayOfNumbers"
+					}
+				}
+			}
+		}
+	},
+	"impedance_options": {
+		"type": "object",
+		"description": "general impedance assessment inputs such as mitigation factors",
+		"properties": {
+			"include_impedance": {
+				"type": "object",
+				"description": "general impedance assessment inputs such as mitigation factors",
+				"properties": {
+					"inspection": {
+						"type": "logical",
+						"description": "flag to include inpection delays"
+					},
+					"financing": {
+						"type": "logical",
+						"description": "flag to include financing delays"
+					},
+					"permitting": {
+						"type": "logical",
+						"description": "flag to include permitting delays"
+					},
+					"engineering": {
+						"type": "logical",
+						"description": "flag to include engineering mobilization and design delays"
+					},
+					"contractor": {
+						"type": "logical",
+						"description": "flag to include contractor mobilization delays"
+					}
+				}
+			},
+			"mitigation": {
+				"type": "object",
+				"description": "general impedance assessment inputs such as mitigation factors",
+				"properties": {
+					"is_essential_facility": {
+						"type": "logical",
+						"description": "is the building deemed as essential by the local jurisdiction"
+					},
+					"is_borp_equivalent": {
+						"type": "logical",
+						"description": "are the BORP, or BORP equivalent, post-earthquake strategies in place to limit inspection delays"
+					},
+					"is_engineer_on_retainer": {
+						"type": "logical",
+						"description": "is an engineer contracted to be on retainer in case of post-earthquake damage"
+					},
+					"is_contractor_on_retainer": {
+						"type": "logical",
+						"description": "is a contractor contracted to be on retainer in case of post-earthquake damage"
+					},
+					"is_expedited_permitting": {
+						"type": "logical",
+						"description": "can the permitting process be expitied to speed up recovery"
+					},
+					"funding_source": {
+						"type": "string",
+						"description": "what is the source of funding for repair costs beyond that of the capital of the owner"
+					},
+					"capital": {
+						"type": "number",
+						"description": "ratio of the building value that the onwer has immediately available for repairs"
+					}
+				}
+			},
+			"surge_factor": {
+				"type": "number",
+				"description": "impedance and temporary repair time amplification factor based on a post-earthquake surge in demand for skilled trade and materials",
+			}
+		}
+	}
+  }
+}
