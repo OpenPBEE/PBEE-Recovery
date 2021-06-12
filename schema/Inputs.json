@@ -115,11 +115,11 @@
 			"type": "number",
 			"description": "days after the earthquake required to repaired all racked doorways"
 		},
-		"egrees_threshold": {
+		"egress_threshold": {
 			"type": "number",
 			"description": "ratio of building egress paths required for building safety and access, assuming an operational fire suppression system"
 		},
-		"egrees_threshold_wo_fs": {
+		"egress_threshold_wo_fs": {
 			"type": "number",
 			"description": "ratio of building egress paths required for building safety and access, assuming an non-operational fire suppression system"
 		},
@@ -195,7 +195,7 @@
 			},
 			"tenant_unit": {
 				"type": "table",
-				"description": "days after the earthquake required to repaired all racked doorways"
+				"description": "attributes and functional requirements of each tenant unit in the building"
 				"properties": {
 					"id": {
 						"type": "number"
@@ -217,63 +217,33 @@
 						"type": "number"
 						"description": "unique id key linking each tenant unit to its associated tenant function requirements"
 					},
-					"occupants": {
+					"exterior": {
 						"type": "number"
-						"description": "number of occupants in each tenant unit"
+						"description": "ratio of perimeter area of the tenant-unit with severe exterior damage that triggers loss of function"
 					},
-					"rent_per_day": {
+					"interior": {
 						"type": "number"
-						"description": "rental cost, in USD, per day for each tenant unit"
+						"description":  "ratio of interior area of the tenant-unit with falling hazards that triggers loss of function"
 					},
-					"function_requirements": {
-						"type": "table"
-						"description": "damage requirements for tenant unit to function"
-						"properties": {
-							"id": {
-								"type": "number"
-								"description": "default tenant unit requirements unique id"
-							},
-							"occupancy_id": {
-								"type": "number"
-								"description": "occupancy id key assicated with this default tenant requirements"
-							},
-							"ext_falling": {
-								"type": "number"
-								"description": "ratio of perimeter area of the tenant-unit with falling hazards that triggers loss of function"
-							},
-							"int_falling": {
-								"type": "number"
-								"description": "ratio of interior area of the tenant-unit with falling hazards that triggers loss of function"
-							},
-							"exterior": {
-								"type": "number"
-								"description": "ratio of perimeter area of the tenant-unit with severe exterior damage that triggers loss of function"
-							},
-							"interior": {
-								"type": "number"
-								"description":  "ratio of interior area of the tenant-unit with falling hazards that triggers loss of function"
-							},
-							"occ_per_elev": {
-								"type": "number"
-								"description": "max number of occupants per elevator required for function"
-							},
-							"elevator_story": {
-								"type": "number"
-								"description": "max story where elevators are not required"
-							},
-							"electrical": {
-								"type": "logical"
-								"description": "is an operational electrical system required for tenant function"
-							},
-							"water": {
-								"type": "logical"
-								"description": "is an operational plumbing system required for tenant function"
-							},
-							"hvac": {
-								"type": "logical"
-								"description": "is an operational hvac system required for tenant function"
-							}
-						}
+					"occ_per_elev": {
+						"type": "number"
+						"description": "max number of occupants per elevator required for function"
+					},
+					"elevator_story": {
+						"type": "number"
+						"description": "max story where elevators are not required"
+					},
+					"electrical": {
+						"type": "logical"
+						"description": "is an operational electrical system required for tenant function"
+					},
+					"water": {
+						"type": "logical"
+						"description": "is an operational plumbing system required for tenant function"
+					},
+					"hvac": {
+						"type": "logical"
+						"description": "is an operational hvac system required for tenant function"
 					}
 				}
 			},
@@ -461,10 +431,6 @@
 					"is_contractor_on_retainer": {
 						"type": "logical",
 						"description": "is a contractor contracted to be on retainer in case of post-earthquake damage"
-					},
-					"is_expedited_permitting": {
-						"type": "logical",
-						"description": "can the permitting process be expitied to speed up recovery"
 					},
 					"funding_source": {
 						"type": "string",

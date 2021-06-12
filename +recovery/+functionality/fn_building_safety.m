@@ -174,8 +174,8 @@ door_access_day_nan(door_access_day_nan == 0) = NaN;
 num_repair_time_increments = building_model.num_entry_doors; % possible unique number of loop increments
 for i = 1:num_repair_time_increments
     num_accessible_doors = sum(door_access_day <= cum_days,2);
-    sufficent_door_access_with_fs  = num_accessible_doors >= max(1,analysis_options.egrees_threshold*building_model.num_entry_doors);   % must have at least 1 functioning entry door or 50% of design egress
-    sufficent_door_access_wo_fs = num_accessible_doors >= max(1,analysis_options.egrees_threshold_wo_fs*building_model.num_entry_doors);  % must have at least 1 functioning entry door or 75% of design egress when fire suppression system is down
+    sufficent_door_access_with_fs  = num_accessible_doors >= max(1,analysis_options.egress_threshold*building_model.num_entry_doors);   % must have at least 1 functioning entry door or 50% of design egress
+    sufficent_door_access_wo_fs = num_accessible_doors >= max(1,analysis_options.egress_threshold_wo_fs*building_model.num_entry_doors);  % must have at least 1 functioning entry door or 75% of design egress when fire suppression system is down
     fire_system_failure = system_operation_day.building.fire > cum_days;
     entry_door_accessible = sufficent_door_access_with_fs .* ~fire_system_failure + sufficent_door_access_wo_fs .* fire_system_failure;
     

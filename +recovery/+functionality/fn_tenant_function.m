@@ -57,14 +57,13 @@ for tu = 1:num_units
     initial_damaged = damaged_comps > 0;
     total_num_comps = damage.story{tu}.num_comps;
     unit = building_model.tenant_unit(tu,:);
-    tentant_requirements = unit.function_requirements{1};
     repair_complete_day = damage.story{tu}.recovery.repair_complete_day;
     repair_complete_day(global_fail,:) = NaN; % Don't track damage when building fails
     repair_complete_day_w_tmp = damage.story{tu}.recovery.repair_complete_day_w_tmp;
     repair_complete_day_w_tmp(global_fail,:) = NaN; % Don't track damage when building fails
     
     %% Elevators
-    if unit.story > tentant_requirements.elevator_story % Check if tenants requre elevators
+    if unit.story > unit.elevator_story % Check if tenants requre elevators
         comps_day_repaired = system_operation_day.comp.elev_day_repaired;
         comps_day_repaired(comps_day_repaired == 0) = NaN;
         comps_quant_damaged = system_operation_day.comp.elev_quant_damaged;
@@ -97,7 +96,7 @@ for tu = 1:num_units
             % elevator function check
             % do tenants have sufficient elevator access need based on
             % elevators that are still operational
-            affects_function = building_occ_per_elev > max(tentant_requirements.occ_per_elev);
+            affects_function = building_occ_per_elev > max(unit.occ_per_elev);
 
             % Add days in this increment to the tally
             delta_day = min(comps_day_repaired(:,damage.fnc_filters.elevators),[],2);
@@ -141,7 +140,7 @@ for tu = 1:num_units
         % Determine if current damage affects function for this tenant unit
         % if the area of exterior wall damage is greater than what is
         % acceptable by the tenant 
-        affects_function = percent_area_affected >= tentant_requirements.exterior; 
+        affects_function = percent_area_affected >= unit.exterior; 
         
         % Add days in this increment to the tally
         delta_day = min(comps_day_repaired(:,damage.fnc_filters.exterior_all),[],2);
@@ -201,7 +200,7 @@ for tu = 1:num_units
         % Determine if current damage affects function for this tenant unit
         % affects function if the area of interior damage is greater than what is
         % acceptable by the tenant 
-        affects_function = percent_area_affected >= tentant_requirements.interior; 
+        affects_function = percent_area_affected >= unit.interior; 
         
         % Add days in this increment to the tally
         delta_day = min(comps_day_repaired(:,damage.fnc_filters.interior_all),[],2);
@@ -223,7 +222,7 @@ for tu = 1:num_units
     comp_breakdowns.interior(:,:,tu) = int_comps_day_repaired;
     
     %% Water and Plumbing System
-    if tentant_requirements.water
+    if unit.water
         % determine effect on funciton at this tenant unit
         % any major damage to the branch pipes (small diameter) failes for this tenant unit
         tenant_sys_recovery_day = max(repair_complete_day .* damage.fnc_filters.water_unit,[],2); 
@@ -239,7 +238,7 @@ for tu = 1:num_units
     
     %% Electrical Power System
     % Does not consider effect of backup systems
-    if tentant_requirements.electrical
+    if unit.electrical
         % determine effect on funciton at this tenant unit
         % any major damage to the unit level electrical equipment failes for this tenant unit
         tenant_sys_recovery_day = max(repair_complete_day .* damage.fnc_filters.electrical_unit,[],2);
@@ -255,7 +254,7 @@ for tu = 1:num_units
     
     %% HVAC System
     % HVAC Equipment - Tenant Level
-    if tentant_requirements.hvac
+    if unit.hvac
         % Nonredundant equipment
         % any major damage to the equipment servicing this tenant unit fails the system for this tenant unit
         nonredundant_sys_repair_day = max(repair_complete_day .* damage.fnc_filters.hvac_unit_nonredundant,[],2); 

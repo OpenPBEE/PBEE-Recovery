@@ -75,18 +75,32 @@ id,fragility_id_regex,component_type,damage_state,full_permit,redesign,affects_f
 68,B1071\.00\w+,Wood Framed Walls with strutural panel sheathing,3,1,1,1,1,1,1,component,0,NA,0,0,1,7
 69,B1071\.01\w+,Wood Framed Walls with strutural panel sheathing (heavy clad),2,1,1,0,0,1,1,component,0,NA,1,0,1,7
 70,B1071\.01\w+,Wood Framed Walls with strutural panel sheathing (heavy clad),3,1,1,1,1,1,1,component,0,NA,1,0,1,7
-71,B1071\.03\w+,Wood walls with diagonal let in bracing,1,1,1,1,0,1,1,component,0,NA,0,0,1,7
+71,B1071\.[02]3\w+,Wood walls with diagonal let in bracing,1,1,1,1,0,1,1,component,0,NA,0,0,1,7
 72,B1071\.04\w+,Wood wall with only gypsum,2,1,1,0,0,1,1,component,0,NA,0,0,0,0
 73,B1071\.04\w+,Wood wall with only gypsum,3,1,1,1,0,1,1,component,0,NA,0,0,1,7
+73.1,B1071\.20\w+,Exterior Walls: Wood Light Frame,2,1,1,0,0,1,1,component,0,NA,0,0,0,0
+73.2,B1071\.20\w+,Exterior Walls: Wood Light Frame,3,1,1,1,1,1,1,component,0,NA,0,0,1,7
+73.3,B1071\.21\w+,"Exterior Walls: Wood Light Frame, Stucco",2,1,1,0,0,1,1,component,0,NA,1,0,1,7
+73.4,B1071\.21\w+,"Exterior Walls: Wood Light Frame, Stucco",3,1,1,1,1,1,1,component,0,NA,1,0,1,7
+73.5,B1071\.3\w+,Interior Walls: Wood Light Frame,3,0,0,1,0,1,1,component,0,NA,0,0,1,7
+73.6,B1071\.3\w+,Interior Walls: Wood Light Frame,4,1,1,1,0,1,1,component,0,NA,0,0,1,7
+73.7,B1071\.3\w+,Interior Walls: Wood Light Frame,5,1,1,1,1,1,1,component,0,NA,0,0,1,7
 74,B2011\.001a,Exterior Walls: Cold Form Steel with wood sheathing,3,1,1,1,1,1,1,component,0,NA,0,0,1,7
 75,B2011\.001b,Exterior Walls: Cold Form Steel with wood sheathing (heavy clad),2,0,0,0,0,1,1,component,0,NA,1,0,0,0
 76,B2011\.001b,Exterior Walls: Cold Form Steel with wood sheathing (heavy clad),3,1,1,1,1,1,1,component,0,NA,1,0,1,7
 77,B2011\.0[12]1a,Exterior Walls: Cold Form Steel with X bracing or steel sheathing,2,0,0,1,0,1,1,component,0,NA,0,0,1,7
 78,B2011\.0[12]1b,Exterior Walls: Cold Form Steel with X bracing or steel sheathing (heavy clad),2,1,1,1,1,1,1,component,0,NA,1,0,1,7
 79,B2011\.1(01|21),Exterior Walls: Wood Light Frame,3,1,1,1,1,1,1,component,0,NA,0,0,1,7
+79.1,B2011\.(301|401),Exterior Walls: Wood Light Frame,3,1,1,1,1,1,1,component,0,NA,0,0,1,7
 80,B2011\.1(02|11),Exterior Walls: Wood Light Frame (heavy clad),2,0,0,0,0,1,1,component,0,NA,1,0,1,7
 81,B2011\.1(02|11),Exterior Walls: Wood Light Frame (heavy clad),3,1,1,1,1,1,1,component,0,NA,1,0,1,7
-82,B2011\.131,Exterior Wood walls with diagonal let in bracing,1,1,1,1,1,1,1,component,0,NA,0,0,1,7
+81.1,B2011\.(211|411),Exterior Walls: Wood Light Frame (heavy clad),2,0,0,0,0,1,1,component,0,NA,1,0,1,7
+81.2,B2011\.(211|411),Exterior Walls: Wood Light Frame (heavy clad),3,1,1,1,1,1,1,component,0,NA,1,0,1,7
+82,B2011\.[12]31,Exterior Wood walls with diagonal let in bracing,1,1,1,1,1,1,1,component,0,NA,0,0,1,7
+82.1,B2011\.3[246]1,Cripple Walls: No Stucco,2,1,1,0,0,1,1,component,0,NA,0,0,0,0
+82.2,B2011\.3[246]1,Cripple Walls: No Stucco,3,1,1,1,1,1,1,component,0,NA,0,0,1,7
+82.3,B2011\.4[246]1,Cripple Walls: Stucco,3,1,1,1,1,1,1,component,0,NA,0,0,1,7
+82.4,B2011.541,Cripple Walls: Horizontal Siding,1,1,1,1,1,1,1,component,0,NA,0,0,1,7
 83,B2011\.201a,Exterior Walls: Precast Concrete Panels In Plane,2,1,1,1,1,1,1,component,0,NA,1,0,1,7
 84,B2011\.201b,Exterior Walls: Precast Concrete Panels OOP,1,1,1,1,1,1,1,component,0,NA,1,0,1,14
 85,B2011\.20[23]a,Exterior Walls: Terracotta or Brick Façade over URM infill replace in kind,3,1,1,1,1,1,1,component,0,NA,1,0,1,7
@@ -104,6 +118,7 @@ id,fragility_id_regex,component_type,damage_state,full_permit,redesign,affects_f
 97,C1011\.001d,Slip Track w/o returns,2,0,0,0,0,1,1,component,0,NA,0,0,0,0
 98,C1011\.011a,Full Fixed,2,0,0,1,0,1,1,component,0,NA,0,0,1,7
 99,C1011\.011a,Full Fixed,3,0,0,1,0,1,1,component,0,NA,0,0,1,7
+99.1,C1011\.[23]\w+,Partition Wall and Wall Finishes,3,0,0,1,0,1,1,component,0,NA,0,0,1,7
 100,C2011\.\w+,Stairs,2,1,1,0,0,0,0,NA,0,NA,0,0,0,0
 101,C2011\.\w+,Stairs,3,1,1,1,0,0,0,NA,0,NA,0,0,0,0
 102,C3011\.00[23][abcd],Tile and Marble Finish,2,0,0,1,0,1,1,component,0,NA,0,0,1,3
@@ -174,6 +189,7 @@ id,fragility_id_regex,component_type,damage_state,full_permit,redesign,affects_f
 167,D3041\.002[abcd],Air distribution systems: HVAC Fan w/o vibration isolator,1,0,0,1,0,0,0,NA,0,unit,0,0,0,0
 168,D3041\.0[12]1[abcd],Air distribution systems: Ducting less than 6 sq ft (branches),2,0,0,1,0,0,0,NA,0,unit,0,0,0,0
 169,D3041\.0[12]2[abcd],Air distribution systems: Ducting greater than 6 sq ft (mains),2,0,0,1,0,0,0,NA,0,building,0,0,0,0
+170,D3041\.03\w+,Air distribution systems: HVAC drops,1,0,0,1,0,0,0,NA,0,unit,0,0,0,0
 170,D3041\.04\w+,Air distribution systems: Variable Air Volume,1,0,0,1,0,0,0,NA,0,unit,0,0,0,0
 171,D4011\.02\w+,Fire Sprinkler Water Supply: Piping and Pipe Bracing,2,0,0,1,0,0,0,NA,0,building,0,0,0,0
 172,D4011\.0(3[12]a|[4567]\w+),Fire Sprinkler Water Supply: Fire sprinkler drop 2 DS,2,0,0,1,0,0,0,NA,0,unit,0,0,0,0

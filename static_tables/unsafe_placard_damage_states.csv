@@ -106,7 +106,7 @@ id,fragility_ids,fragility_name,ds,damage_description,structural_system_id,safet
 105,B1049\.0[13][12],RC Slabs - columns with shear reinforcing,2,Punching occurs causing significant spalling of concrete.,[8],2,1
 106,B1049\.\w+a,RC Slabs no continuity reinforcement,1,"Yield strain of the slab flexural reinforcement has been exceeded, spalling of concrete may/may not occur, slab exhibits large enough crack widths to allow epoxy injection",[8],1,1
 107,B1049\.\w+a,RC Slabs no continuity reinforcement,2,Punching occurs causing significant spalling of concrete.,[8],3,1
-108,B1049\.\w+b,RC Slabs with continuity reinforcement,1,"Yield strain of the slab flexural reinforcement has been exceeded, spalling of concrete may/may not occur, slab exhibits large enough crack widths to allow epoxy injection",[8],0,1
+108,B1049\.\w+b,RC Slabs with continuity reinforcement,1,"Yield strain of the slab flexural reinforcement has been exceeded, spalling of concrete may/may not occur, slab exhibits large enough crack widths to allow epoxy injection",[8],1,1
 109,B1049\.\w+b,RC Slabs with continuity reinforcement,2,Punching occurs causing significant spalling of concrete.,[8],1,1
 110,B1051\.0[012][12],Special Masonry Walls: shear dominated,1,First occurrence of major diagonal cracks. Cracks remain closed with hardly noticeable residual crack widths after load removal.,[2],0,1
 111,B1051\.0[012][12],Special Masonry Walls: shear dominated,2,Wide diagonal cracks with typically one or more cracks in each direction. Crushing or spalling at wall toes.,[2],1,1
@@ -123,10 +123,28 @@ id,fragility_ids,fragility_name,ds,damage_description,structural_system_id,safet
 122,B1061\.0[01]\w+,Cold formed steel walls with wood structural panel,3, Failure of wall.,[4],1,1
 123,B1061\.02\w+,"Cold formed steel walls with 22 or 31 mil steel sheathing,",1, Pull out of sheathing fasteners from studs.,[4],0,1
 124,B1061\.02\w+,"Cold formed steel walls with 22 or 31 mil steel sheathing,",2,Buckling of steel sheathing. Buckling of framing members.,[4],1,1
-125,B1071\.0[014]\w+,Light framed wood walls,1,Slight separation of sheathing or nails which come loose.,[4],0,1
-126,B1071\.0[014]\w+,Light framed wood walls,2,"Permanent rotation of sheathing, tear out of nails or sheathing.",[4],0,1
-127,B1071\.0[014]\w+,Light framed wood walls,3,"Fracture of studs, major sill plate cracking",[4],1,1
-128,B1071\.03\w+,Wood walls with diagonal let-in bracing,1,Failure of diagonal bracing.,[4],1,1
+125,B1071\.0[0124]\w+,Light framed wood walls,1,Slight separation of sheathing or nails which come loose.,[4],0,1
+126,B1071\.0[0124]\w+,Light framed wood walls,2,"Permanent rotation of sheathing, tear out of nails or sheathing.",[4],0,1
+127,B1071\.0[0124]\w+,Light framed wood walls,3,"Fracture of studs, major sill plate cracking",[4],1,1
+127.01,B1071\.20\w+,Light framed wood walls,1,Slight separation of sheathing or nails which come loose.,[4],0,1
+127.02,B1071\.20\w+,Light framed wood walls,2,"Permanent rotation of sheathing, tear out of nails or sheathing.",[4],0,1
+127.03,B1071\.20\w+,Light framed wood walls,3,"Fracture of studs, major sill plate cracking",[4],1,1
+127.04,B1071\.21\w+,Light framed wood walls,1,Cracking of stucco.,[4],0,1
+127.05,B1071\.21\w+,Light framed wood walls,2,"Spalling of stucco, separation of stucco and sheathing from studs.",[4],0,1
+127.06,B1071\.21\w+,Light framed wood walls,3,"Fracture of studs, major sill plate cracking.",[4],1,1
+127.07,B1071\.3\w+,Light framed wood walls,1,Cracking of paint over fasteners or joints.,[4],0,1
+127.08,B1071\.3\w+,Light framed wood walls,2,Local and global buckling out-of-plane and crushing of gypsum wallboards.  Studs are typically not damaged by failure of the gypsum wallboard.,[4],0,1
+127.09,B1071\.3\w+,Light framed wood walls,3,"Local and global buckling out-of-plane and crushing of gypsum wallboards.  Studs are typically not damaged by failure of the gypsum wallboard, but framing adjustments possible for this damage state.",[4],0,1
+127.1,B1071\.3\w+,Light framed wood walls,4,"Permanent rotation of sheathing, tear out of nails or sheathing.",[4],0,1
+127.11,B1071\.3\w+,Light framed wood walls,5,"Fracture of studs, major sill plate cracking.",[4],1,1
+128,B1071\.[02]31,Wood walls with diagonal let-in bracing,1,Failure of diagonal bracing.,[4],1,1
 129,B1100\.\w+,DuraFuse Repairable Residual Drift - per Frame Line ,1,Repairable residual drift (1%),[5],3,1
 130,B1100\.\w+,DuraFuse Repairable Residual Drift - per Frame Line ,2,Repairable residual drift (2%),[5],3,1
 131,B1100\.\w+,DuraFuse Repairable Residual Drift - per Frame Line ,3,Repairable residual drift (2.5%),[5],3,1
+132,B2011\.3[246]1,Cripple Walls: No Stucco,1,Slight separation of sheathing or nails which come loose.,[4],0,1
+133,B2011\.3[246]1,Cripple Walls: No Stucco,2,"Permanent rotation of sheathing, tear out of nails or sheathing.",[4],0,1
+134,B2011\.3[246]1,Cripple Walls: No Stucco,3,"Delamination of sheathing, fracture of studs, sill plate damage possible.",[4],1,1
+135,B2011\.4[246]1,Cripple Walls: Stucco,1,"Cracking of stucco, especially at corners and openings (access and utility).",[4],0,1
+136,B2011\.4[246]1,Cripple Walls: Stucco,2,"Spalling of stucco, significant cracking, onset of delamination of stucco from studs and bottom plate.",[4],0,1
+137,B2011\.4[246]1,Cripple Walls: Stucco,3,Delamination of stucco at studs and bottom plate.,[4],1,1
+138,B2011.541,Cripple Walls: Horizontal Siding,1,"Failure of any bracing within framing, cripple wall will need replacement and stregthening.",[4],1,1
