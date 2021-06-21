@@ -1,9 +1,10 @@
-function financing_imped = fn_financing( capital, funding_source, sys_repair_trigger, repair_cost, trunc_pd )
+function financing_imped = fn_financing( ...
+    capital_available_ratio, funding_source, sys_repair_trigger, repair_cost_ratio, trunc_pd )
 % Simulute financing time
 %
 % Parameters
 % ----------
-% capital: logical
+% capital_available_ratio: number
 %   liquidable funding on hand to make repairs immediately after the
 %   damaging event. Normalized by building replacment value.
 % funding_source: string
@@ -25,8 +26,8 @@ function financing_imped = fn_financing( capital, funding_source, sys_repair_tri
 
 %% Define financing distribution parameters
 % Required Financing
-financing_trigger = repair_cost > capital;
-loan_ratio = max(repair_cost - capital,0);
+financing_trigger = repair_cost_ratio > capital_available_ratio;
+loan_ratio = max(repair_cost_ratio - capital_available_ratio, 0);
 
 % Financing Type
 switch funding_source
@@ -47,7 +48,7 @@ beta = 0.6;
 
 %% Simulate
 % Truncated lognormal distribution (via standard normal simulation)
-num_reals = length(repair_cost);
+num_reals = length(repair_cost_ratio);
 prob_sim = rand(num_reals, 1);
 x_vals_std_n = icdf(trunc_pd, prob_sim);
 financing_time = exp(x_vals_std_n * beta + log(median));

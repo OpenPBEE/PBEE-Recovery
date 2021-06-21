@@ -77,7 +77,7 @@ if impedance_options.include_impedance.inspection
 end
 
 if impedance_options.include_impedance.financing
-    duration.financing = fn_financing( impedance_options.mitigation.capital, ...
+    duration.financing = fn_financing( impedance_options.mitigation.capital_available_ratio, ...
         impedance_options.mitigation.funding_source, sys_repair_trigger, repair_cost, trunc_pd );
 end
 

@@ -1,5 +1,5 @@
 function [ system_operation_day ] = fn_building_level_system_operation( damage, ...
-    damage_consequences, building_model, utilities, analysis_options )
+    damage_consequences, building_model, utilities, functionality_options )
 % Calculate the day certain systems recovery building-level opertaions
 %
 % Parameters
@@ -14,7 +14,7 @@ function [ system_operation_day ] = fn_building_level_system_operation( damage, 
 %   general attributes of the building model
 % utilities: struct
 %   data structure containing simulated utility downtimes
-% analysis_options: struct
+% functionality_options: struct
 %   recovery time optional inputs such as various damage thresholds
 %
 % Returns
@@ -108,7 +108,7 @@ for tu = 1:num_stories
             subsystem_failure = subsystem_num_damaged_comps > 1;
         else
             % Use a predefined ratio (default to requirement 2/3 of components operational)
-            subsystem_failure = ratio_operating < analysis_options.required_ratio_operating_hvac_main;
+            subsystem_failure = ratio_operating < functionality_options.required_ratio_operating_hvac_main;
         end
 
         % Calculate recovery day and combine with other subsystems for this tenant unit

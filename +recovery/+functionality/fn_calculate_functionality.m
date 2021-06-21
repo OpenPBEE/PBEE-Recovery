@@ -1,5 +1,5 @@
 function [functionality] = fn_calculate_functionality(damage, damage_consequences, utilities, ...
-    building_model, subsystems, reoccupancy, analysis_options )
+    building_model, subsystems, reoccupancy, repair_time_options )
 % Calcualte the loss and recovery of building functionality based on global building
 % damage, local component damage, and extenernal factors
 %
@@ -20,7 +20,7 @@ function [functionality] = fn_calculate_functionality(damage, damage_consequence
 % reoccupancy: struct
 %   contains data on the recovery of tenant- and building-level function, 
 %   recovery trajectorires, and contributions from systems and components 
-% analysis_options: struct
+% repair_time_options: struct
 %   recovery time optional inputs such as various damage thresholds
 %
 % Returns
@@ -31,15 +31,17 @@ function [functionality] = fn_calculate_functionality(damage, damage_consequence
 
 %% Initial Set Up
 % import packages
-import recovery.functionality.*
+import recovery.functionality.fn_building_level_system_operation
+import recovery.functionality.fn_tenant_function
+import recovery.functionality.fn_extract_recovery_metrics
 
 %% Define the day each system becomes functionl - Building level
 [ system_operation_day ] = fn_building_level_system_operation( damage, damage_consequences, ...
-    building_model, utilities, analysis_options );
+    building_model, utilities, repair_time_options.functionality );
 
 %% Define the day each system becomes functionl - Tenant level
 [ recovery_day.tenant_function, comp_breakdowns.tenant_function ] = fn_tenant_function( damage, ...
-    building_model, system_operation_day, damage_consequences.global_fail, utilities, subsystems, analysis_options );
+    building_model, system_operation_day, damage_consequences.global_fail, utilities, subsystems, repair_time_options );
 
 %% Combine Checks to determine per unit functionality
 % Each tenant unit is functional only if it is occupiable

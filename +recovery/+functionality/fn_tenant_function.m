@@ -1,5 +1,5 @@
 function [ recovery_day, comp_breakdowns ] = fn_tenant_function( damage, ...
-    building_model, system_operation_day, global_fail, utilities, subsystems, analysis_options )
+    building_model, system_operation_day, global_fail, utilities, subsystems, repair_time_options )
 % Check each tenant unit for damage that would cause that tenant unit 
 % to not be functional
 %
@@ -18,12 +18,12 @@ function [ recovery_day, comp_breakdowns ] = fn_tenant_function( damage, ...
 %   operations
 % global_fail: logical array [num_reals x 1]
 %   is the entire building unrepairable due to issues of collapse or
-%   excessiv residual
+%   excessive residual
 % utilities: struct
 %   data structure containing simulated utility downtimes
 % subsystems: table
 %   data table containing information about each subsystem's attributes
-% analysis_options: struct
+% repair_time_options: struct
 %   recovery time optional inputs such as various damage thresholds
 %
 % Returns
@@ -56,14 +56,14 @@ for tu = 1:num_units
     damaged_comps = damage.story{tu}.qnt_damaged;
     initial_damaged = damaged_comps > 0;
     total_num_comps = damage.story{tu}.num_comps;
-    unit = building_model.tenant_unit(tu,:);
+    unit = repair_time_options.tenant_units(tu,:);
     repair_complete_day = damage.story{tu}.recovery.repair_complete_day;
     repair_complete_day(global_fail,:) = NaN; % Don't track damage when building fails
     repair_complete_day_w_tmp = damage.story{tu}.recovery.repair_complete_day_w_tmp;
     repair_complete_day_w_tmp(global_fail,:) = NaN; % Don't track damage when building fails
     
     %% Elevators
-    if unit.story > unit.elevator_story % Check if tenants requre elevators
+    if unit.story > unit.max_walkable_story && unit.is_elevator_required
         comps_day_repaired = system_operation_day.comp.elev_day_repaired;
         comps_day_repaired(comps_day_repaired == 0) = NaN;
         comps_quant_damaged = system_operation_day.comp.elev_quant_damaged;
@@ -222,7 +222,7 @@ for tu = 1:num_units
     comp_breakdowns.interior(:,:,tu) = int_comps_day_repaired;
     
     %% Water and Plumbing System
-    if unit.water
+    if unit.is_water_required
         % determine effect on funciton at this tenant unit
         % any major damage to the branch pipes (small diameter) failes for this tenant unit
         tenant_sys_recovery_day = max(repair_complete_day .* damage.fnc_filters.water_unit,[],2); 
@@ -238,7 +238,7 @@ for tu = 1:num_units
     
     %% Electrical Power System
     % Does not consider effect of backup systems
-    if unit.electrical
+    if unit.is_electrical_required
         % determine effect on funciton at this tenant unit
         % any major damage to the unit level electrical equipment failes for this tenant unit
         tenant_sys_recovery_day = max(repair_complete_day .* damage.fnc_filters.electrical_unit,[],2);
@@ -254,7 +254,7 @@ for tu = 1:num_units
     
     %% HVAC System
     % HVAC Equipment - Tenant Level
-    if unit.hvac
+    if unit.is_hvac_required
         % Nonredundant equipment
         % any major damage to the equipment servicing this tenant unit fails the system for this tenant unit
         nonredundant_sys_repair_day = max(repair_complete_day .* damage.fnc_filters.hvac_unit_nonredundant,[],2); 
@@ -296,7 +296,7 @@ for tu = 1:num_units
                 tenant_subsystem_failure = subsystem_num_damaged_comps > 1;
             else
                 % Use a predefined ratio (default to requirement 2/3 of components operational)
-                tenant_subsystem_failure = ratio_operating < analysis_options.required_ratio_operating_hvac_main;
+                tenant_subsystem_failure = ratio_operating < repair_time_options.functionality.required_ratio_operating_hvac_main;
             end
             
             % Calculate recovery day and combine with other subsystems for this tenant unit
@@ -312,7 +312,8 @@ for tu = 1:num_units
         recovery_day.hvac(:,tu) = max(tenant_hvac_fnc_recovery_day,system_operation_day.building.hvac_main);
         
         % distribute the the components affecting function
-        nonredundant_comps_day = damage.fnc_filters.hvac_unit_nonredundant .* initial_damaged .* nonredundant_sys_repair_day; % note these components anytime they cause specific system failure
+        % (note these components anytime they cause specific system failure)
+        nonredundant_comps_day = damage.fnc_filters.hvac_unit_nonredundant .* initial_damaged .* nonredundant_sys_repair_day;
         redundant_comps_day = damage.fnc_filters.hvac_unit_redundant .* initial_damaged .* redundant_sys_repair_day;
         comp_breakdowns.hvac(:,:,tu) = max(max(nonredundant_comps_day, redundant_comps_day), system_operation_day.comp.hvac_main);
 
