@@ -22,8 +22,8 @@ Several example input Matlab data files are provided to help illustrate both the
 A breif description of the various input and output variables are provided below. A detailed schema of all expected input and output subfields is provided in the PBEE-Recovery/schema directory.
 
 ### Inputs
- - **analysis_options**: [_struct_]
-   data structure containing recovery time optional method inputs for various limit state thresholds
+ - **repair_time_options**: [_struct_]
+   data structure containing general recovery time, impedance, and mitigation factor optional method inputs
  - **building_model**: [_struct_]
    data structure containing general information about the building such as the number of stories and the building area
  - **damage**: [_struct_]
@@ -32,8 +32,6 @@ A breif description of the various input and output variables are provided below
    data structure containing simulated building consequences, such as red tags and repair costs ratios
  - **functionality.utilities**: [_struct_]
    data structure containing simulated utility downtimes
- - **impedance_options**: [_struct_]
-   data structure containing general impedance assessment inputs such as mitigation factors
 
 ### Outputs
  - **functionality.recovery**: [_struct_]

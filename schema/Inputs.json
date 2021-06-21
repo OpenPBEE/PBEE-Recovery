@@ -107,47 +107,113 @@
     }
   },
   "properties": {
-    "analysis_options": {
-      "type": "object",
-	  "description": "recovery time optional method inputs for various limit state thresholds",
-      "properties": {
-        "door_racking_repair_day": {
-			"type": "number",
-			"description": "days after the earthquake required to repaired all racked doorways"
-		},
-		"egress_threshold": {
-			"type": "number",
-			"description": "ratio of building egress paths required for building safety and access, assuming an operational fire suppression system"
-		},
-		"egress_threshold_wo_fs": {
-			"type": "number",
-			"description": "ratio of building egress paths required for building safety and access, assuming an non-operational fire suppression system"
-		},
-		"required_ratio_operating_hvac_main": {
-			"type": "number",
-			"description": "ratio of hvac units, which service the entire building, required to maintain an operational hvac system"
-		},
-		"required_ratio_operating_hvac_unit": {
-			"type": "number",
-			"description": "ratio of hvac units, which service an individual tenant unit, required to maintain an operational hvac system"
-		},
-		"required_ratio_operating_fs_drops": {
-			"type": "number",
-			"description": "ratio of fire sprinkler drops, in a given tenant unit, required to maintain an operational hvac system"
-		},
-		"exterior_safety_threshold": {
-			"type": "number",
-			"description": "damage theshold that triggers an exterior safety issue; threshold is defined in terms of the ratio of damaged area to perimeter area of a given tenant unit"
-		},
-		"interior_safety_threshold": {
-			"type": "number",
-			"description": "damage theshold that triggers an interior safety issue; threshold is defined in terms of the ratio of damaged area to interior area of a given tenant unit"
-		},
-		"door_access_width_ft": {
-			"type": "number",
-			"description": "width of door access zone, centerlined on the doorway, required for safe access. A safe door access zone must be free of falling hazards"
+    "repair_time_options": {
+		"type": "object",
+		"description": "general recovery, impedance, and mitigation factors optional inputs",
+		"properties": {
+			"include_impedance": {
+				"type": "object",
+				"description": "logical switches for defining which impedance factors to consider in the assessment",
+				"properties": {
+					"inspection": {
+						"type": "logical",
+						"description": "flag to include inpection delays"
+					},
+					"financing": {
+						"type": "logical",
+						"description": "flag to include financing delays"
+					},
+					"permitting": {
+						"type": "logical",
+						"description": "flag to include permitting delays"
+					},
+					"engineering": {
+						"type": "logical",
+						"description": "flag to include engineering mobilization and design delays"
+					},
+					"contractor": {
+						"type": "logical",
+						"description": "flag to include contractor mobilization delays"
+					}
+				}
+			},
+			"mitigation": {
+				"type": "object",
+				"description": "general impedance assessment inputs such as mitigation factors",
+				"properties": {
+					"is_essential_facility": {
+						"type": "logical",
+						"description": "is the building deemed as essential by the local jurisdiction"
+					},
+					"is_borp_equivalent": {
+						"type": "logical",
+						"description": "are the BORP, or BORP equivalent, post-earthquake strategies in place to limit inspection delays"
+					},
+					"is_engineer_on_retainer": {
+						"type": "logical",
+						"description": "is an engineer contracted to be on retainer in case of post-earthquake damage"
+					},
+					"is_contractor_on_retainer": {
+						"type": "logical",
+						"description": "is a contractor contracted to be on retainer in case of post-earthquake damage"
+					},
+					"funding_source": {
+						"type": "string",
+						"description": "what is the source of funding for repair costs beyond that of the capital of the owner"
+					},
+					"capital": {
+						"type": "number",
+						"description": "ratio of the building value that the onwer has immediately available for repairs"
+					}
+				}
+			},
+			"surge_factor": {
+				"type": "number",
+				"description": "impedance and temporary repair time amplification factor based on a post-earthquake surge in demand for skilled trade and materials",
+			},
+			"functionality": {
+				"type": "object"
+				"description": "optional method inputs for various recovery time and functionality limit state thresholds",
+				"properties": {
+					"door_racking_repair_day": {
+						"type": "number",
+						"description": "days after the earthquake required to repaired all racked doorways"
+					},
+					"egress_threshold": {
+						"type": "number",
+						"description": "ratio of building egress paths required for building safety and access, assuming an operational fire suppression system"
+					},
+					"egress_threshold_wo_fs": {
+						"type": "number",
+						"description": "ratio of building egress paths required for building safety and access, assuming an non-operational fire suppression system"
+					},
+					"required_ratio_operating_hvac_main": {
+						"type": "number",
+						"description": "ratio of hvac units, which service the entire building, required to maintain an operational hvac system"
+					},
+					"required_ratio_operating_hvac_unit": {
+						"type": "number",
+						"description": "ratio of hvac units, which service an individual tenant unit, required to maintain an operational hvac system"
+					},
+					"required_ratio_operating_fs_drops": {
+						"type": "number",
+						"description": "ratio of fire sprinkler drops, in a given tenant unit, required to maintain an operational hvac system"
+					},
+					"exterior_safety_threshold": {
+						"type": "number",
+						"description": "damage theshold that triggers an exterior safety issue; threshold is defined in terms of the ratio of damaged area to perimeter area of a given tenant unit"
+					},
+					"interior_safety_threshold": {
+						"type": "number",
+						"description": "damage theshold that triggers an interior safety issue; threshold is defined in terms of the ratio of damaged area to interior area of a given tenant unit"
+					},
+					"door_access_width_ft": {
+						"type": "number",
+						"description": "width of door access zone, centerlined on the doorway, required for safe access. A safe door access zone must be free of falling hazards"
+					}
+				}
+			}
 		}
-      }
     },
 	"building_model": {
 		"type": "object",
@@ -382,71 +448,5 @@
 			}
 		}
 	},
-	"impedance_options": {
-		"type": "object",
-		"description": "general impedance assessment inputs such as mitigation factors",
-		"properties": {
-			"include_impedance": {
-				"type": "object",
-				"description": "general impedance assessment inputs such as mitigation factors",
-				"properties": {
-					"inspection": {
-						"type": "logical",
-						"description": "flag to include inpection delays"
-					},
-					"financing": {
-						"type": "logical",
-						"description": "flag to include financing delays"
-					},
-					"permitting": {
-						"type": "logical",
-						"description": "flag to include permitting delays"
-					},
-					"engineering": {
-						"type": "logical",
-						"description": "flag to include engineering mobilization and design delays"
-					},
-					"contractor": {
-						"type": "logical",
-						"description": "flag to include contractor mobilization delays"
-					}
-				}
-			},
-			"mitigation": {
-				"type": "object",
-				"description": "general impedance assessment inputs such as mitigation factors",
-				"properties": {
-					"is_essential_facility": {
-						"type": "logical",
-						"description": "is the building deemed as essential by the local jurisdiction"
-					},
-					"is_borp_equivalent": {
-						"type": "logical",
-						"description": "are the BORP, or BORP equivalent, post-earthquake strategies in place to limit inspection delays"
-					},
-					"is_engineer_on_retainer": {
-						"type": "logical",
-						"description": "is an engineer contracted to be on retainer in case of post-earthquake damage"
-					},
-					"is_contractor_on_retainer": {
-						"type": "logical",
-						"description": "is a contractor contracted to be on retainer in case of post-earthquake damage"
-					},
-					"funding_source": {
-						"type": "string",
-						"description": "what is the source of funding for repair costs beyond that of the capital of the owner"
-					},
-					"capital": {
-						"type": "number",
-						"description": "ratio of the building value that the onwer has immediately available for repairs"
-					}
-				}
-			},
-			"surge_factor": {
-				"type": "number",
-				"description": "impedance and temporary repair time amplification factor based on a post-earthquake surge in demand for skilled trade and materials",
-			}
-		}
-	}
   }
 }
