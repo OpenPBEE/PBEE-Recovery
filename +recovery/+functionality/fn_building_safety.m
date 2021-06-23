@@ -35,7 +35,7 @@ num_comps = length(damage.comp_ds_info.comp_id);
 
 %% Calculate effect of red tags and fire suppression system
 % Initialize parameters
-recovery_day.red_tag = 0;
+recovery_day.red_tag = zeros(num_reals, 1);
 system_operation_day.building.fire = 0;
 
 % Check red tag type damage througout the building
@@ -47,8 +47,10 @@ for tu = 1:num_units
     %% Red Tags
     % The day the red tag is resolved is the day when all damage (anywhere in building) that has
     % the potentail to cause a red tag is fixed (ie max day)
-    recovery_day.red_tag = max(recovery_day.red_tag, ...
-        damage_consequences.red_tag .* max(repair_complete_day(:,damage.fnc_filters.red_tag),[],2)); 
+    if any(damage.fnc_filters.red_tag)
+        recovery_day.red_tag = max(recovery_day.red_tag, ...
+            damage_consequences.red_tag .* max(repair_complete_day(:,damage.fnc_filters.red_tag),[],2)); 
+    end
     
     % Componet Breakdowns
     comp_breakdowns.red_tag(:,:,tu) = damage.fnc_filters.red_tag .* recovery_day.red_tag;
