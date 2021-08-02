@@ -88,12 +88,14 @@ end
 
 if impedance_options.include_impedance.contractor
     duration.contractor_mob = fn_contractor( ...
-        impedance_options.surge_factor, sys_repair_trigger, system_repair_time, trunc_pd );
+        impedance_options.surge_factor, sys_repair_trigger, system_repair_time, ...
+        systems.imped_contractor_min_days', systems.imped_contractor_max_days', trunc_pd );
 end
 
 if impedance_options.include_impedance.engineering
     [ duration.eng_mob, duration.design ] = fn_engineering( ...
-        impedance_options.surge_factor, system_design_time, trunc_pd);
+        impedance_options.surge_factor, system_design_time, ...
+        systems.imped_design_min_days', systems.imped_design_max_days', trunc_pd);
 end
 
 %% Aggregate experienced impedance time for each system/sequence and realization 

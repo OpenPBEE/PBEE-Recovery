@@ -1,5 +1,5 @@
 function [ eng_mob_imped, design_imped ] = fn_engineering( ...
-    surge_factor, system_design_time, trunc_pd )
+    surge_factor, system_design_time, design_min, design_max, trunc_pd )
 % Simulute permitting time
 %
 % Parameters
@@ -11,6 +11,10 @@ function [ eng_mob_imped, design_imped ] = fn_engineering( ...
 %   portion of system repair time that requires redesign 
 % trunc_pd: matlab normal distribution object
 %   standard normal distrubtion, truncated at upper and lower bounds
+% design_min: row vector [1 x n_systems]
+%   lower bound on the median for each system
+% design_max: row vector [1 x n_systems]
+%   upper bound on the median for each system
 %
 % Returns
 % -------
@@ -49,9 +53,7 @@ eng_mob_time(~redesign_trigger) = 0;
 eng_mob_imped = surge_factor * eng_mob_time;
 
 %% Engineering Design Time
-design_min = [14, 7, 0, 7, 0, 0, 0, 0, 0];
-design_max = [182, 91, 0, 30, 0, 0, 0, 0, 0];
-design_med = min(max(system_design_time,design_min),design_max);
+design_med = min(max(system_design_time, design_min), design_max);
 
 % Truncated lognormal distribution (via standard normal simulation)
 beta = 0.6;

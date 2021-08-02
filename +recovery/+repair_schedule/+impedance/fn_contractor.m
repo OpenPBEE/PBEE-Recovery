@@ -1,5 +1,5 @@
 function contractor_mob_imped = fn_contractor( ...
-    surge_factor, sys_repair_trigger, system_repair_time, trunc_pd )
+    surge_factor, sys_repair_trigger, system_repair_time, contr_min, contr_max, trunc_pd )
 % Simulute contractor mobilization time
 %
 % Parameters
@@ -13,6 +13,10 @@ function contractor_mob_imped = fn_contractor( ...
 %   simulatefd repair time of each system in isolation 
 % trunc_pd: matlab normal distribution object
 %   standard normal distrubtion, truncated at upper and lower bounds
+% contr_min: row vector [1 x n_systems]
+%   lower bound on the median for each system
+% contr_max: row vector [1 x n_systems]
+%   upper bound on the median for each system
 %
 % Returns
 % -------
@@ -21,12 +25,10 @@ function contractor_mob_imped = fn_contractor( ...
 
 %% Define financing distribution parameters
 NDS = sum(sys_repair_trigger,2); % number of damaged systems
-contr_mins = [28 14 5 14 5 5 5 5 5]; % In days, no retainer
-contr_maxs = [52 26 8 26 8 8 8 8 8]*7; % in weeks (transformed), no retainer
 
 contr_median = (1 + (NDS - 1)/8) .* system_repair_time;
-contr_median = max(contr_median, contr_mins);
-contr_median = min(contr_median, contr_maxs);
+contr_median = max(contr_median, contr_min);
+contr_median = min(contr_median, contr_max);
 
 %% Simulate
 % Truncated lognormal distribution (via standard normal simulation)
