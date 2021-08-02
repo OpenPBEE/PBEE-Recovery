@@ -44,8 +44,8 @@ function [repair_complete_day_per_system, worker_data] = fn_allocate_workers_sys
 % Initialize Variables
 [num_reals, num_sys] = size(sys_repair_days);
 priority_system_complete_day = zeros(num_reals,num_sys);
-day_vector = [];
-total_workers = [];
+day_vector = zeros(num_reals, 0);
+total_workers = zeros(num_reals, 0);
 
 % Re-order system variables based on priority
 [ priority_sys_workers_matrix ] = fitler_matrix_by_rows( sys_crew_size, sys_idx_priority_matrix );
