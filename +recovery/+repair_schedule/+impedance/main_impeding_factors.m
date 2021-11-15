@@ -1,5 +1,5 @@
-function [impeding_factors] = main_impeding_factors(damage, impedance_options, repair_cost, ...
-    inpsection_trigger, systems, system_repair_time)
+function [impeding_factors] = main_impeding_factors(damage, impedance_options, ...
+    damage_consequences, systems, system_repair_time)
 % Calculate ATC-138 impeding times for each system given simulation of damage
 %
 % Parameters
@@ -47,16 +47,8 @@ import recovery.repair_schedule.impedance.fn_inspection
 import recovery.repair_schedule.impedance.fn_permitting
 
 % Initialize parameters
-num_reals = length(inpsection_trigger);
+num_reals = length(damage_consequences.inpsection_trigger);
 num_sys = height(systems);
-
-% Preallocatd each impance time
-duration.inspection = zeros(num_reals, num_sys);
-duration.financing = zeros(num_reals, num_sys);
-duration.permitting = zeros(num_reals, num_sys);
-duration.contractor_mob = zeros(num_reals, num_sys);
-duration.eng_mob = zeros(num_reals, num_sys);
-duration.design = zeros(num_reals, num_sys);
 
 % System repair trigger
 sys_repair_trigger = system_repair_time > 0;
@@ -71,31 +63,76 @@ th_high = 2; % Truncate above +2 standard deviations
 trunc_pd = truncate(pd,th_low,th_high);
 
 %% Simulate impedance time for each impedance factor 
+% Inspection
 if impedance_options.include_impedance.inspection
-    duration.inspection = fn_inspection( impedance_options.mitigation.is_essential_facility, ...
-        impedance_options.surge_factor, sys_repair_trigger, inpsection_trigger, trunc_pd );
+    if isfield(damage_consequences,'inspection_time')
+        duration.inspection = damage_consequences.inspection_time * ones(1,num_sys);
+    else
+        duration.inspection = fn_inspection( impedance_options.mitigation.is_essential_facility, ...
+            impedance_options.surge_factor, sys_repair_trigger, damage_consequences.inpsection_trigger, trunc_pd );
+    end
+else
+    duration.inspection = zeros(num_reals, num_sys);
 end
 
+% Financing
 if impedance_options.include_impedance.financing
-    duration.financing = fn_financing( impedance_options.mitigation.capital_available_ratio, ...
-        impedance_options.mitigation.funding_source, sys_repair_trigger, repair_cost, trunc_pd );
+    if isfield(damage_consequences,'financing_time')
+        duration.financing = damage_consequences.financing_time * ones(1,num_sys);
+    else
+        duration.financing = fn_financing( impedance_options.mitigation.capital_available_ratio, ...
+            impedance_options.mitigation.funding_source, sys_repair_trigger, damage_consequences.repair_cost_ratio, trunc_pd );
+    end
+else
+    duration.financing = zeros(num_reals, num_sys);
 end
 
+% Stability
+if isfield(damage_consequences,'stability_time')
+    duration.stability = damage_consequences.stability_time * ones(1,num_sys);
+else
+    duration.stability = zeros(num_reals, num_sys);
+end
+
+% Permitting
 if impedance_options.include_impedance.permitting
-    duration.permitting = fn_permitting(  ...
-        impedance_options.surge_factor, system_rapid_permit_trigger, permit_review_time, trunc_pd );
+    if isfield(damage_consequences,'permitting_time')
+        duration.permitting = damage_consequences.permitting_time;
+    else
+        duration.permitting = fn_permitting(  ...
+            impedance_options.surge_factor, system_rapid_permit_trigger, permit_review_time, trunc_pd );
+    end
+else
+    duration.permitting = zeros(num_reals, num_sys);
 end
 
+% Contractor Impedance
 if impedance_options.include_impedance.contractor
-    duration.contractor_mob = fn_contractor( ...
-        impedance_options.surge_factor, sys_repair_trigger, system_repair_time, ...
-        systems.imped_contractor_min_days', systems.imped_contractor_max_days', trunc_pd );
+    if isfield(damage_consequences,'contractor_mobilization_time')
+        duration.contractor_mob = damage_consequences.contractor_mobilization_time;
+    else
+        duration.contractor_mob = fn_contractor( ...
+            impedance_options.surge_factor, sys_repair_trigger, system_repair_time, ...
+            systems.imped_contractor_min_days', systems.imped_contractor_max_days', trunc_pd );
+    end
+else
+    duration.contractor_mob = zeros(num_reals, num_sys);
 end
 
+% Engineering Time
 if impedance_options.include_impedance.engineering
     [ duration.eng_mob, duration.design ] = fn_engineering( ...
         impedance_options.surge_factor, system_design_time, ...
         systems.imped_design_min_days', systems.imped_design_max_days', trunc_pd);
+    if isfield(damage_consequences,'engineering_mobilization_time')
+        duration.eng_mob = damage_consequences.engineering_mobilization_time;
+    end
+    if isfield(damage_consequences,'engineering_design_time')
+        duration.design = damage_consequences.engineering_design_time;
+    end
+else
+    duration.eng_mob = zeros(num_reals, num_sys);
+    duration.design = zeros(num_reals, num_sys);
 end
 
 %% Aggregate experienced impedance time for each system/sequence and realization 
@@ -106,6 +143,9 @@ complete_day.inspection = duration.inspection;
 start_day.financing = complete_day.inspection;
 complete_day.financing = start_day.financing + duration.financing;
 
+start_day.stability = complete_day.inspection;
+complete_day.stability = start_day.stability + duration.stability;
+
 start_day.eng_mob = max(complete_day.inspection,start_day.financing);
 complete_day.eng_mob = start_day.eng_mob + duration.eng_mob;
 
@@ -115,7 +155,7 @@ complete_day.design = start_day.design + duration.design;
 start_day.permitting = complete_day.design;
 complete_day.permitting = start_day.permitting + duration.permitting;
 
-start_day.contractor_mob = max(max(complete_day.inspection,start_day.financing),start_day.eng_mob);
+start_day.contractor_mob = max(max(max(complete_day.inspection,start_day.financing),start_day.eng_mob),complete_day.stability);
 complete_day.contractor_mob = start_day.contractor_mob + duration.contractor_mob;
 
 % Combine all impedance factors by system
@@ -131,6 +171,8 @@ impeding_factors.breakdowns.inspection.start_day = max(start_day.inspection,[],2
 impeding_factors.breakdowns.inspection.complete_day = max(complete_day.inspection,[],2);
 impeding_factors.breakdowns.financing.start_day = max(start_day.financing,[],2);
 impeding_factors.breakdowns.financing.complete_day = max(complete_day.financing,[],2);
+impeding_factors.breakdowns.stability.start_day = max(start_day.stability,[],2);
+impeding_factors.breakdowns.stability.complete_day = max(complete_day.stability,[],2);
 
 select_sys = [1, 2, 4]; % only for structure, exterior, and stairs
 for ss = select_sys

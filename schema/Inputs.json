@@ -421,6 +421,34 @@
 			"repair_cost_ratio": {
 				"description": "simulated building repair cost normalized by the replacement value", 
 				"$ref": "#/definitions/arrayOfNumbers"
+			},
+			"inspection_time": {
+				"description": "simulated building inspection time, in days", 
+				"$ref": "#/definitions/arrayOfNumbers"
+			},
+			"financing_time": {
+				"description": "simulated time to gather repair financing, in days", 
+				"$ref": "#/definitions/arrayOfNumbers"
+			},
+			"stability_time": {
+				"description": "simulated time to stabilize the building, in days", 
+				"$ref": "#/definitions/arrayOfNumbers"
+			},
+			"permitting_time": {
+				"description": "simulated time to gather required repair permits, for each system, in days", 
+				"$ref": "#/definitions/arrayOfArraysOfNumbers"
+			},
+			"contractor_mobilization_time": {
+				"description": "simulated time to mobilize a contractor to make needed repairs, for each system, in days", 
+				"$ref": "#/definitions/arrayOfArraysOfNumbers"
+			},
+			"engineering_mobilization_time": {
+				"description": "simulated time to mobilize an engineer to make needed re-designs, for each system, in days", 
+				"$ref": "#/definitions/arrayOfArraysOfNumbers"
+			},
+			"engineering_design_time": {
+				"description": "simulated time for engineer to complete the needed re-designs, for each system, in days", 
+				"$ref": "#/definitions/arrayOfArraysOfNumbers"
 			}
 		}
 	},
