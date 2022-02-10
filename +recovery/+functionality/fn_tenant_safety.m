@@ -25,7 +25,7 @@ function [ recovery_day, comp_breakdowns ] = fn_tenant_safety( damage, building_
 
 %% Initial Setup
 num_reals = length(global_fail);
-num_units = length(damage.story);
+num_units = length(damage.tenant_units);
 num_comps = length(damage.comp_ds_info.comp_id);
 comp_types_interior_check = unique(damage.comp_ds_info.comp_type_id(damage.fnc_filters.int_fall_haz_all));
 
@@ -33,19 +33,19 @@ comp_types_interior_check = unique(damage.comp_ds_info.comp_type_id(damage.fnc_f
 for tu = 1:num_units
     % Grab tenant and damage info for this tenant unit
     unit = repair_time_options.tenant_units(tu,:);
-    repair_complete_day_w_tmp = damage.story{tu}.recovery.repair_complete_day_w_tmp; % day each component (and DS) is reparied of this TU
+    repair_complete_day_w_tmp = damage.tenant_units{tu}.recovery.repair_complete_day_w_tmp; % day each component (and DS) is reparied of this TU
     repair_complete_day_w_tmp(global_fail,:) = NaN; % Don't track damage when building fails
 
     %% Exterior Enclosure 
     % Calculated the affected perimeter area of exterior components
     % (assuming all exterior components have either lf or sf units)
-    area_affected_all_linear_comps = damage.comp_ds_info.fraction_area_affected .* damage.comp_ds_info.unit_qty .* building_model.ht_per_story_ft(tu) .* damage.story{tu}.qnt_damaged;
-    area_affected_all_area_comps = damage.comp_ds_info.fraction_area_affected .* damage.comp_ds_info.unit_qty .* damage.story{tu}.qnt_damaged;
+    area_affected_all_linear_comps = damage.comp_ds_info.fraction_area_affected .* damage.comp_ds_info.unit_qty .* building_model.ht_per_story_ft(tu) .* damage.tenant_units{tu}.qnt_damaged;
+    area_affected_all_area_comps = damage.comp_ds_info.fraction_area_affected .* damage.comp_ds_info.unit_qty .* damage.tenant_units{tu}.qnt_damaged;
     
     % construct a matrix of affected areas from the various damaged component types
     comp_affected_area = zeros(num_reals,num_comps);
-    comp_affected_area(:,damage.fnc_filters.exterior_lf) = area_affected_all_linear_comps(:,damage.fnc_filters.exterior_lf);
-    comp_affected_area(:,damage.fnc_filters.exterior_sf) = area_affected_all_area_comps(:,damage.fnc_filters.exterior_sf);
+    comp_affected_area(:,damage.fnc_filters.exterior_safety_lf) = area_affected_all_linear_comps(:,damage.fnc_filters.exterior_safety_lf);
+    comp_affected_area(:,damage.fnc_filters.exterior_safety_sf) = area_affected_all_area_comps(:,damage.fnc_filters.exterior_safety_sf);
     
     % Go each possible unique repair time contributing to interior safety check
     % Find when enough repairs are complete such that interior damage no
@@ -53,7 +53,7 @@ for tu = 1:num_units
     comps_day_repaired = repair_complete_day_w_tmp; % define as initial repair day considering tmp repairs
     ext_repair_day = zeros(num_reals,1);
     all_comps_day_repaired = zeros(num_reals,num_comps);
-    num_repair_time_increments = sum(damage.fnc_filters.exterior_all); % possible unique number of loop increments
+    num_repair_time_increments = sum(damage.fnc_filters.exterior_safety_all); % possible unique number of loop increments
     for i = 1:num_repair_time_increments
         
         % Quantify Affected Area
@@ -64,7 +64,7 @@ for tu = 1:num_units
         affects_occupancy = percent_area_affected > repair_time_options.functionality.exterior_safety_threshold;
 
         % Determine step increment based on the component with the shortest repair time
-        delta_day = min(comps_day_repaired(:,damage.fnc_filters.exterior_all),[],2);
+        delta_day = min(comps_day_repaired(:,damage.fnc_filters.exterior_safety_all),[],2);
         delta_day(isnan(delta_day)) = 0;
         
         % Add increment to the tally of days until the interior damage
@@ -72,7 +72,7 @@ for tu = 1:num_units
         ext_repair_day = ext_repair_day + affects_occupancy .* delta_day;
         
         % Add days to components that are affecting occupancy
-        any_area_affected_all_comps = (damage.fnc_filters.exterior_all .* comp_affected_area) > 0; % Count any component that contributes to the loss of occupancy regardless of by how much
+        any_area_affected_all_comps = (damage.fnc_filters.exterior_safety_all .* comp_affected_area) > 0; % Count any component that contributes to the loss of occupancy regardless of by how much
         all_comps_day_repaired = all_comps_day_repaired + any_area_affected_all_comps .* affects_occupancy .* delta_day;
         
         % Reduce compent damaged for the next increment based on what was
@@ -89,15 +89,21 @@ for tu = 1:num_units
     
     %% Interior Falling Hazards
     % Convert all component into affected areas
-    area_affected_all_linear_comps = damage.comp_ds_info.fraction_area_affected .* damage.comp_ds_info.unit_qty .* building_model.ht_per_story_ft(tu) .* damage.story{tu}.qnt_damaged;
-    area_affected_all_area_comps   = damage.comp_ds_info.fraction_area_affected .* damage.comp_ds_info.unit_qty .* damage.story{tu}.qnt_damaged;
-    area_affected_all_bay_comps    = damage.comp_ds_info.fraction_area_affected .* building_model.struct_bay_area_per_story(tu) .* damage.story{tu}.qnt_damaged;
-    area_affected_all_build_comps  = damage.comp_ds_info.fraction_area_affected .* building_model.total_area_sf .* damage.story{tu}.qnt_damaged;
+    area_affected_all_linear_comps = damage.comp_ds_info.fraction_area_affected .* damage.comp_ds_info.unit_qty .* building_model.ht_per_story_ft(tu) .* damage.tenant_units{tu}.qnt_damaged;
+    area_affected_all_area_comps   = damage.comp_ds_info.fraction_area_affected .* damage.comp_ds_info.unit_qty .* damage.tenant_units{tu}.qnt_damaged;
+    area_affected_all_bay_comps    = damage.comp_ds_info.fraction_area_affected .* building_model.struct_bay_area_per_story(tu) .* damage.tenant_units{tu}.qnt_damaged;
+    area_affected_all_build_comps  = damage.comp_ds_info.fraction_area_affected .* building_model.total_area_sf .* damage.tenant_units{tu}.qnt_damaged;
     
     % Checking damage that affects components in story below
+    repair_complete_day_w_tmp_w_instabilities = repair_complete_day_w_tmp;
     if tu > 1
-        area_affected_below = damage.comp_ds_info.fraction_area_affected .* building_model.struct_bay_area_per_story(tu-1) .* damage.story{tu-1}.qnt_damaged;
-        area_affected_all_bay_comps(:,damage.fnc_filters.vert_instabilities) = max(area_affected_below(:,damage.fnc_filters.vert_instabilities),area_affected_all_bay_comps(:,damage.fnc_filters.vert_instabilities));
+        area_affected_below = damage.comp_ds_info.fraction_area_affected .* building_model.struct_bay_area_per_story(tu-1) .* damage.tenant_units{tu-1}.qnt_damaged;
+        area_affected_all_bay_comps(:,damage.fnc_filters.vert_instabilities) ...
+            = max(area_affected_below(:,damage.fnc_filters.vert_instabilities),area_affected_all_bay_comps(:,damage.fnc_filters.vert_instabilities));
+        repair_time_below = damage.tenant_units{tu-1}.recovery.repair_complete_day_w_tmp;
+        repair_time_below(global_fail,:) = NaN; % Don't track damage when building fails
+        repair_complete_day_w_tmp_w_instabilities(:,damage.fnc_filters.vert_instabilities) ...
+            = max(repair_time_below(:,damage.fnc_filters.vert_instabilities),repair_complete_day_w_tmp(:,damage.fnc_filters.vert_instabilities));
     end
 
     % construct a matrix of affected areas from the various damaged component types
@@ -110,7 +116,7 @@ for tu = 1:num_units
     % Go each possible unique repair time contributing to interior safety check
     % Find when enough repairs are complete such that interior damage no
     % longer affects tenant safety
-    comps_day_repaired = repair_complete_day_w_tmp; % define as initial repair day considering tmp repairs
+    comps_day_repaired = repair_complete_day_w_tmp_w_instabilities; % define as initial repair day considering tmp repairs
     int_repair_day = zeros(num_reals,1);
     all_comps_day_repaired = zeros(num_reals,num_comps);
     num_repair_time_increments = sum(damage.fnc_filters.int_fall_haz_all); % possible unique number of loop increments
@@ -150,6 +156,17 @@ for tu = 1:num_units
     % Save interior recovery day for this tenant unit
     recovery_day.interior(:,tu) = int_repair_day;
     comp_breakdowns.interior(:,:,tu) = all_comps_day_repaired;
+    
+    %% Hazardous Materials
+    % note: hazardous materials are accounted for in building functional
+    % assessment here, but are not currently quantified in the component
+    % breakdowns
+    if any(damage.fnc_filters.local_hazardous_material)
+        % Any local hazardous material shuts down the entire tenant unit
+        recovery_day.hazardous_material(:,tu) = max(repair_complete_day_w_tmp(:,damage.fnc_filters.local_hazardous_material),[],2); 
+    else
+        recovery_day.hazardous_material(:,tu) = zeros(num_reals,1);
+    end
 end
 
 end % end function

@@ -45,10 +45,9 @@ max_workers_per_story = zeros(num_reals,num_stories);
 % assigned workers
 iter = 0;
 while sum(sum(total_worker_days)) > 0.01
-    iter = iter + 1; % keep the pandemic in line
-    if iter > 1000
-        % pandamit! we've gone too far
-        error('Error: Could not converge worker allocations for among stories in sequence');
+    iter = iter + 1; 
+    if iter > 1000 % keep the while loop pandemic contained
+        error('PBEE_Recovery:RepairSchedule', 'Could not converge worker allocations for among stories in sequence');
     end
 
     % Determine the available workers in the building

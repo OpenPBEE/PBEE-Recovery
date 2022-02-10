@@ -1,5 +1,5 @@
 function [damage, impeding_factors, worker_data, building_repair_schedule ] = main_repair_schedule(...
-    damage, building_model, damage_consequences, repair_time_options, systems)
+    damage, building_model, damage_consequences, repair_time_options)
 % Determine the repair time for a given damage simulation.
 %
 % Simulation of system and building level repair times based on a
@@ -18,8 +18,6 @@ function [damage, impeding_factors, worker_data, building_repair_schedule ] = ma
 %   tags and repair costs ratios
 % repair_time_options: struct
 %   general repair time options such as mitigation factors
-% systems: table
-%   data table containing information about each system's attributes
 %
 % Returns
 % -------
@@ -39,9 +37,12 @@ function [damage, impeding_factors, worker_data, building_repair_schedule ] = ma
 import recovery.repair_schedule.*
 import recovery.repair_schedule.impedance.main_impeding_factors
 
+% to make the reference simpler
+systems = repair_time_options.systems;
+
 %% Step 1 - Define max worker allocations
 % Set the range for max workers per story and on site 
-max_workers_per_building = min(max(floor(building_model.total_area_sf*0.00025+10),20),260); % based on REDi
+max_workers_per_building = min(max(floor(building_model.total_area_sf * 0.00025 + 10), 20), 260); % based on REDi
 max_workers_per_story = ceil(building_model.area_per_story_sf * 0.001); % based on FEMA P-58
 
 %% Step 2 - Calculate the start and finish times for each system in isolation
@@ -55,25 +56,33 @@ max_workers_per_story = ceil(building_model.area_per_story_sf * 0.001); % based 
     damage_consequences.repair_cost_ratio, ...
     damage_consequences.inpsection_trigger, ...
     systems, ...
-    system_schedule.system_totals.repair_days ...
+    system_schedule.system_totals.repair_days, ...
+    building_model.building_value ...
 );
 
-%% Step 4 - Set system repair priority
-[ sys_idx_priority_matrix ] = fn_prioritize_systems( systems, damage );
-
-%% Step 5 - Define system repair constraints
+%% Step 4 - Simulate Temporary Repair Times
+[ tmp_repair_complete_day ] = fn_simulate_tmp_repair_times( damage, ...
+                              impeding_factors.breakdowns.inspection.complete_day,...
+                              repair_time_options.functionality.beta_temp, ...
+                              repair_time_options.surge_factor );
+                          
+%% Step 5 - Set system repair priority
+[ sys_idx_priority_matrix ] = fn_prioritize_systems( systems, damage, tmp_repair_complete_day );
+                          
+%% Step 6 - Define system repair constraints
 [ sys_constraint_matrix ] = fn_set_repair_constraints( systems, damage_consequences.red_tag );
 
-%% Step 6 - Allocate workers among systems and determine the total days until repair is completed for each sequence
+%% Step 7 - Allocate workers among systems and determine the total days until repair is completed for each sequence
 [repair_complete_day_per_system, worker_data] = fn_allocate_workers_systems(...
-    system_schedule.system_totals.repair_days, system_schedule.system_totals.num_workers, max_workers_per_building, ...
-    sys_idx_priority_matrix, sys_constraint_matrix, ...
+    system_schedule.system_totals.repair_days, system_schedule.system_totals.num_workers, ...
+     max_workers_per_building, sys_idx_priority_matrix, sys_constraint_matrix, ...
     damage_consequences.red_tag, impeding_factors.time_sys );
-
-%% Step 7 - Format Outputs 
+                          
+%% Step 8 - Format Outputs 
 % Format outputs for Functionality calculations
-[ damage ] = fn_restructure_repair_schedule( damage, system_schedule, repair_complete_day_per_system, systems, ...
-    damage_consequences.global_fail, building_model.replacement_time_days, repair_time_options.surge_factor );
+[ damage ] = fn_restructure_repair_schedule( damage, system_schedule, ...
+             repair_complete_day_per_system, systems, damage_consequences, ...
+             building_model, tmp_repair_complete_day);
 
 % Format Start and Stop Time Data for Gantt Chart plots 
 [ building_repair_schedule ] = fn_format_gantt_chart_data( damage, systems );

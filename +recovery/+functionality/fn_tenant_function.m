@@ -35,9 +35,10 @@ function [ recovery_day, comp_breakdowns ] = fn_tenant_function( damage, ...
 %   simulation of each components contributions to each of the fault tree events 
 
 %% Initial Setup
-num_units = length(damage.story);
+num_units = length(damage.tenant_units);
 num_reals = length(global_fail);
 num_comps = length(damage.comp_ds_info.comp_id);
+num_stories = building_model.num_stories;
 
 recovery_day.elevators = zeros(num_reals,num_units);
 recovery_day.exterior = zeros(num_reals,num_units);
@@ -53,13 +54,13 @@ comp_breakdowns.hvac = zeros(num_reals,num_comps,num_units);
 
 %% Go through each tenant unit, define system level performacne and determine tenant unit recovery time
 for tu = 1:num_units
-    damaged_comps = damage.story{tu}.qnt_damaged;
+    damaged_comps = damage.tenant_units{tu}.qnt_damaged;
     initial_damaged = damaged_comps > 0;
-    total_num_comps = damage.story{tu}.num_comps;
+    total_num_comps = damage.tenant_units{tu}.num_comps;
     unit = repair_time_options.tenant_units(tu,:);
-    repair_complete_day = damage.story{tu}.recovery.repair_complete_day;
+    repair_complete_day = damage.tenant_units{tu}.recovery.repair_complete_day;
     repair_complete_day(global_fail,:) = NaN; % Don't track damage when building fails
-    repair_complete_day_w_tmp = damage.story{tu}.recovery.repair_complete_day_w_tmp;
+    repair_complete_day_w_tmp = damage.tenant_units{tu}.recovery.repair_complete_day_w_tmp;
     repair_complete_day_w_tmp(global_fail,:) = NaN; % Don't track damage when building fails
     
     %% Elevators
@@ -86,7 +87,7 @@ for tu = 1:num_units
             num_elev_pgs = length(unique(damage.comp_ds_info.comp_idx(damage.fnc_filters.elevators)));
             is_sim_ds = any(damage.comp_ds_info.is_sim_ds(damage.fnc_filters.elevators));
             if (num_elev_pgs > 1) && is_sim_ds
-                error('SPEx:FunctionalRecovery','Elevator Function check does not handle multiple performance groups with simultaneous damage states')
+                error('PBEE_Recovery:Function','Elevator Function check does not handle multiple performance groups with simultaneous damage states')
             end
 
             % quantifty the number of occupancy needing to use the elevators
@@ -113,24 +114,25 @@ for tu = 1:num_units
             fixed_comps_filt = isnan(comps_day_repaired);
             comps_quant_damaged(fixed_comps_filt) = 0;
         end
-        power_supply_recovery_day = max(max(system_operation_day.building.mcs,system_operation_day.building.electrical_main),utilities.electrical);
+        power_supply_recovery_day = max(max(system_operation_day.building.elevator_mcs,system_operation_day.building.electrical_main),utilities.electrical);
         recovery_day.elevators(:,tu) = max(elev_function_recovery_day,power_supply_recovery_day); % electrical system and utility
-        power_supply_recovery_day_comp = max(system_operation_day.comp.mcs,system_operation_day.comp.electrical_main);
+        power_supply_recovery_day_comp = max(system_operation_day.comp.elevator_mcs,system_operation_day.comp.electrical_main);
         comp_breakdowns.elevators(:,:,tu) = max(elev_comps_day_fnc,power_supply_recovery_day_comp);
     end
     
-    %% Exterior Enclosure (assuming all exterior components have either lf or sf units)
-    area_affected_lf_all_comps = damage.comp_ds_info.fraction_area_affected .* damage.comp_ds_info.unit_qty .* building_model.ht_per_story_ft(tu) .* damage.story{tu}.qnt_damaged;
-    area_affected_sf_all_comps = damage.comp_ds_info.fraction_area_affected .* damage.comp_ds_info.unit_qty .* damage.story{tu}.qnt_damaged;
+    %% Exterior Enclosure 
+    % Perimeter Cladding (assuming all exterior components have either lf or sf units)
+    area_affected_lf_all_comps = damage.comp_ds_info.fraction_area_affected .* damage.comp_ds_info.unit_qty .* building_model.ht_per_story_ft(tu) .* damage.tenant_units{tu}.qnt_damaged;
+    area_affected_sf_all_comps = damage.comp_ds_info.fraction_area_affected .* damage.comp_ds_info.unit_qty .* damage.tenant_units{tu}.qnt_damaged;
    
     comp_affected_area = zeros(num_reals,num_comps);
-    comp_affected_area(:,damage.fnc_filters.exterior_lf) = area_affected_lf_all_comps(:,damage.fnc_filters.exterior_lf);
-    comp_affected_area(:,damage.fnc_filters.exterior_sf) = area_affected_sf_all_comps(:,damage.fnc_filters.exterior_sf);
+    comp_affected_area(:,damage.fnc_filters.exterior_seal_lf) = area_affected_lf_all_comps(:,damage.fnc_filters.exterior_seal_lf);
+    comp_affected_area(:,damage.fnc_filters.exterior_seal_sf) = area_affected_sf_all_comps(:,damage.fnc_filters.exterior_seal_sf);
     
     comps_day_repaired = repair_complete_day;
     ext_function_recovery_day = zeros(num_reals,1);
-    all_comps_day_functional = zeros(num_reals,num_comps);
-    num_repair_time_increments = sum(damage.fnc_filters.exterior_all); % possible unique number of loop increments
+    all_comps_day_ext = zeros(num_reals,num_comps);
+    num_repair_time_increments = sum(damage.fnc_filters.exterior_seal_all); % possible unique number of loop increments
     % Loop through each unique repair time increment and determine when stops affecting function
     for i = 1:num_repair_time_increments
         % Determine the area of wall which has severe exterior encolusure damage 
@@ -143,13 +145,13 @@ for tu = 1:num_units
         affects_function = percent_area_affected >= unit.exterior; 
         
         % Add days in this increment to the tally
-        delta_day = min(comps_day_repaired(:,damage.fnc_filters.exterior_all),[],2);
+        delta_day = min(comps_day_repaired(:,damage.fnc_filters.exterior_seal_all),[],2);
         delta_day(isnan(delta_day)) = 0;
         ext_function_recovery_day = ext_function_recovery_day + affects_function .* delta_day;
         
         % Add days to components that are affecting occupancy
         any_area_affected_all_comps = comp_affected_area > 0; % Count any component that contributes to the loss of occupance regardless of by how much
-        all_comps_day_functional = all_comps_day_functional + any_area_affected_all_comps .* affects_function .* delta_day;
+        all_comps_day_ext = all_comps_day_ext + any_area_affected_all_comps .* affects_function .* delta_day;
         
         % Change the comps for the next increment
         % reducing damage for what has been repaired in this time increment
@@ -158,33 +160,121 @@ for tu = 1:num_units
         fixed_comps_filt = isnan(comps_day_repaired);
         comp_affected_area(fixed_comps_filt) = 0;
     end
-    recovery_day.exterior(:,tu) = ext_function_recovery_day;
-    comp_breakdowns.exterior(:,:,tu) = all_comps_day_functional;
+    
+    if unit.story == num_stories % If this is the top story, check the roof for functio
+        % Roof structure (currently assuming all roofing components have equal unit
+        % areas)
+        damage_threshold = repair_time_options.subsystems.redundancy_threshold(repair_time_options.subsystems.id == 21);
+        num_comp_damaged = damage.fnc_filters.roof_structure .* damage.tenant_units{tu}.qnt_damaged;
+        num_roof_comps = damage.fnc_filters.roof_structure .* damage.tenant_units{tu}.num_comps;
+
+        comps_day_repaired = repair_complete_day;
+        roof_structure_recovery_day = zeros(num_reals,1);
+        all_comps_day_roof_struct = zeros(num_reals,num_comps);
+        num_repair_time_increments = sum(damage.fnc_filters.roof_structure); % possible unique number of loop increments
+        % Loop through each unique repair time increment and determine when stops affecting function
+        for i = 1:num_repair_time_increments
+            % Determine the area of roof affected 
+            percent_area_affected = sum(num_comp_damaged,2) / sum(num_roof_comps,2); % Assumes roof components do not occupy the same area of roof
+
+            % Determine if current damage affects function for this tenant unit
+            % if the area of exterior wall damage is greater than what is
+            % acceptable by the tenant 
+            affects_function = percent_area_affected >= damage_threshold; 
+
+            % Add days in this increment to the tally
+            delta_day = min(comps_day_repaired(:,damage.fnc_filters.roof_structure),[],2);
+            delta_day(isnan(delta_day)) = 0;
+            roof_structure_recovery_day = roof_structure_recovery_day + affects_function .* delta_day;
+
+            % Add days to components that are affecting function
+            any_area_affected_all_comps = num_comp_damaged > 0; % Count any component that contributes to the loss of function regardless of by how much
+            all_comps_day_roof_struct = all_comps_day_roof_struct + any_area_affected_all_comps .* affects_function .* delta_day;
+
+            % Change the comps for the next increment
+            % reducing damage for what has been repaired in this time increment
+            comps_day_repaired = comps_day_repaired - delta_day;
+            comps_day_repaired(comps_day_repaired <= 0) = NaN;
+            fixed_comps_filt = isnan(comps_day_repaired);
+            num_comp_damaged(fixed_comps_filt) = 0;
+        end
+
+        % Roof weatherproofing (currently assuming all roofing components have 
+        % equal unit areas)
+        damage_threshold = repair_time_options.subsystems.redundancy_threshold(repair_time_options.subsystems.id == 22);
+        num_comp_damaged = damage.fnc_filters.roof_weatherproofing .* damage.tenant_units{tu}.qnt_damaged;
+        num_roof_comps = damage.fnc_filters.roof_weatherproofing .* damage.tenant_units{tu}.num_comps;
+
+        comps_day_repaired = repair_complete_day;
+        roof_weather_recovery_day = zeros(num_reals,1);
+        all_comps_day_roof_weather = zeros(num_reals,num_comps);
+        num_repair_time_increments = sum(damage.fnc_filters.roof_weatherproofing); % possible unique number of loop increments
+        % Loop through each unique repair time increment and determine when stops affecting function
+        for i = 1:num_repair_time_increments
+            % Determine the area of roof affected 
+            percent_area_affected = sum(num_comp_damaged,2) / sum(num_roof_comps,2); % Assumes roof components do not occupy the same area of roof
+
+            % Determine if current damage affects function for this tenant unit
+            % if the area of exterior wall damage is greater than what is
+            % acceptable by the tenant 
+            affects_function = percent_area_affected >= damage_threshold; 
+
+            % Add days in this increment to the tally
+            delta_day = min(comps_day_repaired(:,damage.fnc_filters.roof_weatherproofing),[],2);
+            delta_day(isnan(delta_day)) = 0;
+            roof_weather_recovery_day = roof_weather_recovery_day + affects_function .* delta_day;
+
+            % Add days to components that are affecting function
+            any_area_affected_all_comps = num_comp_damaged > 0; % Count any component that contributes to the loss of function regardless of by how much
+            all_comps_day_roof_weather = all_comps_day_roof_weather + any_area_affected_all_comps .* affects_function .* delta_day;
+
+            % Change the comps for the next increment
+            % reducing damage for what has been repaired in this time increment
+            comps_day_repaired = comps_day_repaired - delta_day;
+            comps_day_repaired(comps_day_repaired <= 0) = NaN;
+            fixed_comps_filt = isnan(comps_day_repaired);
+            num_comp_damaged(fixed_comps_filt) = 0;
+        end
+
+        % Combine branches
+        recovery_day.exterior(:,tu) = max(ext_function_recovery_day,...
+            max(roof_structure_recovery_day,roof_weather_recovery_day));
+        comp_breakdowns.exterior(:,:,tu) = max(all_comps_day_ext,...
+            max(all_comps_day_roof_struct,all_comps_day_roof_weather));
+    else % this is not the top story so just use the cladding for tenant function
+        recovery_day.exterior(:,tu) = ext_function_recovery_day;
+        comp_breakdowns.exterior(:,:,tu) = all_comps_day_ext;
+    end
     
     %% Interior Area
-    area_affected_lf_all_comps    = damage.comp_ds_info.fraction_area_affected .* damage.comp_ds_info.unit_qty .* building_model.ht_per_story_ft(tu) .* damage.story{tu}.qnt_damaged;
-    area_affected_sf_all_comps    = damage.comp_ds_info.fraction_area_affected .* damage.comp_ds_info.unit_qty .* damage.story{tu}.qnt_damaged;
-    area_affected_bay_all_comps   = damage.comp_ds_info.fraction_area_affected .* building_model.struct_bay_area_per_story(tu) .* damage.story{tu}.qnt_damaged;
-    area_affected_build_all_comps = damage.comp_ds_info.fraction_area_affected .* building_model.total_area_sf .* damage.story{tu}.qnt_damaged; 
+    area_affected_lf_all_comps    = damage.comp_ds_info.fraction_area_affected .* damage.comp_ds_info.unit_qty .* building_model.ht_per_story_ft(tu) .* damage.tenant_units{tu}.qnt_damaged;
+    area_affected_sf_all_comps    = damage.comp_ds_info.fraction_area_affected .* damage.comp_ds_info.unit_qty .* damage.tenant_units{tu}.qnt_damaged;
+    area_affected_bay_all_comps   = damage.comp_ds_info.fraction_area_affected .* building_model.struct_bay_area_per_story(tu) .* damage.tenant_units{tu}.qnt_damaged;
+    area_affected_build_all_comps = damage.comp_ds_info.fraction_area_affected .* building_model.total_area_sf .* damage.tenant_units{tu}.qnt_damaged;
     
+    repair_complete_day_w_tmp_w_instabilities = repair_complete_day_w_tmp;
     if tu > 1
-        vert_instabilities_filt = damage.comp_ds_info.system == 1 & damage.comp_ds_info.affects_function & damage.comp_ds_info.int_falling_hazard;
-        area_affected_below = damage.comp_ds_info.fraction_area_affected .* building_model.struct_bay_area_per_story(tu-1) .* damage.story{tu-1}.qnt_damaged;
-        area_affected_bay_all_comps(:,vert_instabilities_filt) = max(area_affected_below(:,vert_instabilities_filt),area_affected_bay_all_comps(:,vert_instabilities_filt));
+        area_affected_below = damage.comp_ds_info.fraction_area_affected .* building_model.struct_bay_area_per_story(tu-1) .* damage.tenant_units{tu-1}.qnt_damaged;
+        area_affected_bay_all_comps(:,damage.fnc_filters.vert_instabilities) ...
+            = max(area_affected_below(:,damage.fnc_filters.vert_instabilities),area_affected_bay_all_comps(:,damage.fnc_filters.vert_instabilities));
+        repair_time_below = damage.tenant_units{tu-1}.recovery.repair_complete_day_w_tmp;
+        repair_time_below(global_fail,:) = NaN; % Don't track damage when building fails
+        repair_complete_day_w_tmp_w_instabilities(:,damage.fnc_filters.vert_instabilities) ...
+            = max(repair_time_below(:,damage.fnc_filters.vert_instabilities),repair_complete_day_w_tmp(:,damage.fnc_filters.vert_instabilities));
     end
 
     comp_affected_area = zeros(num_reals,num_comps);
-    comp_affected_area(:,damage.fnc_filters.interior_lf) = area_affected_lf_all_comps(:,damage.fnc_filters.interior_lf);
-    comp_affected_area(:,damage.fnc_filters.interior_sf) = area_affected_sf_all_comps(:,damage.fnc_filters.interior_sf);
-    comp_affected_area(:,damage.fnc_filters.interior_bay) = area_affected_bay_all_comps(:,damage.fnc_filters.interior_bay);
-    comp_affected_area(:,damage.fnc_filters.interior_build) = area_affected_build_all_comps(:,damage.fnc_filters.interior_build);
+    comp_affected_area(:,damage.fnc_filters.interior_function_lf) = area_affected_lf_all_comps(:,damage.fnc_filters.interior_function_lf);
+    comp_affected_area(:,damage.fnc_filters.interior_function_sf) = area_affected_sf_all_comps(:,damage.fnc_filters.interior_function_sf);
+    comp_affected_area(:,damage.fnc_filters.interior_function_bay) = area_affected_bay_all_comps(:,damage.fnc_filters.interior_function_bay);
+    comp_affected_area(:,damage.fnc_filters.interior_function_build) = area_affected_build_all_comps(:,damage.fnc_filters.interior_function_build);
 
-    frag_types_in_check = unique(damage.comp_ds_info.comp_type_id(damage.fnc_filters.interior_all));
-    comps_day_repaired = repair_complete_day_w_tmp;
-    comps_tmp_repaired = damage.story{tu}.recovery.tmp_day_controls;
+    frag_types_in_check = unique(damage.comp_ds_info.comp_type_id(damage.fnc_filters.interior_function_all));
+    comps_day_repaired = repair_complete_day_w_tmp_w_instabilities;
+
     int_function_recovery_day = zeros(num_reals,1);
     int_comps_day_repaired = zeros(num_reals,num_comps);
-    num_repair_time_increments = sum(damage.fnc_filters.interior_all); % possible unique number of loop increments
+    num_repair_time_increments = sum(damage.fnc_filters.interior_function_all); % possible unique number of loop increments
     % Loop through each unique repair time increment and determine when stops affecting function
     for i = 1:num_repair_time_increments
         % Quantify the affected area (based on srss of differenct component
@@ -203,7 +293,7 @@ for tu = 1:num_units
         affects_function = percent_area_affected >= unit.interior; 
         
         % Add days in this increment to the tally
-        delta_day = min(comps_day_repaired(:,damage.fnc_filters.interior_all),[],2);
+        delta_day = min(comps_day_repaired(:,damage.fnc_filters.interior_function_all),[],2);
         delta_day(isnan(delta_day)) = 0;
         int_function_recovery_day = int_function_recovery_day + affects_function .* delta_day;
         
@@ -296,7 +386,7 @@ for tu = 1:num_units
                 tenant_subsystem_failure = subsystem_num_damaged_comps > 1;
             else
                 % Use a predefined ratio (default to requirement 2/3 of components operational)
-                tenant_subsystem_failure = ratio_operating < repair_time_options.functionality.required_ratio_operating_hvac_main;
+                tenant_subsystem_failure = ratio_operating < repair_time_options.functionality.required_ratio_operating_hvac_unit;
             end
             
             % Calculate recovery day and combine with other subsystems for this tenant unit
@@ -321,7 +411,7 @@ for tu = 1:num_units
         subsystem_handle = {'hvac_duct_braches', 'hvac_in_line_fan', 'hvac_duct_drops', 'hvac_vav_boxes'};
         for sub = 1:length(subsystem_handle)
             if sum(damage.fnc_filters.hvac_duct_braches) > 0
-                subsystem_threshold = subsystems.threshold(strcmp(subsystems.handle,subsystem_handle{sub}));
+                subsystem_threshold = subsystems.redundancy_threshold(strcmp(subsystems.handle,subsystem_handle{sub}));
 
                 % Assess subsystem recovery day for this tenant unit
                 [subsystem_recovery_day, subsystem_comp_recovery_day] = fn_quantify_hvac_subsystem_recovery_day(...
@@ -354,7 +444,7 @@ ratio_damaged = tot_num_comp_dam ./ num_comp;
 % Check to make sure its not simeltanous
 % Quantification of number of damaged comp
 if any(is_sim_ds(subsystem_filter))
-    error('SPEx:FunctionalRecovery','HVAC Function check does not handle performance groups with simultaneous damage states')
+    error('PBEE_Recovery:Function','HVAC Function check does not handle performance groups with simultaneous damage states')
 end
 
 % If ratio of component in this subsystem is greater than the

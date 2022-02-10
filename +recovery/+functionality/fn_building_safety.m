@@ -30,18 +30,19 @@ function [ recovery_day, comp_breakdowns, system_operation_day ] = fn_building_s
 
 %% Initial Setup
 num_reals = length(damage_consequences.global_fail);
-num_units = length(damage.story);
+num_units = length(damage.tenant_units);
 num_comps = length(damage.comp_ds_info.comp_id);
 
 %% Calculate effect of red tags and fire suppression system
 % Initialize parameters
 recovery_day.red_tag = zeros(num_reals, 1);
+recovery_day.hazardous_material = zeros(num_reals, 1);
 system_operation_day.building.fire = 0;
 
-% Check red tag type damage througout the building
+% Check damage throughout the building
 for tu = 1:num_units
     % Grab tenant and damage info for this tenant unit
-    repair_complete_day = damage.story{tu}.recovery.repair_complete_day;
+    repair_complete_day = damage.tenant_units{tu}.recovery.repair_complete_day;
     repair_complete_day(damage_consequences.global_fail,:) = NaN; % Don't track damage when building fails
     
     %% Red Tags
@@ -67,6 +68,15 @@ for tu = 1:num_units
     % Componet Breakdowns
     system_operation_day.comp.fire(:,:,tu) = damage.fnc_filters.fire_building .* repair_complete_day;
     
+    %% Hazardous Materials
+    % note: hazardous materials are accounted for in building functional
+    % assessment here, but are not currently quantified in the component
+    % breakdowns
+    if any(damage.fnc_filters.global_hazardous_material)
+        % Any global hazardous material shuts down the entire building
+        recovery_day.hazardous_material = max(recovery_day.hazardous_material, max(repair_complete_day(:,damage.fnc_filters.global_hazardous_material),[],2)); 
+    end
+    
 end
 
 %% Building Egress
@@ -89,7 +99,7 @@ day_repair_fall_haz = zeros(num_reals,building_model.num_entry_doors);
 fall_haz_comps_day_rep = zeros(num_reals,num_comps,num_units,building_model.num_entry_doors);
 comp_affected_area = zeros(num_reals,num_comps,num_units);
 for tu = 1:num_units
-    repair_complete_day_w_tmp(:,:,tu) = damage.story{tu}.recovery.repair_complete_day_w_tmp;
+    repair_complete_day_w_tmp(:,:,tu) = damage.tenant_units{tu}.recovery.repair_complete_day_w_tmp;
 end
 repair_complete_day_w_tmp(damage_consequences.global_fail,:,:) = NaN; % Don't track damage when building fails
 
@@ -101,9 +111,9 @@ for i = 1:num_repair_time_increments
     for tu = 1:num_units
         for s = 1:4 % assumes there are 4 sides
             area_affected_lf_all_comps = damage.comp_ds_info.fraction_area_affected .* ...
-                damage.comp_ds_info.unit_qty .* building_model.ht_per_story_ft(tu) .* damage.story{tu}.(['qnt_damaged_side_' num2str(s)]);
+                damage.comp_ds_info.unit_qty .* building_model.ht_per_story_ft(tu) .* damage.tenant_units{tu}.(['qnt_damaged_side_' num2str(s)]);
             area_affected_sf_all_comps = damage.comp_ds_info.fraction_area_affected .* ...
-                damage.comp_ds_info.unit_qty .* damage.story{tu}.(['qnt_damaged_side_' num2str(s)]);
+                damage.comp_ds_info.unit_qty .* damage.tenant_units{tu}.(['qnt_damaged_side_' num2str(s)]);
 
             comp_affected_area(:,damage.fnc_filters.ext_fall_haz_lf,tu) = area_affected_lf_all_comps(:,damage.fnc_filters.ext_fall_haz_lf);
             comp_affected_area(:,damage.fnc_filters.ext_fall_haz_sf,tu) = area_affected_sf_all_comps(:,damage.fnc_filters.ext_fall_haz_sf);

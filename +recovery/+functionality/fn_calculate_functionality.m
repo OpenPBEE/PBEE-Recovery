@@ -55,7 +55,7 @@ end
 
 %% Reformat outputs into functionality data strucutre
 [ functionality ] = fn_extract_recovery_metrics( day_tentant_unit_functional, recovery_day, comp_breakdowns, ...
-    building_model.replacement_time_days, damage_consequences.global_fail, damage.comp_ds_info.comp_id );
+    building_model, damage_consequences, damage.comp_ds_info.comp_id );
 
 end
 
