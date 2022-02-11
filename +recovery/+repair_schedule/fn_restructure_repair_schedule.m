@@ -1,6 +1,5 @@
 function [ damage ] = fn_restructure_repair_schedule( damage, system_schedule, ...
-    repair_complete_day_per_system, systems, damage_consequences, ...
-    building_model, tmp_repair_complete_day)
+    repair_complete_day_per_system, systems, tmp_repair_complete_day)
 % Redistribute repair schedule data from the system and story level to the component level for use 
 % in the functionality assessment (ie, put repair schedule data into the
 % damage object)
@@ -17,11 +16,6 @@ function [ damage ] = fn_restructure_repair_schedule( damage, system_schedule, .
 %   some sequences start before others)
 % systems: table
 %   data table containing information about each system's attributes
-% global_fail: logical array [num_reals x 1]
-%   true if building has global failure which renders it un-repairable.
-%   Typically for collapse or excessive resiudal cases.
-% replacement_time: number
-%   number of days required to replace the entire building
 % tmp_repair_complete_day: array [num_reals x num_comp]
 %   contains the day (after the earthquake) the temporary repair time is 
 %   resolved per damage state damage and realization
@@ -60,14 +54,8 @@ for sys = 1:num_sys
     end
 end
     
-% Post process for global failure and temp repairs
+% Post process for temp repairs
 for tu = 1:num_units
-    % Replace global failure cases with full repair time
-    damage.tenant_units{tu}.recovery.repair_start_day(damage_consequences.global_fail,:) = 0;
-    damage.tenant_units{tu}.recovery.repair_complete_day(damage_consequences.global_fail,:) = building_model.replacement_time_days;
-    % overwrite the substructure failure repair time
-    damage.tenant_units{tu}.recovery.repair_complete_day(damage_consequences.substructure_fail,:) = building_model.replacement_time_days * building_model.substructure_fraction_of_replace_time;
-
     % Calculate the day repairs are completed considering temporary repairs
     repair_complete_day_no_NaN = max(damage.tenant_units{tu}.recovery.repair_complete_day,0);
     damage.tenant_units{tu}.recovery.repair_complete_day_w_tmp = min(repair_complete_day_no_NaN, tmp_repair_complete_day);

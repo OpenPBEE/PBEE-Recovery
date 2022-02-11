@@ -28,7 +28,7 @@ function [ system_operation_day ] = fn_building_level_system_operation( damage, 
 
 %% Initial Setep
 num_stories = building_model.num_stories;
-num_reals = length(damage_consequences.global_fail);
+num_reals = length(damage_consequences.red_tag);
 num_comps = length(damage.comp_ds_info.comp_id);
 
 system_operation_day.building.hvac_main = zeros(num_reals,1);
@@ -47,7 +47,6 @@ for tu = 1:num_stories
     initial_damaged = damaged_comps > 0;
     total_num_comps = damage.tenant_units{tu}.num_comps;
     repair_complete_day = damage.tenant_units{tu}.recovery.repair_complete_day;
-    repair_complete_day(damage_consequences.global_fail,:) = NaN; % Don't track damage when building fails
     
     % Elevators
     % Assumed all components affect entire height of shaft

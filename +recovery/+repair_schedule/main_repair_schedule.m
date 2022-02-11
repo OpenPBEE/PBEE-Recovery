@@ -81,8 +81,7 @@ max_workers_per_story = ceil(building_model.area_per_story_sf * 0.001); % based 
 %% Step 8 - Format Outputs 
 % Format outputs for Functionality calculations
 [ damage ] = fn_restructure_repair_schedule( damage, system_schedule, ...
-             repair_complete_day_per_system, systems, damage_consequences, ...
-             building_model, tmp_repair_complete_day);
+             repair_complete_day_per_system, systems, tmp_repair_complete_day);
 
 % Format Start and Stop Time Data for Gantt Chart plots 
 [ building_repair_schedule ] = fn_format_gantt_chart_data( damage, systems );

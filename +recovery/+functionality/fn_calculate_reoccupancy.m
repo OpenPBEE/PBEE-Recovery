@@ -45,7 +45,7 @@ import recovery.functionality.fn_extract_recovery_metrics
 
 %% Stage 3: Quantify the effect that component damage has on the safety of each tenant unit
 [ recovery_day.tenant_safety, comp_breakdowns.tenant_safety ] = ...
-    fn_tenant_safety( damage, building_model, damage_consequences.global_fail, repair_time_options );
+    fn_tenant_safety( damage, building_model, repair_time_options );
 
 %% Combine Check to determine the day the each tenant unit is reoccupiable
 % Check the day the building is Safe
@@ -61,8 +61,8 @@ day_tenant_unit_safe = max(recovery_day.tenant_safety.interior, max(recovery_day
 day_tentant_unit_reoccupiable = max(max(day_building_safe, day_story_accessible), day_tenant_unit_safe); 
 
 %% Reformat outputs into occupancy data strucutre
-[ reoccupancy ] = fn_extract_recovery_metrics( day_tentant_unit_reoccupiable, recovery_day, comp_breakdowns, ...
-     building_model, damage_consequences, damage.comp_ds_info.comp_id );
+[ reoccupancy ] = fn_extract_recovery_metrics( day_tentant_unit_reoccupiable, ...
+     recovery_day, comp_breakdowns, damage.comp_ds_info.comp_id );
 
 
 end

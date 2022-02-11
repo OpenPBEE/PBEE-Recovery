@@ -1,21 +1,24 @@
-id,name,handle,threshold,n1_redundancy
-1,building equipment,,0,0
-2,motor control center,,0,0
-3,utility backup equipment,,0,0
-4,air distribution: ducts,hvac_duct_braches,0.25,0
-5,air distribution: in-line fans,hvac_in_line_fan,0.25,0
-6,air distribution: drops/diffusers,hvac_duct_drops,0.5,0
-7,air distribution: variable air volume boxes,hvac_vav_boxes,0.5,0
-8,fluid distribution: potable,,0,0
-9,fluid distribution: sanitary,,0,0
-10,fluid distribution: heating,,0,0
-11,fluid distribution: chilling,,0,0
-12,elevator cab,,0,0
-13,elevator lift mechanism,,0,0
-14,elevator guide mechanism,,0,0
-15,hvac equipment: chillers,,0,1
-16,hvac equipment: cooling towers,,0,1
-17,hvac equipment: roof top units,,0,0
-18,hvac equipment: exhaust fans,,0,0
-19,hvac equipment: air handeling units,,0,0
-20,hvac equipment: control panel,,0,0
+id,name,handle,parallel_operation,redundancy_threshold,n1_redundancy
+1,building equipment,,0,0,0
+2,motor control center,,0,0,0
+3,utility backup equipment,,0,0,0
+4,air distribution: ducts,hvac_duct_braches,0,0.25,0
+5,air distribution: in-line fans,hvac_in_line_fan,0,0.25,0
+6,air distribution: drops/diffusers,hvac_duct_drops,0,0.5,0
+7,air distribution: variable air volume boxes,hvac_vav_boxes,0,0.5,0
+8,fluid distribution: potable,,0,0,0
+9,fluid distribution: sanitary,,0,0,0
+10,fluid distribution: heating,,0,0,0
+11,fluid distribution: chilling,,0,0,0
+12,elevator cab,,1,0,0
+13,elevator lift mechanism,,1,0,0
+14,elevator guide mechanism,,1,0,0
+15,hvac equipment: chillers,,1,0,1
+16,hvac equipment: cooling towers,,1,0,1
+17,hvac equipment: roof top units,,1,0,0
+18,hvac equipment: exhaust fans,,1,0,0
+19,hvac equipment: air handeling units,,0,0,0
+20,hvac equipment: control panel,,0,0,0
+21,roof: structure,,0,0.1,0
+22,roof: weatherproofing,,0,0.25,0
+23,fire sprinkler drops,fs_drops,0,0.25,0

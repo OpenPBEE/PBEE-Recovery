@@ -1,5 +1,5 @@
 function [ recovery_day, comp_breakdowns ] = fn_tenant_function( damage, ...
-    building_model, system_operation_day, global_fail, utilities, subsystems, repair_time_options )
+    building_model, system_operation_day, utilities, subsystems, repair_time_options )
 % Check each tenant unit for damage that would cause that tenant unit 
 % to not be functional
 %
@@ -16,9 +16,6 @@ function [ recovery_day, comp_breakdowns ] = fn_tenant_function( damage, ...
 % system_operation_day.comp: struct
 %   simulation number of days each component is affecting building system
 %   operations
-% global_fail: logical array [num_reals x 1]
-%   is the entire building unrepairable due to issues of collapse or
-%   excessive residual
 % utilities: struct
 %   data structure containing simulated utility downtimes
 % subsystems: table
@@ -36,8 +33,7 @@ function [ recovery_day, comp_breakdowns ] = fn_tenant_function( damage, ...
 
 %% Initial Setup
 num_units = length(damage.tenant_units);
-num_reals = length(global_fail);
-num_comps = length(damage.comp_ds_info.comp_id);
+[num_reals, num_comps] = size(damage.tenant_units{1}.qnt_damaged);
 num_stories = building_model.num_stories;
 
 recovery_day.elevators = zeros(num_reals,num_units);
@@ -59,9 +55,7 @@ for tu = 1:num_units
     total_num_comps = damage.tenant_units{tu}.num_comps;
     unit = repair_time_options.tenant_units(tu,:);
     repair_complete_day = damage.tenant_units{tu}.recovery.repair_complete_day;
-    repair_complete_day(global_fail,:) = NaN; % Don't track damage when building fails
     repair_complete_day_w_tmp = damage.tenant_units{tu}.recovery.repair_complete_day_w_tmp;
-    repair_complete_day_w_tmp(global_fail,:) = NaN; % Don't track damage when building fails
     
     %% Elevators
     if unit.story > unit.max_walkable_story && unit.is_elevator_required
@@ -258,7 +252,6 @@ for tu = 1:num_units
         area_affected_bay_all_comps(:,damage.fnc_filters.vert_instabilities) ...
             = max(area_affected_below(:,damage.fnc_filters.vert_instabilities),area_affected_bay_all_comps(:,damage.fnc_filters.vert_instabilities));
         repair_time_below = damage.tenant_units{tu-1}.recovery.repair_complete_day_w_tmp;
-        repair_time_below(global_fail,:) = NaN; % Don't track damage when building fails
         repair_complete_day_w_tmp_w_instabilities(:,damage.fnc_filters.vert_instabilities) ...
             = max(repair_time_below(:,damage.fnc_filters.vert_instabilities),repair_complete_day_w_tmp(:,damage.fnc_filters.vert_instabilities));
     end

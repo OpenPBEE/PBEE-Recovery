@@ -1,5 +1,5 @@
 function [ recovery ] = fn_extract_recovery_metrics( tentant_unit_recovery_day, ...
-   recovery_day, comp_breakdowns, building_model, damage_consequences, comp_id )
+   recovery_day, comp_breakdowns, comp_id )
 % Reformant tenant level recovery outcomes into outcomes at the building level, 
 % system level, and compoennt level
 %
@@ -12,10 +12,6 @@ function [ recovery ] = fn_extract_recovery_metrics( tentant_unit_recovery_day, 
 %   recovery
 % comp_breakdowns: struct
 %   simulation of each components contributions to each of the fault tree events 
-% building_model: struct
-%   building info, such as replacement cost
-% damage_consequences: struct
-%   consequences of damage for all realizations
 % comp_id: cell array [1 x num comp damage states]
 %   list of each fragility id associated with the per component damage
 %   state structure of the damage object. With of array is the same as the
@@ -51,15 +47,10 @@ function [ recovery ] = fn_extract_recovery_metrics( tentant_unit_recovery_day, 
 %% Initial Setup
 num_units = size(tentant_unit_recovery_day,2);
 
-%% Post process tenant-level re-occupancy times
+%% Post process tenant-level recovery times
 % Overwrite NaNs in tenant_unit_day_functional
 % Only NaN where never had functional loss, therefore set to zero
 tentant_unit_recovery_day(isnan(tentant_unit_recovery_day)) = 0;
-
-% Global Consequences
-% Set collapse and residual cases to complete hinderence prior to replacement time
-tentant_unit_recovery_day(damage_consequences.global_fail,:) = building_model.replacement_time_days;
-tentant_unit_recovery_day(damage_consequences.substructure_fail,:) = building_model.replacement_time_days * building_model.substructure_fraction_of_replace_time;
 
 %% Save building-level outputs to occupancy structure
 % Tenant Unit level outputs

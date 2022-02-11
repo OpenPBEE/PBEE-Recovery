@@ -29,7 +29,7 @@ function [ recovery_day, comp_breakdowns, system_operation_day ] = fn_building_s
 %   simulation of recovery of operation for various systems in the building
 
 %% Initial Setup
-num_reals = length(damage_consequences.global_fail);
+num_reals = length(damage_consequences.red_tag);
 num_units = length(damage.tenant_units);
 num_comps = length(damage.comp_ds_info.comp_id);
 
@@ -43,7 +43,6 @@ system_operation_day.building.fire = 0;
 for tu = 1:num_units
     % Grab tenant and damage info for this tenant unit
     repair_complete_day = damage.tenant_units{tu}.recovery.repair_complete_day;
-    repair_complete_day(damage_consequences.global_fail,:) = NaN; % Don't track damage when building fails
     
     %% Red Tags
     % The day the red tag is resolved is the day when all damage (anywhere in building) that has
@@ -101,7 +100,6 @@ comp_affected_area = zeros(num_reals,num_comps,num_units);
 for tu = 1:num_units
     repair_complete_day_w_tmp(:,:,tu) = damage.tenant_units{tu}.recovery.repair_complete_day_w_tmp;
 end
-repair_complete_day_w_tmp(damage_consequences.global_fail,:,:) = NaN; % Don't track damage when building fails
 
 % Loop through component repair times to determine the day it stops affecting re-occupancy
 num_repair_time_increments = sum(damage.fnc_filters.ext_fall_haz_all)*num_units; % possible unique number of loop increments

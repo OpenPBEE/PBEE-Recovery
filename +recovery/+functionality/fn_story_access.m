@@ -30,7 +30,7 @@ function [ recovery_day, comp_breakdowns ] = fn_story_access(...
 %   simulation of each components contributions to each of the fault tree events 
 
 %% Initial Setup
-num_reals = length(damage_consequences.global_fail);
+num_reals = length(damage_consequences.red_tag);
 num_units = length(damage.tenant_units);
 num_stories = length(damage.tenant_units);
 num_comps = length(damage.comp_ds_info.comp_id);
@@ -67,7 +67,6 @@ for tu = 1:num_stories
 
     % Quantify damaged stairs on this story
     repair_complete_day = damage.tenant_units{tu}.recovery.repair_complete_day;
-    repair_complete_day(damage_consequences.global_fail,:) = NaN; % Don't track damage when building fails
     damaged_comps = damage.tenant_units{tu}.qnt_damaged;
     total_num_fs_drops = damage.tenant_units{tu}.num_comps .* damage.fnc_filters.fire_drops;
 
