@@ -136,13 +136,5 @@ recovery.breakdowns.perform_targ_days = perform_targ_days;
 recovery.breakdowns.system_names = system_names;
 recovery.breakdowns.comp_names = comps';
 
-%% red tag
-if isfield(recovery_day, 'building_safety')
-    recovery.red_tag.probability = mean(recovery_day.building_safety.red_tag > 0);
-    recovery.red_tag.mean = mean(recovery_day.building_safety.red_tag);
-    recovery.red_tag.median = median(recovery_day.building_safety.red_tag);
-    recovery.red_tag.fractile_90 = prctile(recovery_day.building_safety.red_tag, 90);
-end
-
 end
 

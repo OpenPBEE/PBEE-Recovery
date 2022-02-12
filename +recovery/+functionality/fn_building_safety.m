@@ -1,5 +1,5 @@
 function [ recovery_day, comp_breakdowns, system_operation_day ] = fn_building_safety( ...
-    damage, building_model, damage_consequences, utilities, analysis_options )
+    damage, building_model, damage_consequences, utilities, functionality_options )
 % Check damage that would cause the whole building to be shut down due to
 % issues of safety
 %
@@ -15,7 +15,7 @@ function [ recovery_day, comp_breakdowns, system_operation_day ] = fn_building_s
 %   general attributes of the building model
 % utilities: struct
 %   data structure containing simulated utility downtimes
-% analysis_options: struct
+% functionality_options: struct
 %   recovery time optional inputs such as various damage thresholds
 %
 % Returns
@@ -141,7 +141,7 @@ for i = 1:num_repair_time_increments
         % add the door access width to the width of falling hazards to account
         % for the width of the door (ie if any part of the door access zone is
         % under the falling hazard, its a problem)
-        door_access_zone = analysis_options.door_access_width_ft / building_model.edge_lengths(1,door_side(d)); 
+        door_access_zone = functionality_options.door_access_width_ft / building_model.edge_lengths(1,door_side(d)); 
         total_fall_haz_zone = fall_haz_zone + 2*door_access_zone;
 
         % Determine if current damage affects occupancy
@@ -167,10 +167,10 @@ side_2_count = 0;
 for d = 1:building_model.num_entry_doors
     if door_side(d) == 1
         side_1_count = side_1_count + 1;
-        day_repair_racked(:,d) = analysis_options.door_racking_repair_day * (damage_consequences.racked_entry_doors_side_1 >= side_1_count);
+        day_repair_racked(:,d) = functionality_options.door_racking_repair_day * (damage_consequences.racked_entry_doors_side_1 >= side_1_count);
     else 
         side_2_count = side_2_count + 1;
-        day_repair_racked(:,d) = analysis_options.door_racking_repair_day * (damage_consequences.racked_entry_doors_side_2 >= side_2_count);
+        day_repair_racked(:,d) = functionality_options.door_racking_repair_day * (damage_consequences.racked_entry_doors_side_2 >= side_2_count);
     end
 end
 door_access_day = max(day_repair_racked,day_repair_fall_haz);
@@ -184,8 +184,8 @@ door_access_day_nan(door_access_day_nan == 0) = NaN;
 num_repair_time_increments = building_model.num_entry_doors; % possible unique number of loop increments
 for i = 1:num_repair_time_increments
     num_accessible_doors = sum(door_access_day <= cum_days,2);
-    sufficent_door_access_with_fs  = num_accessible_doors >= max(1,analysis_options.egress_threshold*building_model.num_entry_doors);   % must have at least 1 functioning entry door or 50% of design egress
-    sufficent_door_access_wo_fs = num_accessible_doors >= max(1,analysis_options.egress_threshold_wo_fs*building_model.num_entry_doors);  % must have at least 1 functioning entry door or 75% of design egress when fire suppression system is down
+    sufficent_door_access_with_fs  = num_accessible_doors >= max(1,functionality_options.egress_threshold*building_model.num_entry_doors);   % must have at least 1 functioning entry door or 50% of design egress
+    sufficent_door_access_wo_fs = num_accessible_doors >= max(1,functionality_options.egress_threshold_wo_fs*building_model.num_entry_doors);  % must have at least 1 functioning entry door or 75% of design egress when fire suppression system is down
     fire_system_failure = system_operation_day.building.fire > cum_days;
     entry_door_accessible = sufficent_door_access_with_fs .* ~fire_system_failure + sufficent_door_access_wo_fs .* fire_system_failure;
     

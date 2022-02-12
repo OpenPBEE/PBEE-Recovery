@@ -1,5 +1,5 @@
 function [ recovery_day, comp_breakdowns ] = fn_tenant_safety( damage, ...
-    building_model, repair_time_options )
+    building_model, functionality_options, tenant_units )
 % Check each tenant unit for damage that would cause that tenant unit 
 % to be shut down due to issues of locay safety
 %
@@ -10,8 +10,10 @@ function [ recovery_day, comp_breakdowns ] = fn_tenant_safety( damage, ...
 %   component in the building
 % building_model: struct
 %   general attributes of the building model
-% repair_time_options: struct
+% functionality_options: struct
 %   recovery time optional inputs such as various damage thresholds
+% tenant_units: table
+%   attributes of each tenant unit within the building
 %
 % Returns
 % -------
@@ -29,7 +31,7 @@ comp_types_interior_check = unique(damage.comp_ds_info.comp_type_id(damage.fnc_f
 % go through each tenant unit and quantify the affect that each system has on reoccpauncy
 for tu = 1:num_units
     % Grab tenant and damage info for this tenant unit
-    unit = repair_time_options.tenant_units(tu,:);
+    unit = tenant_units(tu,:);
     repair_complete_day_w_tmp = damage.tenant_units{tu}.recovery.repair_complete_day_w_tmp; % day each component (and DS) is reparied of this TU
 
     %% Exterior Enclosure 
@@ -57,7 +59,7 @@ for tu = 1:num_units
         percent_area_affected = area_affected / unit.perim_area;
 
         % Check if this is sufficent enough to cause as tenant safety issue
-        affects_occupancy = percent_area_affected > repair_time_options.functionality.exterior_safety_threshold;
+        affects_occupancy = percent_area_affected > functionality_options.exterior_safety_threshold;
 
         % Determine step increment based on the component with the shortest repair time
         delta_day = min(comps_day_repaired(:,damage.fnc_filters.exterior_safety_all),[],2);
@@ -126,7 +128,7 @@ for tu = 1:num_units
         
         % Determine if current damage affects occupancy
         percent_area_affected = min(area_affected / unit.area,1);
-        affects_occupancy = percent_area_affected > repair_time_options.functionality.interior_safety_threshold;
+        affects_occupancy = percent_area_affected > functionality_options.interior_safety_threshold;
         
         % Determine step increment based on the component with the shortest repair time
         delta_day = min(comps_day_repaired(:,damage.fnc_filters.int_fall_haz_all),[],2);

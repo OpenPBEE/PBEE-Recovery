@@ -1,6 +1,6 @@
 function [ recovery_day, comp_breakdowns ] = fn_story_access(...
     damage, building_model, damage_consequences, system_operation_day, ...
-    subsystems, analysis_options )
+    subsystems, functionality_options )
 % Check each story for damage that would cause that story to be shut down due to
 % issues of access
 %
@@ -18,7 +18,7 @@ function [ recovery_day, comp_breakdowns ] = fn_story_access(...
 %   simulation of recovery of operation for various systems in the building
 % subsystems: table
 %   data table containing information about each subsystem's attributes
-% analysis_options: struct
+% functionality_options: struct
 %   recovery time optional inputs such as various damage thresholds
 %
 % Returns
@@ -62,7 +62,7 @@ for tu = 1:num_stories
     damage.tenant_units{tu}.num_comps = [damage.tenant_units{tu}.num_comps, building_model.stairs_per_story(tu)];
     racked_stair_doors = min(damage_consequences.racked_stair_doors_per_story(:,tu),building_model.stairs_per_story(tu));
     damage.tenant_units{tu}.qnt_damaged = [damage.tenant_units{tu}.qnt_damaged, racked_stair_doors];
-    door_repair_day = (racked_stair_doors > 0) * analysis_options.door_racking_repair_day;
+    door_repair_day = (racked_stair_doors > 0) * functionality_options.door_racking_repair_day;
     damage.tenant_units{tu}.recovery.repair_complete_day = [damage.tenant_units{tu}.recovery.repair_complete_day, door_repair_day];
 
     % Quantify damaged stairs on this story
@@ -109,8 +109,8 @@ for tu = 1:num_stories
         end
 
         % Required egress with and without operational fire suppression system
-        required_stairs_w_fs = max(1,analysis_options.egress_threshold .* building_model.stairs_per_story(tu)); 
-        required_stairs_wo_fs = max(1,analysis_options.egress_threshold_wo_fs .* building_model.stairs_per_story(tu));
+        required_stairs_w_fs = max(1,functionality_options.egress_threshold .* building_model.stairs_per_story(tu)); 
+        required_stairs_wo_fs = max(1,functionality_options.egress_threshold_wo_fs .* building_model.stairs_per_story(tu));
 
         % Determine Stair Access
         sufficient_stair_access_w_fs  = functioning_stairs >= required_stairs_w_fs;

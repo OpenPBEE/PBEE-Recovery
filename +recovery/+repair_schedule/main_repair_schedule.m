@@ -1,5 +1,5 @@
 function [damage, impeding_factors, worker_data, building_repair_schedule ] = main_repair_schedule(...
-    damage, building_model, damage_consequences, repair_time_options)
+    damage, building_model, damage_consequences, repair_time_options, systems)
 % Determine the repair time for a given damage simulation.
 %
 % Simulation of system and building level repair times based on a
@@ -18,6 +18,9 @@ function [damage, impeding_factors, worker_data, building_repair_schedule ] = ma
 %   tags and repair costs ratios
 % repair_time_options: struct
 %   general repair time options such as mitigation factors
+% systems: table
+%   attributes of structural and nonstructural building systems; data 
+%   provided in static tables directory
 %
 % Returns
 % -------
@@ -37,8 +40,6 @@ function [damage, impeding_factors, worker_data, building_repair_schedule ] = ma
 import recovery.repair_schedule.*
 import recovery.repair_schedule.impedance.main_impeding_factors
 
-% to make the reference simpler
-systems = repair_time_options.systems;
 
 %% Step 1 - Define max worker allocations
 % Set the range for max workers per story and on site 
@@ -63,7 +64,7 @@ max_workers_per_story = ceil(building_model.area_per_story_sf * 0.001); % based 
 %% Step 4 - Simulate Temporary Repair Times
 [ tmp_repair_complete_day ] = fn_simulate_tmp_repair_times( damage, ...
                               impeding_factors.breakdowns.inspection.complete_day,...
-                              repair_time_options.functionality.beta_temp, ...
+                              repair_time_options.temp_repair_beta, ...
                               repair_time_options.surge_factor );
                           
 %% Step 5 - Set system repair priority

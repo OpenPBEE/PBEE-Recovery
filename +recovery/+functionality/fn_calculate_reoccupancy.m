@@ -1,6 +1,6 @@
 function [reoccupancy] = fn_calculate_reoccupancy(...
     damage, damage_consequences, utilities, building_model, subsystems,...
-    repair_time_options )
+    functionality_options, tenant_units )
 % Calcualte the loss and recovery of building re-occupancy 
 % based on global building damage, local component damage, and extenernal factors
 %
@@ -17,9 +17,12 @@ function [reoccupancy] = fn_calculate_reoccupancy(...
 % building_model: struct
 %   general attributes of the building model
 % subsystems: table
-%   data table containing information about each subsystem's attributes
-% repair_time_options: struct
+%   attributes of building subsystems; data provided in static tables
+%   directory
+% functionality_options: struct
 %   recovery time optional inputs such as various damage thresholds
+% tenant_units: table
+%   attributes of each tenant unit within the building
 %
 % Returns
 % -------
@@ -36,16 +39,16 @@ import recovery.functionality.fn_extract_recovery_metrics
     
 %% Stage 1: Quantify the effect that component damage has on the building safety
 [ recovery_day.building_safety, comp_breakdowns.building_safety, system_operation_day ] = ...
-    fn_building_safety( damage, building_model, damage_consequences, utilities, repair_time_options.functionality );
+    fn_building_safety( damage, building_model, damage_consequences, utilities, functionality_options );
 
 %% Stage 2: Quantify the accessibility of each story in the building
 [ recovery_day.story_access, comp_breakdowns.story_access ] = ...
     fn_story_access( damage, building_model, damage_consequences, ...
-    system_operation_day, subsystems, repair_time_options.functionality );
+    system_operation_day, subsystems, functionality_options );
 
 %% Stage 3: Quantify the effect that component damage has on the safety of each tenant unit
 [ recovery_day.tenant_safety, comp_breakdowns.tenant_safety ] = ...
-    fn_tenant_safety( damage, building_model, repair_time_options );
+    fn_tenant_safety( damage, building_model, functionality_options, tenant_units );
 
 %% Combine Check to determine the day the each tenant unit is reoccupiable
 % Check the day the building is Safe

@@ -1,5 +1,5 @@
 function [ recovery_day, comp_breakdowns ] = fn_tenant_function( damage, ...
-    building_model, system_operation_day, utilities, subsystems, repair_time_options )
+    building_model, system_operation_day, utilities, subsystems, tenant_units )
 % Check each tenant unit for damage that would cause that tenant unit 
 % to not be functional
 %
@@ -20,8 +20,8 @@ function [ recovery_day, comp_breakdowns ] = fn_tenant_function( damage, ...
 %   data structure containing simulated utility downtimes
 % subsystems: table
 %   data table containing information about each subsystem's attributes
-% repair_time_options: struct
-%   recovery time optional inputs such as various damage thresholds
+% tenant_units: table
+%   attributes of each tenant unit within the building
 %
 % Returns
 % -------
@@ -53,12 +53,12 @@ for tu = 1:num_units
     damaged_comps = damage.tenant_units{tu}.qnt_damaged;
     initial_damaged = damaged_comps > 0;
     total_num_comps = damage.tenant_units{tu}.num_comps;
-    unit = repair_time_options.tenant_units(tu,:);
+    unit = tenant_units(tu,:);
     repair_complete_day = damage.tenant_units{tu}.recovery.repair_complete_day;
     repair_complete_day_w_tmp = damage.tenant_units{tu}.recovery.repair_complete_day_w_tmp;
     
     %% Elevators
-    if unit.story > unit.max_walkable_story && unit.is_elevator_required
+    if unit.is_elevator_required
         comps_day_repaired = system_operation_day.comp.elev_day_repaired;
         comps_day_repaired(comps_day_repaired == 0) = NaN;
         comps_quant_damaged = system_operation_day.comp.elev_quant_damaged;
@@ -158,7 +158,7 @@ for tu = 1:num_units
     if unit.story == num_stories % If this is the top story, check the roof for functio
         % Roof structure (currently assuming all roofing components have equal unit
         % areas)
-        damage_threshold = repair_time_options.subsystems.redundancy_threshold(repair_time_options.subsystems.id == 21);
+        damage_threshold = subsystems.redundancy_threshold(subsystems.id == 21);
         num_comp_damaged = damage.fnc_filters.roof_structure .* damage.tenant_units{tu}.qnt_damaged;
         num_roof_comps = damage.fnc_filters.roof_structure .* damage.tenant_units{tu}.num_comps;
 
@@ -195,7 +195,7 @@ for tu = 1:num_units
 
         % Roof weatherproofing (currently assuming all roofing components have 
         % equal unit areas)
-        damage_threshold = repair_time_options.subsystems.redundancy_threshold(repair_time_options.subsystems.id == 22);
+        damage_threshold = subsystems.redundancy_threshold(subsystems.id == 22);
         num_comp_damaged = damage.fnc_filters.roof_weatherproofing .* damage.tenant_units{tu}.qnt_damaged;
         num_roof_comps = damage.fnc_filters.roof_weatherproofing .* damage.tenant_units{tu}.num_comps;
 
