@@ -28,7 +28,7 @@ function [ system_operation_day ] = fn_building_level_system_operation( damage, 
 
 %% Initial Setep
 num_stories = building_model.num_stories;
-num_reals = length(damage_consequences.global_fail);
+num_reals = length(damage_consequences.red_tag);
 num_comps = length(damage.comp_ds_info.comp_id);
 
 system_operation_day.building.hvac_main = zeros(num_reals,1);
@@ -38,20 +38,20 @@ system_operation_day.comp.elev_day_repaired = zeros(num_reals,num_comps);
 system_operation_day.comp.electrical_main = zeros(num_reals,num_comps);
 system_operation_day.comp.water_main = zeros(num_reals,num_comps);
 system_operation_day.comp.hvac_main = zeros(num_reals,num_comps);
-system_operation_day.comp.mcs = zeros(num_reals,num_comps);
+system_operation_day.comp.elevator_mcs = zeros(num_reals,num_comps);
+system_operation_day.comp.hvac_mcs = zeros(num_reals,num_comps);
 
 %% Loop through each story/TU and quantify the building-level performance of each system (e.g. equipment that severs the entire building)
 for tu = 1:num_stories
-    damaged_comps = damage.story{tu}.qnt_damaged;
+    damaged_comps = damage.tenant_units{tu}.qnt_damaged;
     initial_damaged = damaged_comps > 0;
-    total_num_comps = damage.story{tu}.num_comps;
-    repair_complete_day = damage.story{tu}.recovery.repair_complete_day;
-    repair_complete_day(damage_consequences.global_fail,:) = NaN; % Don't track damage when building fails
+    total_num_comps = damage.tenant_units{tu}.num_comps;
+    repair_complete_day = damage.tenant_units{tu}.recovery.repair_complete_day;
     
     % Elevators
     % Assumed all components affect entire height of shaft
     system_operation_day.comp.elev_quant_damaged = ...
-        max(system_operation_day.comp.elev_quant_damaged, damage.story{tu}.qnt_damaged .* damage.fnc_filters.elevators);
+        max(system_operation_day.comp.elev_quant_damaged, damage.tenant_units{tu}.qnt_damaged .* damage.fnc_filters.elevators);
     system_operation_day.comp.elev_day_repaired = ...
         max(system_operation_day.comp.elev_day_repaired, repair_complete_day .* damage.fnc_filters.elevators);
     
@@ -59,9 +59,9 @@ for tu = 1:num_stories
     system_operation_day.comp.electrical_main = ...
         max(system_operation_day.comp.electrical_main, repair_complete_day .* damage.fnc_filters.electrical_main);
     
-    % Motor Control system
-    system_operation_day.comp.mcs = ...
-        max(system_operation_day.comp.mcs, repair_complete_day .* damage.fnc_filters.mcs); % any major damage fails the system for the whole building so take the max
+    % Motor Control system - Elevators
+    system_operation_day.comp.elevator_mcs = ...
+        max(system_operation_day.comp.elevator_mcs, repair_complete_day .* damage.fnc_filters.elevator_mcs);
     
     % Water
     system_operation_day.comp.water_main = ...
@@ -129,21 +129,26 @@ for tu = 1:num_stories
     heating_piping_repair_day = max(repair_complete_day .* damage.fnc_filters.hvac_heating_piping,[],2); % any major damage to the piping fails the system for the entire building
 
     % HVAC control Equipment
-    % hvac control panel is currently embedded into the non-redundant
-    % equipment check, therefore this is just the MCS
-    hvac_control_equip_repair_day = max(repair_complete_day .* damage.fnc_filters.mcs,[],2); % any major damage leads to loss of the MCS (ie no redundancy)
+    % hvac control panel is currently embedded into the non-redundant equipment check
     
     % HVAC building level exhaust
     % this is embedded in the main equipment check
     
+    % Motor Control system - HVAC
+    % if seperate from the hvac control panel (only pulls in if defined as
+    % part or the HVAC system -- using the component system attribute)
+    hvac_mcs_repair_day = max(repair_complete_day .* damage.fnc_filters.hvac_mcs,[],2); % any major damage fails the system for the whole building so take the max
+    
     % Putting it all together
     % Currently not seperating heating equip from cooling equip (as they are currently the same, ie there are no boilers in P-58)
-    main_equip_repair_day = max(max(main_nonredundant_sys_repair_day, main_redundant_sys_repair_day), hvac_control_equip_repair_day); % This includes hvac controls and exhaust
+    main_equip_repair_day = max(main_nonredundant_sys_repair_day, main_redundant_sys_repair_day); % This includes hvac controls and exhaust
     heating_utility_repair_day = utilities.gas;
     heating_system_repair_day = max(main_equip_repair_day, max(duct_mains_repair_day, max(heating_utility_repair_day, heating_piping_repair_day)));
     cooling_utility_repair_day = utilities.electrical;
     cooling_system_repair_day = max(main_equip_repair_day, max(duct_mains_repair_day, max(cooling_utility_repair_day, cooling_piping_repair_day)));
-    system_operation_day.building.hvac_main = max(system_operation_day.building.hvac_main, max(heating_system_repair_day, cooling_system_repair_day)); % combine with damage from previous floors
+    system_operation_day.building.hvac_main = max( system_operation_day.building.hvac_main, ... % combine with damage from previous floors
+                                              max( hvac_mcs_repair_day, ...
+                                              max( heating_system_repair_day, cooling_system_repair_day))); 
 
     % HVAC Equipment and Distribution - Building Level
     nonredundant_comps_day = damage.fnc_filters.hvac_main_nonredundant .* initial_damaged .* main_nonredundant_sys_repair_day; % note these components anytime they cause specific system failure
@@ -151,15 +156,18 @@ for tu = 1:num_stories
     main_duct_comps_day = damage.fnc_filters.hvac_duct_mains .* initial_damaged .* duct_mains_repair_day;
     cooling_piping_comps_day = damage.fnc_filters.hvac_cooling_piping .* initial_damaged .* cooling_piping_repair_day;
     heating_piping_comps_day = damage.fnc_filters.hvac_heating_piping .* initial_damaged .* heating_piping_repair_day;
+    hvac_mcs_comps_day = damage.fnc_filters.hvac_mcs .* initial_damaged .* hvac_mcs_repair_day;
     hvac_comp_recovery_day = max(max(max(max(max(nonredundant_comps_day, redundant_comps_day), ...
-                                                main_duct_comps_day), cooling_piping_comps_day), ...
-                                                heating_piping_comps_day), system_operation_day.comp.mcs);
+                                                 main_duct_comps_day), cooling_piping_comps_day), ...
+                                                 heating_piping_comps_day),...
+                                                 hvac_mcs_comps_day);
     system_operation_day.comp.hvac_main = max(system_operation_day.comp.hvac_main,hvac_comp_recovery_day);                         
 end
 
 %% Calculate building level consequences for systems where any major main damage leads to system failure
 system_operation_day.building.electrical_main = max(system_operation_day.comp.electrical_main,[],2);  % any major damage to the main equipment fails the system for the entire building
 system_operation_day.building.water_main = max(system_operation_day.comp.water_main,[],2);  % any major damage to the main pipes fails the system for the entire building
-system_operation_day.building.mcs = max(system_operation_day.comp.mcs,[],2); % any major damage fails the system for the whole building so take the max
+system_operation_day.building.elevator_mcs = max(system_operation_day.comp.elevator_mcs,[],2); % any major damage fails the system for the whole building so take the max
+system_operation_day.building.hvac_mcs = max(system_operation_day.comp.hvac_mcs,[],2); % any major damage fails the system for the whole building so take the max
 end
 

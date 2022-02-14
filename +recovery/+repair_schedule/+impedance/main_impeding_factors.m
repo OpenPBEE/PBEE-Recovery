@@ -1,5 +1,5 @@
-function [impeding_factors] = main_impeding_factors(damage, impedance_options, repair_cost, ...
-    inpsection_trigger, systems, system_repair_time)
+function [impeding_factors] = main_impeding_factors(damage, impedance_options, repair_cost_ratio, ...
+    inpsection_trigger, systems, system_repair_time, building_value)
 % Calculate ATC-138 impeding times for each system given simulation of damage
 %
 % Parameters
@@ -8,7 +8,7 @@ function [impeding_factors] = main_impeding_factors(damage, impedance_options, r
 %   contains per damage state damage and loss data for each component in the building
 % impedance_options: struct
 %   general impedance assessment user inputs such as mitigation factors
-% repair_cost: array [num_reals x 1]
+% repair_cost_ratio: array [num_reals x 1]
 %   total repair cost per realization normalized by building replacement
 %   value
 % inpsection_trigger: logical array [num_reals x 1]
@@ -39,7 +39,6 @@ function [impeding_factors] = main_impeding_factors(damage, impedance_options, r
 
 %% Initial Setup
 % Import packages
-import recovery.repair_schedule.impedance.fn_calculate_sdt_prt
 import recovery.repair_schedule.impedance.fn_contractor
 import recovery.repair_schedule.impedance.fn_engineering
 import recovery.repair_schedule.impedance.fn_financing
@@ -59,10 +58,8 @@ duration.eng_mob = zeros(num_reals, num_sys);
 duration.design = zeros(num_reals, num_sys);
 
 % System repair trigger
+% are there any repairs needed for this system
 sys_repair_trigger = system_repair_time > 0;
-
-[ system_design_time, permit_review_time, system_rapid_permit_trigger ] = fn_calculate_sdt_prt( ...
-    damage, system_repair_time );
 
 % Create basic trucated standard normal distribution for later simulation
 pd = makedist('normal','mu',0,'sigma',1);
@@ -73,28 +70,31 @@ trunc_pd = truncate(pd,th_low,th_high);
 %% Simulate impedance time for each impedance factor 
 if impedance_options.include_impedance.inspection
     duration.inspection = fn_inspection( impedance_options.mitigation.is_essential_facility, ...
+        impedance_options.mitigation.is_borp_equivalent, ...
         impedance_options.surge_factor, sys_repair_trigger, inpsection_trigger, trunc_pd );
 end
 
 if impedance_options.include_impedance.financing
     duration.financing = fn_financing( impedance_options.mitigation.capital_available_ratio, ...
-        impedance_options.mitigation.funding_source, sys_repair_trigger, repair_cost, trunc_pd );
+        impedance_options.mitigation.funding_source, impedance_options.surge_factor,...
+        sys_repair_trigger, repair_cost_ratio, trunc_pd );
 end
 
 if impedance_options.include_impedance.permitting
-    duration.permitting = fn_permitting(  ...
-        impedance_options.surge_factor, system_rapid_permit_trigger, permit_review_time, trunc_pd );
+    duration.permitting = fn_permitting( damage, num_sys, num_reals, ...
+        impedance_options.surge_factor, trunc_pd );
 end
 
 if impedance_options.include_impedance.contractor
-    duration.contractor_mob = fn_contractor( ...
-        impedance_options.surge_factor, sys_repair_trigger, system_repair_time, ...
-        systems.imped_contractor_min_days', systems.imped_contractor_max_days', trunc_pd );
+    duration.contractor_mob = fn_contractor( num_sys, num_reals, ...
+        impedance_options.surge_factor, sys_repair_trigger, ...
+        systems, impedance_options.mitigation.is_contractor_on_retainer );
 end
 
 if impedance_options.include_impedance.engineering
-    [ duration.eng_mob, duration.design ] = fn_engineering( ...
-        impedance_options.surge_factor, system_design_time, ...
+    [ duration.eng_mob, duration.design ] = fn_engineering( damage, num_sys, ...
+        num_reals, repair_cost_ratio, building_value, impedance_options.surge_factor, ...
+        impedance_options.mitigation.is_engineer_on_retainer, impedance_options.system_design_time, ...
         systems.imped_design_min_days', systems.imped_design_max_days', trunc_pd);
 end
 
@@ -115,7 +115,7 @@ complete_day.design = start_day.design + duration.design;
 start_day.permitting = complete_day.design;
 complete_day.permitting = start_day.permitting + duration.permitting;
 
-start_day.contractor_mob = max(max(complete_day.inspection,start_day.financing),start_day.eng_mob);
+start_day.contractor_mob = max(complete_day.inspection,start_day.financing);
 complete_day.contractor_mob = start_day.contractor_mob + duration.contractor_mob;
 
 % Combine all impedance factors by system

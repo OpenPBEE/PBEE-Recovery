@@ -1,5 +1,6 @@
 function [ recovery_day, comp_breakdowns ] = fn_story_access(...
-    damage, building_model, damage_consequences, system_operation_day, analysis_options )
+    damage, building_model, damage_consequences, system_operation_day, ...
+    subsystems, functionality_options )
 % Check each story for damage that would cause that story to be shut down due to
 % issues of access
 %
@@ -15,7 +16,9 @@ function [ recovery_day, comp_breakdowns ] = fn_story_access(...
 %   tags and repair costs ratios
 % system_operation_day: struct
 %   simulation of recovery of operation for various systems in the building
-% analysis_options: struct
+% subsystems: table
+%   data table containing information about each subsystem's attributes
+% functionality_options: struct
 %   recovery time optional inputs such as various damage thresholds
 %
 % Returns
@@ -27,9 +30,9 @@ function [ recovery_day, comp_breakdowns ] = fn_story_access(...
 %   simulation of each components contributions to each of the fault tree events 
 
 %% Initial Setup
-num_reals = length(damage_consequences.global_fail);
-num_units = length(damage.story);
-num_stories = length(damage.story);
+num_reals = length(damage_consequences.red_tag);
+num_units = length(damage.tenant_units);
+num_stories = length(damage.tenant_units);
 num_comps = length(damage.comp_ds_info.comp_id);
 
 % Pre-allocate data
@@ -44,29 +47,28 @@ end
 
 % Augment damage filters with door data
 damage.fnc_filters.stairs = logical([damage.fnc_filters.stairs, 0]);
-damage.fnc_filters.fire_unit = logical([damage.fnc_filters.fire_unit, 0]);
+damage.fnc_filters.fire_drops = logical([damage.fnc_filters.fire_drops, 0]);
 damage.fnc_filters.fire_building = logical([damage.fnc_filters.fire_building, 0]);
 damage.fnc_filters.stair_doors = logical([zeros(1,num_comps), 1]);
 
 % check if building has fire supprsion system
 % must have both the building level (pipes) and tenant level (drops)components
-fs_exists = any(damage.fnc_filters.fire_building) & any(damage.fnc_filters.fire_unit);
+fs_exists = any(damage.fnc_filters.fire_building) & any(damage.fnc_filters.fire_drops);
 
 %% Stairs
-% if stairs dont exist on a story, this will assume they are rugged (along with the stair doors)
+% if stairs don't exist on a story, this will assume they are rugged (along with the stair doors)
 for tu = 1:num_stories
-    % Augment damage metrix with door data
-    damage.story{tu}.num_comps = [damage.story{tu}.num_comps, building_model.stairs_per_story(tu)];
+    % Augment damage matrix with door data
+    damage.tenant_units{tu}.num_comps = [damage.tenant_units{tu}.num_comps, building_model.stairs_per_story(tu)];
     racked_stair_doors = min(damage_consequences.racked_stair_doors_per_story(:,tu),building_model.stairs_per_story(tu));
-    damage.story{tu}.qnt_damaged = [damage.story{tu}.qnt_damaged, racked_stair_doors];
-    door_repair_day = (racked_stair_doors > 0) * analysis_options.door_racking_repair_day;
-    damage.story{tu}.recovery.repair_complete_day = [damage.story{tu}.recovery.repair_complete_day, door_repair_day];
+    damage.tenant_units{tu}.qnt_damaged = [damage.tenant_units{tu}.qnt_damaged, racked_stair_doors];
+    door_repair_day = (racked_stair_doors > 0) * functionality_options.door_racking_repair_day;
+    damage.tenant_units{tu}.recovery.repair_complete_day = [damage.tenant_units{tu}.recovery.repair_complete_day, door_repair_day];
 
     % Quantify damaged stairs on this story
-    repair_complete_day = damage.story{tu}.recovery.repair_complete_day;
-    repair_complete_day(damage_consequences.global_fail,:) = NaN; % Don't track damage when building fails
-    damaged_comps = damage.story{tu}.qnt_damaged;
-    total_num_fs_drops = damage.story{tu}.num_comps .* damage.fnc_filters.fire_unit;
+    repair_complete_day = damage.tenant_units{tu}.recovery.repair_complete_day;
+    damaged_comps = damage.tenant_units{tu}.qnt_damaged;
+    total_num_fs_drops = damage.tenant_units{tu}.num_comps .* damage.fnc_filters.fire_drops;
 
     % Replace story level repair day with building level for fire suppression system mains
     % This includes loss of utility, so its not just about component
@@ -85,7 +87,7 @@ for tu = 1:num_stories
     % stairs stop affecting story access
     stair_access_day = zeros(num_reals,1); % day story becomes accessible from repair of stairs
     stairdoor_access_day = zeros(num_reals,1); % day story becomes accessible from repair of doors
-    filt_all = damage.fnc_filters.stairs | damage.fnc_filters.fire_unit | damage.fnc_filters.stair_doors | damage.fnc_filters.fire_building;
+    filt_all = damage.fnc_filters.stairs | damage.fnc_filters.fire_drops | damage.fnc_filters.stair_doors | damage.fnc_filters.fire_building;
     num_repair_time_increments = sum(filt_all); % possible unique number of loop increments
     for i = 1:num_repair_time_increments
         % number of functioning stairs
@@ -96,19 +98,19 @@ for tu = 1:num_stories
 
         % Fraction of functioning fire sprinkler drops
         if fs_exists % only do this if the building has a fire suppression system
-            num_dam_fs_drops = sum(damaged_comps .* damage.fnc_filters.fire_unit,2); % assumes comps are not simeltaneous
-            ratio_fs_drop_operating = 1 - max(num_dam_fs_drops ./ total_num_fs_drops,[],2); % Does not does not properly account for
+            num_dam_fs_drops = sum(damaged_comps .* damage.fnc_filters.fire_drops,2); % assumes comps are not simeltaneous
+            ratio_fs_drop_failed = max(num_dam_fs_drops ./ total_num_fs_drops,[],2); % Does not does not properly account for
                                                                                             % components in multuple PGs
 
             % Determine if the fire sprinkler system is operation at this story
-            sufficient_fs_drop = ratio_fs_drop_operating >= analysis_options.required_ratio_operating_fs_drops;
+            sufficient_fs_drop = ratio_fs_drop_failed <= subsystems.redundancy_threshold(strcmp(subsystems.handle,'fs_drops'));
             building_fs_operational = isnan(max(repair_complete_day(:,damage.fnc_filters.fire_building),[],2)); % has all damage been repaired 
             fs_operational = sufficient_fs_drop & building_fs_operational;
         end
 
         % Required egress with and without operational fire suppression system
-        required_stairs_w_fs = max(1,analysis_options.egress_threshold .* building_model.stairs_per_story(tu)); 
-        required_stairs_wo_fs = max(1,analysis_options.egress_threshold_wo_fs .* building_model.stairs_per_story(tu));
+        required_stairs_w_fs = max(1,functionality_options.egress_threshold .* building_model.stairs_per_story(tu)); 
+        required_stairs_wo_fs = max(1,functionality_options.egress_threshold_wo_fs .* building_model.stairs_per_story(tu));
 
         % Determine Stair Access
         sufficient_stair_access_w_fs  = functioning_stairs >= required_stairs_w_fs;
@@ -154,7 +156,7 @@ for tu = 1:num_stories
         if fs_exists
             % Count any fire component, only if fs operation matters foraccess
             contributing_fire_comps = ((damaged_comps .* ...
-                (damage.fnc_filters.fire_unit | damage.fnc_filters.fire_building)) > 0) .* fs_matters_for_access; 
+                (damage.fnc_filters.fire_drops | damage.fnc_filters.fire_building)) > 0) .* fs_matters_for_access; 
             contributing_comps = contributing_stairs | contributing_fire_comps;
         else
             contributing_comps = contributing_stairs;
@@ -170,7 +172,13 @@ for tu = 1:num_stories
     end
 
     % This story is not accessible if any story below has insufficient stair egress
-    recovery_day.stairs(:,tu) = max(stair_access_day,max(recovery_day.stairs(:,1:tu),[],2));
+    if tu == 1
+        recovery_day.stairs(:,tu) = max(stair_access_day,max(recovery_day.stairs(:,1:tu),[],2));
+    else
+        % also the story below is not accessible if there is insufficient
+        % stair egress at this story
+        recovery_day.stairs(:,(tu-1):tu) = ones(1,2) .* max(stair_access_day,max(recovery_day.stairs(:,1:tu),[],2));
+    end
 
     % Damage to doors only affects this story
     recovery_day.stair_doors(:,tu) = stairdoor_access_day;

@@ -69,9 +69,8 @@ current_day = zeros(num_reals,1);
 priority_sys_waiting_days = priority_sys_impeding_factors;
 while sum(sum(priority_sys_repair_days)) > 0.01
     iter = iter + 1; 
-    if iter > 1000 % keep the pandemic in line
-        % pandamit! we've gone too far
-        error('Error: Could not converge worker allocations for among systems');
+    if iter > 1000 % keep the while loop pandemic contained
+        error('PBEE_Recovery:RepairSchedule', 'Could not converge worker allocations for among systems');
     end
     
     % zero out assigned workers matrix

@@ -1,5 +1,5 @@
 function [ recovery_day, comp_breakdowns, system_operation_day ] = fn_building_safety( ...
-    damage, building_model, damage_consequences, utilities, analysis_options )
+    damage, building_model, damage_consequences, utilities, functionality_options )
 % Check damage that would cause the whole building to be shut down due to
 % issues of safety
 %
@@ -15,7 +15,7 @@ function [ recovery_day, comp_breakdowns, system_operation_day ] = fn_building_s
 %   general attributes of the building model
 % utilities: struct
 %   data structure containing simulated utility downtimes
-% analysis_options: struct
+% functionality_options: struct
 %   recovery time optional inputs such as various damage thresholds
 %
 % Returns
@@ -29,20 +29,20 @@ function [ recovery_day, comp_breakdowns, system_operation_day ] = fn_building_s
 %   simulation of recovery of operation for various systems in the building
 
 %% Initial Setup
-num_reals = length(damage_consequences.global_fail);
-num_units = length(damage.story);
+num_reals = length(damage_consequences.red_tag);
+num_units = length(damage.tenant_units);
 num_comps = length(damage.comp_ds_info.comp_id);
 
 %% Calculate effect of red tags and fire suppression system
 % Initialize parameters
 recovery_day.red_tag = zeros(num_reals, 1);
+recovery_day.hazardous_material = zeros(num_reals, 1);
 system_operation_day.building.fire = 0;
 
-% Check red tag type damage througout the building
+% Check damage throughout the building
 for tu = 1:num_units
     % Grab tenant and damage info for this tenant unit
-    repair_complete_day = damage.story{tu}.recovery.repair_complete_day;
-    repair_complete_day(damage_consequences.global_fail,:) = NaN; % Don't track damage when building fails
+    repair_complete_day = damage.tenant_units{tu}.recovery.repair_complete_day;
     
     %% Red Tags
     % The day the red tag is resolved is the day when all damage (anywhere in building) that has
@@ -67,6 +67,15 @@ for tu = 1:num_units
     % Componet Breakdowns
     system_operation_day.comp.fire(:,:,tu) = damage.fnc_filters.fire_building .* repair_complete_day;
     
+    %% Hazardous Materials
+    % note: hazardous materials are accounted for in building functional
+    % assessment here, but are not currently quantified in the component
+    % breakdowns
+    if any(damage.fnc_filters.global_hazardous_material)
+        % Any global hazardous material shuts down the entire building
+        recovery_day.hazardous_material = max(recovery_day.hazardous_material, max(repair_complete_day(:,damage.fnc_filters.global_hazardous_material),[],2)); 
+    end
+    
 end
 
 %% Building Egress
@@ -89,9 +98,8 @@ day_repair_fall_haz = zeros(num_reals,building_model.num_entry_doors);
 fall_haz_comps_day_rep = zeros(num_reals,num_comps,num_units,building_model.num_entry_doors);
 comp_affected_area = zeros(num_reals,num_comps,num_units);
 for tu = 1:num_units
-    repair_complete_day_w_tmp(:,:,tu) = damage.story{tu}.recovery.repair_complete_day_w_tmp;
+    repair_complete_day_w_tmp(:,:,tu) = damage.tenant_units{tu}.recovery.repair_complete_day_w_tmp;
 end
-repair_complete_day_w_tmp(damage_consequences.global_fail,:,:) = NaN; % Don't track damage when building fails
 
 % Loop through component repair times to determine the day it stops affecting re-occupancy
 num_repair_time_increments = sum(damage.fnc_filters.ext_fall_haz_all)*num_units; % possible unique number of loop increments
@@ -101,9 +109,9 @@ for i = 1:num_repair_time_increments
     for tu = 1:num_units
         for s = 1:4 % assumes there are 4 sides
             area_affected_lf_all_comps = damage.comp_ds_info.fraction_area_affected .* ...
-                damage.comp_ds_info.unit_qty .* building_model.ht_per_story_ft(tu) .* damage.story{tu}.(['qnt_damaged_side_' num2str(s)]);
+                damage.comp_ds_info.unit_qty .* building_model.ht_per_story_ft(tu) .* damage.tenant_units{tu}.(['qnt_damaged_side_' num2str(s)]);
             area_affected_sf_all_comps = damage.comp_ds_info.fraction_area_affected .* ...
-                damage.comp_ds_info.unit_qty .* damage.story{tu}.(['qnt_damaged_side_' num2str(s)]);
+                damage.comp_ds_info.unit_qty .* damage.tenant_units{tu}.(['qnt_damaged_side_' num2str(s)]);
 
             comp_affected_area(:,damage.fnc_filters.ext_fall_haz_lf,tu) = area_affected_lf_all_comps(:,damage.fnc_filters.ext_fall_haz_lf);
             comp_affected_area(:,damage.fnc_filters.ext_fall_haz_sf,tu) = area_affected_sf_all_comps(:,damage.fnc_filters.ext_fall_haz_sf);
@@ -133,7 +141,7 @@ for i = 1:num_repair_time_increments
         % add the door access width to the width of falling hazards to account
         % for the width of the door (ie if any part of the door access zone is
         % under the falling hazard, its a problem)
-        door_access_zone = analysis_options.door_access_width_ft / building_model.edge_lengths(1,door_side(d)); 
+        door_access_zone = functionality_options.door_access_width_ft / building_model.edge_lengths(1,door_side(d)); 
         total_fall_haz_zone = fall_haz_zone + 2*door_access_zone;
 
         % Determine if current damage affects occupancy
@@ -159,10 +167,10 @@ side_2_count = 0;
 for d = 1:building_model.num_entry_doors
     if door_side(d) == 1
         side_1_count = side_1_count + 1;
-        day_repair_racked(:,d) = analysis_options.door_racking_repair_day * (damage_consequences.racked_entry_doors_side_1 >= side_1_count);
+        day_repair_racked(:,d) = functionality_options.door_racking_repair_day * (damage_consequences.racked_entry_doors_side_1 >= side_1_count);
     else 
         side_2_count = side_2_count + 1;
-        day_repair_racked(:,d) = analysis_options.door_racking_repair_day * (damage_consequences.racked_entry_doors_side_2 >= side_2_count);
+        day_repair_racked(:,d) = functionality_options.door_racking_repair_day * (damage_consequences.racked_entry_doors_side_2 >= side_2_count);
     end
 end
 door_access_day = max(day_repair_racked,day_repair_fall_haz);
@@ -176,8 +184,8 @@ door_access_day_nan(door_access_day_nan == 0) = NaN;
 num_repair_time_increments = building_model.num_entry_doors; % possible unique number of loop increments
 for i = 1:num_repair_time_increments
     num_accessible_doors = sum(door_access_day <= cum_days,2);
-    sufficent_door_access_with_fs  = num_accessible_doors >= max(1,analysis_options.egress_threshold*building_model.num_entry_doors);   % must have at least 1 functioning entry door or 50% of design egress
-    sufficent_door_access_wo_fs = num_accessible_doors >= max(1,analysis_options.egress_threshold_wo_fs*building_model.num_entry_doors);  % must have at least 1 functioning entry door or 75% of design egress when fire suppression system is down
+    sufficent_door_access_with_fs  = num_accessible_doors >= max(1,functionality_options.egress_threshold*building_model.num_entry_doors);   % must have at least 1 functioning entry door or 50% of design egress
+    sufficent_door_access_wo_fs = num_accessible_doors >= max(1,functionality_options.egress_threshold_wo_fs*building_model.num_entry_doors);  % must have at least 1 functioning entry door or 75% of design egress when fire suppression system is down
     fire_system_failure = system_operation_day.building.fire > cum_days;
     entry_door_accessible = sufficent_door_access_with_fs .* ~fire_system_failure + sufficent_door_access_wo_fs .* fire_system_failure;
     

@@ -11,7 +11,6 @@
 
 clear
 close all
-fclose('all');
 clc 
 rehash
 
@@ -29,7 +28,7 @@ import recovery.functionality.main_functionality
 %% Load FEMA P-58 performance model data and simulated damage and loss
 load([model_dir filesep model_name filesep 'simulated_inputs.mat'])
 
-%% Load system and subsystem data
+%% Load required static data
 systems = readtable(['static_tables' filesep 'systems.csv']);
 subsystems = readtable(['static_tables' filesep 'subsystems.csv']);
 
@@ -39,7 +38,7 @@ subsystems = readtable(['static_tables' filesep 'subsystems.csv']);
 
 %% Determine building functional at each day of the repair schedule
 [ functionality.recovery ] = main_functionality( damage, building_model, ...
-    damage_consequences, functionality.utilities, subsystems, repair_time_options);
+    damage_consequences, functionality.utilities, functionality_options, tenant_units, subsystems );
 
 %% Save Outputs
 if ~exist(outputs_dir,'dir')

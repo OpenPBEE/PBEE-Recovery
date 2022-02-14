@@ -1,5 +1,5 @@
 function [ recovery ] = fn_extract_recovery_metrics( tentant_unit_recovery_day, ...
-   recovery_day, comp_breakdowns, replacement_time_days, global_fail, comp_id )
+   recovery_day, comp_breakdowns, comp_id )
 % Reformant tenant level recovery outcomes into outcomes at the building level, 
 % system level, and compoennt level
 %
@@ -12,11 +12,6 @@ function [ recovery ] = fn_extract_recovery_metrics( tentant_unit_recovery_day, 
 %   recovery
 % comp_breakdowns: struct
 %   simulation of each components contributions to each of the fault tree events 
-% replacement_time_days: number
-%   number of days required to fully replace the building
-% global_fail: logical array [num_reals x 1]
-%   is the entire building unrepairable due to issues of collapse or
-%   excessiv residual
 % comp_id: cell array [1 x num comp damage states]
 %   list of each fragility id associated with the per component damage
 %   state structure of the damage object. With of array is the same as the
@@ -52,14 +47,10 @@ function [ recovery ] = fn_extract_recovery_metrics( tentant_unit_recovery_day, 
 %% Initial Setup
 num_units = size(tentant_unit_recovery_day,2);
 
-%% Post process tenant-level re-occupancy times
+%% Post process tenant-level recovery times
 % Overwrite NaNs in tenant_unit_day_functional
 % Only NaN where never had functional loss, therefore set to zero
 tentant_unit_recovery_day(isnan(tentant_unit_recovery_day)) = 0;
-
-% Global Consequences
-% Set collapse and residual cases to complete hinderence prior to replacement time
-tentant_unit_recovery_day(global_fail,:) = replacement_time_days;
 
 %% Save building-level outputs to occupancy structure
 % Tenant Unit level outputs
@@ -74,8 +65,7 @@ recovery.recovery_trajectory.recovery_day = sort([tentant_unit_recovery_day, ten
 recovery.recovery_trajectory.percent_recovered = sort([(0:(num_units-1)), (1:num_units)])/num_units;
 
 %% Format and Save Component-level breakdowns
-% Component Breakdowns - Find the day repairs start on each ds of each
-% component for any story
+% Find the day each ds of each component stops affecting recovery for any story
 
 % Combine among all fault tree events
 component_breakdowns_per_story = 0;
@@ -89,16 +79,13 @@ for i = 1:length(fault_tree_events_LV1)
 end
 
 % Combine among all stories
-% isolated recovery time for each component for all building damage
-% aka time each component affects recovery anywhere in the building
+% aka time each component's DS affects recovery anywhere in the building
 component_breakdowns = max(component_breakdowns_per_story,[],3);
 
 %% Format and Save System-level breakdowns
-% System Breakdowns based on full building recovery day for each system minus day the repair
-% starts for the given system anywhere in the building
+% Find the day each system stops affecting recovery for any story
 
-% Go through each fault tree event and define its contribution to
-% recovery time (in terms of isolated reocovery time)
+% Combine among all fault tree events
 system_breakdowns = [];
 fault_tree_events_LV1 = fieldnames(recovery_day);
 for i = 1:length(fault_tree_events_LV1)
@@ -148,14 +135,6 @@ end
 recovery.breakdowns.perform_targ_days = perform_targ_days;
 recovery.breakdowns.system_names = system_names;
 recovery.breakdowns.comp_names = comps';
-
-%% red tag
-if isfield(recovery_day, 'building_safety')
-    recovery.red_tag.probability = mean(recovery_day.building_safety.red_tag > 0);
-    recovery.red_tag.mean = mean(recovery_day.building_safety.red_tag);
-    recovery.red_tag.median = median(recovery_day.building_safety.red_tag);
-    recovery.red_tag.fractile_90 = prctile(recovery_day.building_safety.red_tag, 90);
-end
 
 end
 

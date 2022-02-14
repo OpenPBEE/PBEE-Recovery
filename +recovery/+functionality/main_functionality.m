@@ -1,5 +1,5 @@
-function [ recovery ] = main_functionality( ...
-    damage, building_model, damage_consequences, utilities, subsystems, repair_time_options )
+function [ recovery ] = main_functionality( damage, building_model, ...
+     damage_consequences, utilities, functionality_options, tenant_units, subsystems )
 % Calculates building re-occupancy and function based on simulations of
 % building damage and calculates the recovery times of each recovery state
 % based on a given repair schedule
@@ -16,10 +16,13 @@ function [ recovery ] = main_functionality( ...
 %   tags and repair costs ratios
 % utilities: struct
 %   data structure containing simulated utility downtimes
-% subsystems: table
-%   data table containing information about each subsystem's attributes
-% repair_time_options: struct
+% functionality_options: struct
 %   recovery time optional inputs such as various damage thresholds
+% tenant_units: table
+%   attributes of each tenant unit within the building
+% subsystems: table
+%   attributes of building subsystems; data provided in static tables
+%   directory
 %
 % Returns
 % -------
@@ -37,10 +40,10 @@ import recovery.functionality.fn_calculate_functionality
 %% Calaculate Building Functionality Restoration Curves
 % Downtime including external delays
 [recovery.reoccupancy] = fn_calculate_reoccupancy( damage, damage_consequences, utilities, ...
-    building_model, repair_time_options );
+    building_model, subsystems, functionality_options, tenant_units );
 
 [recovery.functional] =  fn_calculate_functionality( damage, damage_consequences, utilities,  ...
-    building_model, subsystems, recovery.reoccupancy, repair_time_options );
+    building_model, subsystems, recovery.reoccupancy, functionality_options, tenant_units );
 
 end
 

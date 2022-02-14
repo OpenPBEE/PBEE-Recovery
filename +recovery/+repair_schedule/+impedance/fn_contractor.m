@@ -1,22 +1,22 @@
-function contractor_mob_imped = fn_contractor( ...
-    surge_factor, sys_repair_trigger, system_repair_time, contr_min, contr_max, trunc_pd )
+function contractor_mob_imped = fn_contractor( num_sys, num_reals, ...
+    surge_factor, sys_repair_trigger, systems, is_contractor_on_retainer )
 % Simulute contractor mobilization time
 %
 % Parameters
 % ----------
+% num_sys: int
+%   number of building systems considered in the assessment
+% num_reals: int
+%   number of Monte Carlo simulations assessed
 % surge_factor: number
 %   amplification factor for impedance time based on a post disaster surge
 %   in demand for skilled trades and construction supplies
 % sys_repair_trigger: logical array [num_reals x num_systems]
 %   systems that require repair for each realization
-% permit_review_time: array [num_reals x num_systems]
-%   simulatefd repair time of each system in isolation 
-% trunc_pd: matlab normal distribution object
-%   standard normal distrubtion, truncated at upper and lower bounds
-% contr_min: row vector [1 x n_systems]
-%   lower bound on the median for each system
-% contr_max: row vector [1 x n_systems]
-%   upper bound on the median for each system
+% systems: table
+%   data table containing information about each system's attributes
+% is_contractor_on_retainer: logical
+%   is there a pre-arranged agreement with a contractor for priorization of repairs
 %
 % Returns
 % -------
@@ -24,26 +24,27 @@ function contractor_mob_imped = fn_contractor( ...
 %   Simulated contractor mobilization time for each system
 
 %% Define financing distribution parameters
-NDS = sum(sys_repair_trigger,2); % number of damaged systems
+if is_contractor_on_retainer
+    contr_min = surge_factor * systems.imped_contractor_min_days';
+    contr_max = surge_factor * systems.imped_contractor_max_days';
+else
+    contr_min = surge_factor * systems.imped_contractor_min_days_retainer';
+    contr_max = surge_factor * systems.imped_contractor_max_days_retainer';
+end
 
-contr_median = (1 + (NDS - 1)/8) .* system_repair_time;
-contr_median = max(contr_median, contr_min);
-contr_median = min(contr_median, contr_max);
-
-%% Simulate
-% Truncated lognormal distribution (via standard normal simulation)
-[num_reals, ~] = size(system_repair_time);
-beta = 0.6;
-prob_sim = rand(num_reals, 1); % This assumes systems are correlated
-x_vals_std_n = icdf(trunc_pd, prob_sim);
-contractor_mob_imped = exp(x_vals_std_n * beta + log(contr_median));
+%% Simulate 
+% uniform distribution between min and max
+% This assumes systems are independant
+contractor_mob_imped = unifrnd(contr_min.*ones(num_reals,1),...
+    contr_max.*ones(num_reals,1),num_reals,num_sys);
 
 % Only use the simulated values for the realzation and system that
 % require permitting
 contractor_mob_imped(~sys_repair_trigger) = 0;
 
 % Amplify by the surge factor
-contractor_mob_imped = surge_factor * contractor_mob_imped;
+% Assume impedance always takes a full day
+contractor_mob_imped = ceil(contractor_mob_imped);
 
 end
 

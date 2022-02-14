@@ -1,5 +1,5 @@
 function [functionality] = fn_calculate_functionality(damage, damage_consequences, utilities, ...
-    building_model, subsystems, reoccupancy, repair_time_options )
+    building_model, subsystems, reoccupancy, functionality_options, tenant_units )
 % Calcualte the loss and recovery of building functionality based on global building
 % damage, local component damage, and extenernal factors
 %
@@ -20,8 +20,10 @@ function [functionality] = fn_calculate_functionality(damage, damage_consequence
 % reoccupancy: struct
 %   contains data on the recovery of tenant- and building-level function, 
 %   recovery trajectorires, and contributions from systems and components 
-% repair_time_options: struct
+% functionality_options: struct
 %   recovery time optional inputs such as various damage thresholds
+% tenant_units: table
+%   attributes of each tenant unit within the building
 %
 % Returns
 % -------
@@ -37,11 +39,11 @@ import recovery.functionality.fn_extract_recovery_metrics
 
 %% Define the day each system becomes functionl - Building level
 [ system_operation_day ] = fn_building_level_system_operation( damage, damage_consequences, ...
-    building_model, utilities, repair_time_options.functionality );
+    building_model, utilities, functionality_options );
 
 %% Define the day each system becomes functionl - Tenant level
 [ recovery_day.tenant_function, comp_breakdowns.tenant_function ] = fn_tenant_function( damage, ...
-    building_model, system_operation_day, damage_consequences.global_fail, utilities, subsystems, repair_time_options );
+    building_model, system_operation_day, utilities, subsystems, tenant_units );
 
 %% Combine Checks to determine per unit functionality
 % Each tenant unit is functional only if it is occupiable
@@ -54,8 +56,8 @@ for i = 1:length(fault_tree_events)
 end
 
 %% Reformat outputs into functionality data strucutre
-[ functionality ] = fn_extract_recovery_metrics( day_tentant_unit_functional, recovery_day, comp_breakdowns, ...
-    building_model.replacement_time_days, damage_consequences.global_fail, damage.comp_ds_info.comp_id );
+[ functionality ] = fn_extract_recovery_metrics( day_tentant_unit_functional, ...
+    recovery_day, comp_breakdowns, damage.comp_ds_info.comp_id );
 
 end
 
