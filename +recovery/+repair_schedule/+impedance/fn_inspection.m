@@ -1,5 +1,6 @@
-function inspection_imped = fn_inspection( is_essential_facility, is_borp_equivalent, ...
-    surge_factor, sys_repair_trigger, inpsection_trigger, trunc_pd )
+function inspection_imped = fn_inspection( is_essential_facility, ...
+    is_borp_equivalent, surge_factor, sys_repair_trigger, ...
+    inpsection_trigger, trunc_pd, beta, impeding_factor_medians )
 % Simulute inspection time
 %
 % Parameters
@@ -17,6 +18,10 @@ function inspection_imped = fn_inspection( is_essential_facility, is_borp_equiva
 %   defines which realizations require inspection
 % trunc_pd: matlab normal distribution object
 %   standard normal distrubtion, truncated at upper and lower bounds
+% beta: number
+%   lognormal standard deviation (dispersion)
+% impeding_factor_medians: table
+%   median delays for various impeding factors
 %
 % Returns
 % -------
@@ -24,16 +29,20 @@ function inspection_imped = fn_inspection( is_essential_facility, is_borp_equiva
 %   Simulated inspection time for each system
 
 %% Define inspection distribtuion parameters
+inspection_medians = ...
+    impeding_factor_medians(strcmp(impeding_factor_medians.factor,'inspection'),:);
+    
 if is_borp_equivalent
-    median = 1; % BORP equivalent is not affected by surge
+    filt = strcmp(inspection_medians.category,'borp');
+    % BORP equivalent is not affected by surge
+    median = inspection_medians.time_days(filt); 
 elseif is_essential_facility
-    median = 3 * surge_factor;
+    filt = strcmp(inspection_medians.category,'essential');
+    median = inspection_medians.time_days(filt) * surge_factor;
 else
-    median = 7 * surge_factor;
+    filt = strcmp(inspection_medians.category,'default');
+    median = inspection_medians.time_days(filt) * surge_factor;
 end
-
-% set uncertainty
-beta = 0.6;
 
 %% Simulate 
 % Truncated lognormal distribution

@@ -1,0 +1,11 @@
+factor,category,time_days
+inspection,default,7
+inspection,essential,3
+inspection,borp,1
+financing,sba,60
+financing,private,60
+financing,insurance,60
+permitting,rapid,1
+permitting,full,56
+engineering mobilization,default,14
+engineering mobilization,retainer,1
