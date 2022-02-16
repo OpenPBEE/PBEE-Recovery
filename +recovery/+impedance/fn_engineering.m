@@ -1,15 +1,11 @@
 function [ eng_mob_imped, eng_design_imped ] = fn_engineering( ...
-    damage, num_sys, num_reals, repair_cost_ratio, building_value, ...
-    surge_factor, is_engineer_on_retainer, user_options, design_min, ...
-    design_max, trunc_pd, beta, impeding_factor_medians )
+    num_reals, repair_cost_ratio, building_value, ...
+    surge_factor, redesign_trigger, is_engineer_on_retainer, user_options, ...
+    design_min, design_max, trunc_pd, beta, impeding_factor_medians )
 % Simulute permitting time
 %
 % Parameters
 % ----------
-% damage: struct
-%   contains per damage state damage and loss data for each component in the building
-% num_sys: int
-%   number of building systems considered in the assessment
 % num_reals: int
 %   number of Monte Carlo simulations assessed
 % repair_cost_ratio: array [num_reals x 1]
@@ -20,6 +16,8 @@ function [ eng_mob_imped, eng_design_imped ] = fn_engineering( ...
 % surge_factor: number
 %   amplification factor for impedance time based on a post disaster surge
 %   in demand for skilled trades and construction supplies
+% redesign_trigger: logical array [num_reals x num_sys]
+%   is redesign required for the given system
 % is_engineer_on_retainer: logical
 %   is there a pre-arranged agreement with an engineer for priorization of
 %   redesign
@@ -50,20 +48,6 @@ function [ eng_mob_imped, eng_design_imped ] = fn_engineering( ...
 % designers for the structural, stairs, exterior, and whatever other systems 
 % need design time, but the time it takes to spin up an engineer is not
 % related to the time it takes for them to complete the re-design.
-
-
-%% Parse damage object to figure out when redesign is requried
-redesign_filt = damage.comp_ds_info.redesign == 1;
-redesign_trigger = zeros(num_reals, num_sys);
-for sys = 1:num_sys
-    sys_filt = damage.comp_ds_info.system == sys; 
-    for tu = 1:length(damage.tenant_units)
-        is_damaged = damage.tenant_units{tu}.qnt_damaged > 0;
-        redesign_trigger(:,sys) = max( redesign_trigger(:,sys), ...
-            max(is_damaged .* (sys_filt & redesign_filt), [], 2) ...
-        );
-    end
-end
 
 %% Calculate System Design Time
 RC_total = repair_cost_ratio .* building_value;
