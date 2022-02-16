@@ -1,5 +1,6 @@
-function financing_imped = fn_financing( capital_available_ratio, funding_source,...
-     surge_factor, sys_repair_trigger, repair_cost_ratio, trunc_pd )
+function financing_imped = fn_financing( capital_available_ratio, ...
+    funding_source, surge_factor, sys_repair_trigger, repair_cost_ratio, ...
+    trunc_pd, beta, impeding_factor_medians )
 % Simulute financing time
 %
 % Parameters
@@ -20,6 +21,10 @@ function financing_imped = fn_financing( capital_available_ratio, funding_source
 %   value.
 % trunc_pd: matlab normal distribution object
 %   standard normal distrubtion, truncated at upper and lower bounds
+% beta: number
+%   lognormal standard deviation (dispersion)
+% impeding_factor_medians: table
+%   median delays for various impeding factors
 %
 % Returns
 % -------
@@ -27,23 +32,27 @@ function financing_imped = fn_financing( capital_available_ratio, funding_source
 %   Simulated financing time for each system
 
 %% Define financing distribution parameters
+% Median financing times
+finance_medians = ...
+    impeding_factor_medians(strcmp(impeding_factor_medians.factor,'financing'),:);
+
 % Required Financing
 financing_trigger = repair_cost_ratio > capital_available_ratio;
 
 % Financing Type
 switch funding_source
     case 'sba'  % SBA Backed Loans
-        median = 60 * surge_factor; %days
+        filt = strcmp(finance_medians.category,'sba');
+        median = finance_medians.time_days(filt) * surge_factor; %days
     case 'private'  % Private loans 
-        median = 60; % days, not affected by surge
+        filt = strcmp(finance_medians.category,'private');
+        median = finance_medians.time_days(filt); % days, not affected by surge
     case 'insurance'  % Insurance
-        median = 60; % assumed to be the same as private
+        filt = strcmp(finance_medians.category,'insurance');
+        median = finance_medians.time_days(filt); % days, not affected by surge
     otherwise 
         error('PBEE_Recovery:RepairSchedule', 'Invalid financing type, "%s", for impedance factor simulation', funding_source)
 end
-
-% set uncertainty
-beta = 0.6;
 
 %% Simulate
 % Truncated lognormal distribution (via standard normal simulation)

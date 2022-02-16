@@ -1,5 +1,5 @@
 function permitting_imped = fn_permitting( damage, num_sys, num_reals, ...
-    surge_factor, trunc_pd )
+    surge_factor, trunc_pd, beta, impeding_factor_medians )
 % Simulute permitting time
 %
 % Parameters
@@ -15,6 +15,10 @@ function permitting_imped = fn_permitting( damage, num_sys, num_reals, ...
 %   in demand for skilled trades and construction supplies
 % trunc_pd: matlab normal distribution object
 %   standard normal distrubtion, truncated at upper and lower bounds
+% beta: number
+%   lognormal standard deviation (dispersion)
+% impeding_factor_medians: table
+%   median delays for various impeding factors
 %
 % Returns
 % -------
@@ -23,12 +27,17 @@ function permitting_imped = fn_permitting( damage, num_sys, num_reals, ...
 
 %% Define permitting distribution parameters
 % Find the median permit time for each system
+permit_medians = ...
+    impeding_factor_medians(strcmp(impeding_factor_medians.factor,'permitting'),:);
 permitting_surge = 1 + (surge_factor-1)/4; % permitting is proportional to, but not directly scaled by surge
-full_permit_median = 8*7 * permitting_surge; % set in weeks, coverted to days
-rapid_permit_median = 1; % 1 days
 
-% set uncertainty
-beta = 0.6;
+% Full Permits
+filt = strcmp(permit_medians.category,'full');
+full_permit_median = permit_medians.time_days(filt) * permitting_surge; % days
+
+% Rapid Permits
+filt = strcmp(permit_medians.category,'rapid');
+rapid_permit_median = permit_medians.time_days(filt); % days
 
 %% Parse damage object to figure out when permits are requried
 rapid_permit = strcmp(damage.comp_ds_info.permit_type, 'rapid');

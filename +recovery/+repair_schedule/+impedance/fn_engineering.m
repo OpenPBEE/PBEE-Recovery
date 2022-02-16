@@ -1,6 +1,7 @@
 function [ eng_mob_imped, eng_design_imped ] = fn_engineering( ...
     damage, num_sys, num_reals, repair_cost_ratio, building_value, ...
-    surge_factor, is_engineer_on_retainer, user_options, design_min, design_max, trunc_pd )
+    surge_factor, is_engineer_on_retainer, user_options, design_min, ...
+    design_max, trunc_pd, beta, impeding_factor_medians )
 % Simulute permitting time
 %
 % Parameters
@@ -30,6 +31,10 @@ function [ eng_mob_imped, eng_design_imped ] = fn_engineering( ...
 %   upper bound on the median for each system
 % trunc_pd: matlab normal distribution object
 %   standard normal distrubtion, truncated at upper and lower bounds
+% beta: number
+%   lognormal standard deviation (dispersion)
+% impeding_factor_medians: table
+%   median delays for various impeding factors
 %
 % Returns
 % -------
@@ -66,14 +71,18 @@ SDT = RC_total * user_options.f / ...
     (user_options.r * user_options.t * user_options.w);
 
 %% Engineering Mobilization Time
+% Mobilization medians
+eng_mob_medians = ...
+    impeding_factor_medians(strcmp(impeding_factor_medians.factor,'engineering mobilization'),:);
+
 if is_engineer_on_retainer
-    median_eng_mob = surge_factor * 1; % 1 day
+    filt = strcmp(eng_mob_medians.category,'retainer');
 else
-    median_eng_mob = surge_factor * 14; % 2 weeks
+    filt = strcmp(eng_mob_medians.category,'default');
 end
+median_eng_mob = surge_factor * eng_mob_medians.time_days(filt); % days
 
 % Truncated lognormal distribution (via standard normal simulation)
-beta = 0.6;
 prob_sim = rand(num_reals, 1); % This assumes systems are correlated
 x_vals_std_n = icdf(trunc_pd, prob_sim);
 eng_mob_time = exp(x_vals_std_n * beta + log(median_eng_mob));

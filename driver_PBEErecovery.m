@@ -31,10 +31,11 @@ load([model_dir filesep model_name filesep 'simulated_inputs.mat'])
 %% Load required static data
 systems = readtable(['static_tables' filesep 'systems.csv']);
 subsystems = readtable(['static_tables' filesep 'subsystems.csv']);
+impeding_factor_medians = readtable(['static_tables' filesep 'impeding_factors.csv']);
 
 %% Calculate ATC 138 building repair schedule and impeding times
 [damage, functionality.impeding_factors, functionality.worker_data, functionality.building_repair_schedule ] = ...
-    main_repair_schedule(damage, building_model, damage_consequences, repair_time_options, systems);
+    main_repair_schedule(damage, building_model, damage_consequences, repair_time_options, systems, impeding_factor_medians);
 
 %% Determine building functional at each day of the repair schedule
 [ functionality.recovery ] = main_functionality( damage, building_model, ...

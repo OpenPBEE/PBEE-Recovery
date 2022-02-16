@@ -1,5 +1,5 @@
 function [damage, impeding_factors, worker_data, building_repair_schedule ] = main_repair_schedule(...
-    damage, building_model, damage_consequences, repair_time_options, systems)
+    damage, building_model, damage_consequences, repair_time_options, systems, impeding_factor_medians)
 % Determine the repair time for a given damage simulation.
 %
 % Simulation of system and building level repair times based on a
@@ -21,6 +21,8 @@ function [damage, impeding_factors, worker_data, building_repair_schedule ] = ma
 % systems: table
 %   attributes of structural and nonstructural building systems; data 
 %   provided in static tables directory
+% impeding_factor_medians: table
+%   median delays for various impeding factors
 %
 % Returns
 % -------
@@ -40,11 +42,19 @@ function [damage, impeding_factors, worker_data, building_repair_schedule ] = ma
 import recovery.repair_schedule.*
 import recovery.repair_schedule.impedance.main_impeding_factors
 
-
 %% Step 1 - Define max worker allocations
-% Set the range for max workers per story and on site 
-max_workers_per_building = min(max(floor(building_model.total_area_sf * 0.00025 + 10), 20), 260); % based on REDi
-max_workers_per_story = ceil(building_model.area_per_story_sf * 0.001); % based on FEMA P-58
+% Define the maximum number of workers that can be on site, based on REDI
+max_workers_per_building = ...
+    min(max(floor(building_model.total_area_sf * ...
+    repair_time_options.max_workers_per_sqft_building + 10), ...
+    repair_time_options.max_workers_building_min), ...
+    repair_time_options.max_workers_building_max);
+
+% Define the maximum number of workers that can be on any given story,
+% based on FEMA P-58
+max_workers_per_story = ...
+    ceil(building_model.area_per_story_sf * ...
+    repair_time_options.max_workers_per_sqft_story); 
 
 %% Step 2 - Calculate the start and finish times for each system in isolation
 % based on REDi repair sequencing and Yoo 2016 worker allocations
@@ -58,8 +68,10 @@ max_workers_per_story = ceil(building_model.area_per_story_sf * 0.001); % based 
     damage_consequences.inpsection_trigger, ...
     systems, ...
     system_schedule.system_totals.repair_days, ...
-    building_model.building_value ...
-);
+    building_model.building_value, ...
+    impeding_factor_medians ...
+);    
+
 
 %% Step 4 - Simulate Temporary Repair Times
 [ tmp_repair_complete_day ] = fn_simulate_tmp_repair_times( damage, ...
