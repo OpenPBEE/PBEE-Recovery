@@ -24,6 +24,7 @@ outputs_dir = ['outputs' filesep model_name]; % Directory where the assessment o
 %% Import Packages
 import recovery.repair_schedule.main_repair_schedule
 import recovery.functionality.main_functionality
+import recovery.impedance.main_impeding_factors
 
 %% Load FEMA P-58 performance model data and simulated damage and loss
 load([model_dir filesep model_name filesep 'simulated_inputs.mat'])
@@ -33,13 +34,20 @@ systems = readtable(['static_tables' filesep 'systems.csv']);
 subsystems = readtable(['static_tables' filesep 'subsystems.csv']);
 impeding_factor_medians = readtable(['static_tables' filesep 'impeding_factors.csv']);
 
-%% Calculate ATC 138 building repair schedule and impeding times
-[damage, functionality.impeding_factors, functionality.worker_data, functionality.building_repair_schedule ] = ...
-    main_repair_schedule(damage, building_model, damage_consequences, repair_time_options, systems, impeding_factor_medians);
+%% Simulate ATC 138 Impeding Factors
+[functionality.impeding_factors] = main_impeding_factors(damage, repair_time_options, ...
+    damage_consequences.repair_cost_ratio, damage_consequences.inpsection_trigger, ...
+    systems, building_model.building_value, impeding_factor_medians); 
 
-%% Determine building functional at each day of the repair schedule
+%% Construct the Building Repair Schedule
+[damage, functionality.worker_data, functionality.building_repair_schedule ] = ...
+    main_repair_schedule(damage, building_model, damage_consequences, ...
+    repair_time_options, systems, functionality.impeding_factors);
+
+%% Calculate the Recovery of Building Reoccupancy and Function
 [ functionality.recovery ] = main_functionality( damage, building_model, ...
-    damage_consequences, functionality.utilities, functionality_options, tenant_units, subsystems );
+    damage_consequences, functionality.utilities, functionality_options, ...
+    tenant_units, subsystems );
 
 %% Save Outputs
 if ~exist(outputs_dir,'dir')
