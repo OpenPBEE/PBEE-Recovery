@@ -27,14 +27,14 @@ function [ repair_schedule ] = fn_format_gantt_chart_data( damage, systems )
 %% Initial Setup
 num_stories = length(damage.tenant_units);
 [num_reals, ~] = size(damage.tenant_units{1}.recovery.repair_start_day);
-comps = unique(damage.comp_ds_info.comp_id);
+comps = unique(damage.comp_ds_table.comp_id);
 
 %% Reformate repair schedule data into various breakdowns
 % Per component
 repair_schedule.repair_start_day.per_component = nan(num_reals,length(comps));
 repair_schedule.repair_complete_day.per_component = zeros(num_reals,length(comps));
 for c = 1:length(comps)
-    comps_filt = strcmp(damage.comp_ds_info.comp_id,comps{c});
+    comps_filt = strcmp(damage.comp_ds_table.comp_id',comps{c});
     for s = 1:num_stories
         repair_schedule.repair_start_day.per_component(:,c) = min([repair_schedule.repair_start_day.per_component(:,c), damage.tenant_units{s}.recovery.repair_start_day(:,comps_filt)],[],2);
         repair_schedule.repair_complete_day.per_component(:,c) = max([repair_schedule.repair_complete_day.per_component(:,c), damage.tenant_units{s}.recovery.repair_complete_day(:,comps_filt)],[],2);
@@ -54,7 +54,7 @@ end
 repair_schedule.repair_start_day.per_system = nan(num_reals,height(systems));
 repair_schedule.repair_complete_day.per_system = zeros(num_reals,height(systems));
 for sys = 1:height(systems)
-    sys_filt = damage.comp_ds_info.system == systems.id(sys); % identifies which ds idices are in this seqeunce  
+    sys_filt = damage.comp_ds_table.system' == systems.id(sys); % identifies which ds idices are in this seqeunce  
     for s = 1:num_stories
         repair_schedule.repair_start_day.per_system(:,sys) = min([repair_schedule.repair_start_day.per_system(:,sys), damage.tenant_units{s}.recovery.repair_start_day(:,sys_filt)],[],2);
         repair_schedule.repair_complete_day.per_system(:,sys) = max([repair_schedule.repair_complete_day.per_system(:,sys), damage.tenant_units{s}.recovery.repair_complete_day(:,sys_filt)],[],2);
@@ -70,7 +70,7 @@ id = 0;
 for s = 1:num_stories
     for sys = 1:height(systems)
         id = id + 1;
-        sys_filt = damage.comp_ds_info.system == systems.id(sys); % identifies which ds idices are in this seqeunce  
+        sys_filt = damage.comp_ds_table.system' == systems.id(sys); % identifies which ds idices are in this seqeunce  
         repair_schedule.repair_start_day.per_system_story(:,id) = min([repair_schedule.repair_start_day.per_system_story(:,id), damage.tenant_units{s}.recovery.repair_start_day(:,sys_filt)],[],2);
         repair_schedule.repair_complete_day.per_system_story(:,id) = max([repair_schedule.repair_complete_day.per_system_story(:,id), damage.tenant_units{s}.recovery.repair_complete_day(:,sys_filt)],[],2);
     end
@@ -84,7 +84,7 @@ id = 0;
 for sys = 1:height(systems)
     for s = 1:num_stories
         id = id + 1;
-        sys_filt = damage.comp_ds_info.system == systems.id(sys); % identifies which ds idices are in this seqeunce  
+        sys_filt = damage.comp_ds_table.system' == systems.id(sys); % identifies which ds idices are in this seqeunce  
         repair_schedule.repair_start_day.per_story_system(:,id) = min([repair_schedule.repair_start_day.per_story_system(:,id), damage.tenant_units{s}.recovery.repair_start_day(:,sys_filt)],[],2);
         repair_schedule.repair_complete_day.per_story_system(:,id) = max([repair_schedule.repair_complete_day.per_story_system(:,id), damage.tenant_units{s}.recovery.repair_complete_day(:,sys_filt)],[],2);
     end

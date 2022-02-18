@@ -1,22 +1,22 @@
 {
 	"definitions": {
 		"arrayOfNumbers": {
-		  "type": "array",
-		  "items": {
-			"type": "number"
-		  }
+			"type": "array",
+			"items": {
+				"type": "number"
+			}
 		},
 		"arrayOfArraysOfNumbers": {
-		  "type": "array",
-		  "items": {
-			"$ref": "#/definitions/arrayOfNumbers"
-		  }
+			"type": "array",
+			"items": {
+				"$ref": "#/definitions/arrayOfNumbers"
+			}
 		}
 	},
 	"properties": {
-		"repair_time_options": {
+		"impedance_options": {
 			"type": "object",
-			"description": "general recovery, impedance, and mitigation factors optional inputs",
+			"description": "general impedance module inputs",
 			"properties": {
 				"include_impedance": {
 					"type": "object",
@@ -96,19 +96,45 @@
 						}
 					}
 				},
-				"surge_factor": {
+				"impedance_beta": {
 					"type": "number",
-					"description": "impedance and temporary repair time amplification factor based on a post-earthquake surge in demand for skilled trade and materials",
+					"description": "lognormal uncetainty of impedance times. Default to 0.6",
 				},
+				"impedance_truncation": {
+					"type": "number",
+					"description": "Truncation bounds of lognormal distribution of impedance time, input as the number of standard deviations above and below the mean. Default to 2",
+				}
+			}
+		},
+		"repair_time_options": {
+			"type": "object",
+			"description": "general repair schedule module inputs",
+			"properties": {
 				"temp_repair_beta": {
 					"type": "number",
-					"description": "lognormal uncetainty of temporary repair times. Defaul to 0.6",
+					"description": "lognormal uncetainty of temporary repair times. Default to 0.6",
+				},
+				"max_workers_per_sqft_story": {
+					"type": "number",
+					"description": "Maximum density of workers on a given story. Default to 0.001 from FEMA P-58",
+				},
+				"max_workers_per_sqft_building": {
+					"type": "number",
+					"description": "Maximum density of workers for the entire building after the first 10. Default to 0.00025 from REDi",
+				},
+				"max_workers_building_min": {
+					"type": "number",
+					"description": "Lower limit on the maximum number of workers for the entire building (i.e., max number of workers is never less than this). Default to 20 from REDi",
+				},
+				"max_workers_building_max": {
+					"type": "number",
+					"description": "Upper limit on the maximum number of workers for the entire building (i.e., max number of workers is never more than this). Default to 260 from REDi",
 				}
 			}
 		},
 		"functionality_options": {
 			"type": "object"
-			"description": "optional method inputs for various recovery time and functionality limit state thresholds",
+			"description": "general functionality module inputs",
 			"properties": {
 				"door_racking_repair_day": {
 					"type": "number",
@@ -124,11 +150,11 @@
 				},
 				"required_ratio_operating_hvac_main": {
 					"type": "number",
-					"description": "ratio of hvac units, which service the entire building, required to maintain an operational hvac system"
+					"description": "ratio of hvac units, which service the entire building, required to maintain an operational hvac system; not applied to components with n+1 redundancy"
 				},
 				"required_ratio_operating_hvac_unit": {
 					"type": "number",
-					"description": "ratio of hvac units, which service an individual tenant unit, required to maintain an operational hvac system"
+					"description": "ratio of hvac units, which service an individual tenant unit, required to maintain an operational hvac system; not applied to components with n+1 redundancy"
 				},
 				"exterior_safety_threshold": {
 					"type": "number",
@@ -141,6 +167,16 @@
 				"door_access_width_ft": {
 					"type": "number",
 					"description": "width of door access zone, centerlined on the doorway, required for safe access. A safe door access zone must be free of falling hazards"
+				}
+			}
+		},
+		"regional_impact": {
+			"type": "object",
+			"description": "general inputs that quantify regional impact on individual building performance",
+			"properties": {
+				"surge_factor": {
+					"type": "number",
+					"description": "impedance and temporary repair time amplification factor based on a post-earthquake surge in demand for skilled trade and materials",
 				}
 			}
 		},
@@ -198,13 +234,9 @@
 			"type": "object",
 			"description": "simulated damage, simulated repair time, and compoennt attribute data associated with each component's damages state in the building",
 			"properties": {
-				"comp_ds_info": {
-					"type": "object",
+				"comp_ds_table": {
+					"type": "table",
 					"description": "various component attributes by damage state. Can be populated from the component_attribites.csv and damage_state_attribute_mapping.csv databases in the static_tables directory"
-				},
-				"fnc_filters": {
-					"type": "object",
-					"description": "logical filters controlling the function and reoccupancy consequences / attributes of various component damage states. Can be populated from the component_attribites.csv and damage_state_attribute_mapping.csv databases in the static_tables directory"
 				},
 				"tenant_units": {
 					"type": "array",

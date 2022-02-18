@@ -33,7 +33,7 @@ function [ recovery_day, comp_breakdowns ] = fn_story_access(...
 num_reals = length(damage_consequences.red_tag);
 num_units = length(damage.tenant_units);
 num_stories = length(damage.tenant_units);
-num_comps = length(damage.comp_ds_info.comp_id);
+num_comps = height(damage.comp_ds_table);
 
 % Pre-allocate data
 recovery_day.stairs = zeros(num_reals,num_units);

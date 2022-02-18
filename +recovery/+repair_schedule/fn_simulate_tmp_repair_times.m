@@ -39,8 +39,8 @@ th_high = 2; % Truncate above +2 standard deviations
 trunc_pd = truncate(pd,th_low,th_high);
 
 % Determine which damage states require shoring
-shoring_filt = damage.comp_ds_info.requires_shoring;
-tmp_repair_filt = damage.comp_ds_info.tmp_fix & ~damage.comp_ds_info.requires_shoring;
+shoring_filt = damage.comp_ds_table.requires_shoring';
+tmp_repair_filt = damage.comp_ds_table.tmp_fix' & ~damage.comp_ds_table.requires_shoring';
 
 %% Go through damage and determine which relization have shoring repairs
 is_shoring_damage = zeros(num_reals,1);
@@ -50,7 +50,7 @@ end
 
 %% Simulate temporary repair times
 % simulate shoring time (assumes correlated throughout whole building)
-shoring_time_med = max(surge_factor * damage.comp_ds_info.tmp_fix_time .* shoring_filt); % median shoring time for the building is the max among all components
+shoring_time_med = max(surge_factor * damage.comp_ds_table.tmp_fix_time' .* shoring_filt); % median shoring time for the building is the max among all components
 prob_sim = rand(num_reals, 1); % assumes components are correlated
 x_vals_std_n = icdf(trunc_pd, prob_sim); % Truncated lognormal distribution (via standard normal simulation)
 sim_shoring_time = ceil(exp(x_vals_std_n * beta_temp + log(shoring_time_med)));% assume it takes whole days to temporarily fix things
@@ -60,7 +60,7 @@ building_shoring_time = sim_shoring_time .* is_shoring_damage;
 
 % Simulate temp repair and clean up time
 % assumes tmp repair times are independent between components but correlated between stories
-tmp_repair_time = surge_factor * damage.comp_ds_info.tmp_fix_time .* tmp_repair_filt;
+tmp_repair_time = surge_factor * damage.comp_ds_table.tmp_fix_time' .* tmp_repair_filt;
 tmp_repair_time(tmp_repair_time == 0) = inf; % convert zero day times to inf to not affect building repair time logic
 prob_sim = rand(num_reals, num_comps); % This assumes components are indepednant
 x_vals_std_n = icdf(trunc_pd, prob_sim); % Truncated lognormal distribution (via standard normal simulation)

@@ -26,7 +26,7 @@ function [ recovery_day, comp_breakdowns ] = fn_tenant_safety( damage, ...
 %% Initial Setup
 [num_reals, num_comps] = size(damage.tenant_units{1}.qnt_damaged);
 num_units = length(damage.tenant_units);
-comp_types_interior_check = unique(damage.comp_ds_info.comp_type_id(damage.fnc_filters.int_fall_haz_all));
+comp_types_interior_check = unique(damage.comp_ds_table.comp_type_id(damage.fnc_filters.int_fall_haz_all));
 
 % go through each tenant unit and quantify the affect that each system has on reoccpauncy
 for tu = 1:num_units
@@ -37,8 +37,8 @@ for tu = 1:num_units
     %% Exterior Enclosure 
     % Calculated the affected perimeter area of exterior components
     % (assuming all exterior components have either lf or sf units)
-    area_affected_all_linear_comps = damage.comp_ds_info.fraction_area_affected .* damage.comp_ds_info.unit_qty .* building_model.ht_per_story_ft(tu) .* damage.tenant_units{tu}.qnt_damaged;
-    area_affected_all_area_comps = damage.comp_ds_info.fraction_area_affected .* damage.comp_ds_info.unit_qty .* damage.tenant_units{tu}.qnt_damaged;
+    area_affected_all_linear_comps = damage.comp_ds_table.fraction_area_affected' .* damage.comp_ds_table.unit_qty' .* building_model.ht_per_story_ft(tu) .* damage.tenant_units{tu}.qnt_damaged;
+    area_affected_all_area_comps = damage.comp_ds_table.fraction_area_affected' .* damage.comp_ds_table.unit_qty' .* damage.tenant_units{tu}.qnt_damaged;
     
     % construct a matrix of affected areas from the various damaged component types
     comp_affected_area = zeros(num_reals,num_comps);
@@ -87,15 +87,15 @@ for tu = 1:num_units
     
     %% Interior Falling Hazards
     % Convert all component into affected areas
-    area_affected_all_linear_comps = damage.comp_ds_info.fraction_area_affected .* damage.comp_ds_info.unit_qty .* building_model.ht_per_story_ft(tu) .* damage.tenant_units{tu}.qnt_damaged;
-    area_affected_all_area_comps   = damage.comp_ds_info.fraction_area_affected .* damage.comp_ds_info.unit_qty .* damage.tenant_units{tu}.qnt_damaged;
-    area_affected_all_bay_comps    = damage.comp_ds_info.fraction_area_affected .* building_model.struct_bay_area_per_story(tu) .* damage.tenant_units{tu}.qnt_damaged;
-    area_affected_all_build_comps  = damage.comp_ds_info.fraction_area_affected .* building_model.total_area_sf .* damage.tenant_units{tu}.qnt_damaged;
+    area_affected_all_linear_comps = damage.comp_ds_table.fraction_area_affected' .* damage.comp_ds_table.unit_qty' .* building_model.ht_per_story_ft(tu) .* damage.tenant_units{tu}.qnt_damaged;
+    area_affected_all_area_comps   = damage.comp_ds_table.fraction_area_affected' .* damage.comp_ds_table.unit_qty' .* damage.tenant_units{tu}.qnt_damaged;
+    area_affected_all_bay_comps    = damage.comp_ds_table.fraction_area_affected' .* building_model.struct_bay_area_per_story(tu) .* damage.tenant_units{tu}.qnt_damaged;
+    area_affected_all_build_comps  = damage.comp_ds_table.fraction_area_affected' .* building_model.total_area_sf .* damage.tenant_units{tu}.qnt_damaged;
     
     % Checking damage that affects components in story below
     repair_complete_day_w_tmp_w_instabilities = repair_complete_day_w_tmp;
     if tu > 1
-        area_affected_below = damage.comp_ds_info.fraction_area_affected .* building_model.struct_bay_area_per_story(tu-1) .* damage.tenant_units{tu-1}.qnt_damaged;
+        area_affected_below = damage.comp_ds_table.fraction_area_affected' .* building_model.struct_bay_area_per_story(tu-1) .* damage.tenant_units{tu-1}.qnt_damaged;
         area_affected_all_bay_comps(:,damage.fnc_filters.vert_instabilities) ...
             = max(area_affected_below(:,damage.fnc_filters.vert_instabilities),area_affected_all_bay_comps(:,damage.fnc_filters.vert_instabilities));
         repair_time_below = damage.tenant_units{tu-1}.recovery.repair_complete_day_w_tmp;
@@ -121,7 +121,7 @@ for tu = 1:num_units
         % Quantify Affected Area
         diff_comp_areas = [];
         for cmp = 1:length(comp_types_interior_check)
-            filt = strcmp(damage.comp_ds_info.comp_type_id,comp_types_interior_check{cmp}); % check to see if it matches the first part of the ID (ie the type of comp)
+            filt = strcmp(damage.comp_ds_table.comp_type_id,comp_types_interior_check{cmp})'; % check to see if it matches the first part of the ID (ie the type of comp)
             diff_comp_areas(:,cmp) = sum(comp_affected_area(:,filt),2);
         end
         area_affected = sqrt(sum(diff_comp_areas.^2,2)); % total area affected is the srss of the areas in the unit

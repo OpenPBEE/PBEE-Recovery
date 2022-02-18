@@ -31,7 +31,7 @@ function [ recovery_day, comp_breakdowns, system_operation_day ] = fn_building_s
 %% Initial Setup
 num_reals = length(damage_consequences.red_tag);
 num_units = length(damage.tenant_units);
-num_comps = length(damage.comp_ds_info.comp_id);
+num_comps = height(damage.comp_ds_table);
 
 %% Calculate effect of red tags and fire suppression system
 % Initialize parameters
@@ -103,15 +103,15 @@ end
 
 % Loop through component repair times to determine the day it stops affecting re-occupancy
 num_repair_time_increments = sum(damage.fnc_filters.ext_fall_haz_all)*num_units; % possible unique number of loop increments
-edge_lengths = [building_model.edge_lengths,building_model.edge_lengths];
+edge_lengths = [building_model.edge_lengths; building_model.edge_lengths];
 for i = 1:num_repair_time_increments 
     % Calculate the falling hazards per side
     for tu = 1:num_units
-        for s = 1:4 % assumes there are 4 sides
-            area_affected_lf_all_comps = damage.comp_ds_info.fraction_area_affected .* ...
-                damage.comp_ds_info.unit_qty .* building_model.ht_per_story_ft(tu) .* damage.tenant_units{tu}.(['qnt_damaged_side_' num2str(s)]);
-            area_affected_sf_all_comps = damage.comp_ds_info.fraction_area_affected .* ...
-                damage.comp_ds_info.unit_qty .* damage.tenant_units{tu}.(['qnt_damaged_side_' num2str(s)]);
+        for side = 1:4 % assumes there are 4 sides
+            area_affected_lf_all_comps = damage.comp_ds_table.fraction_area_affected' .* ...
+                damage.comp_ds_table.unit_qty' .* building_model.ht_per_story_ft(tu) .* damage.tenant_units{tu}.(['qnt_damaged_side_' num2str(side)]);
+            area_affected_sf_all_comps = damage.comp_ds_table.fraction_area_affected' .* ...
+                damage.comp_ds_table.unit_qty' .* damage.tenant_units{tu}.(['qnt_damaged_side_' num2str(side)]);
 
             comp_affected_area(:,damage.fnc_filters.ext_fall_haz_lf,tu) = area_affected_lf_all_comps(:,damage.fnc_filters.ext_fall_haz_lf);
             comp_affected_area(:,damage.fnc_filters.ext_fall_haz_sf,tu) = area_affected_sf_all_comps(:,damage.fnc_filters.ext_fall_haz_sf);
@@ -119,7 +119,7 @@ for i = 1:num_repair_time_increments
             comp_affected_ft_this_story = comp_affected_area(:,:,tu) ./ building_model.ht_per_story_ft(tu);
             affected_ft_this_story = sum(comp_affected_ft_this_story,2); % Assumes cladding components do not occupy the same perimeter space
 
-            affected_ratio.(['side_' num2str(s)])(:,tu) = min((affected_ft_this_story) ./ edge_lengths(tu,s),1);
+            affected_ratio.(['side_' num2str(side)])(:,tu) = min((affected_ft_this_story) ./ edge_lengths(side,tu),1);
         end
     end
 

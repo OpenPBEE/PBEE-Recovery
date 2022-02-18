@@ -42,7 +42,7 @@ for sys = 1:num_sys
     story_complete_day = start_day + system_schedule.per_system{sys}.repair_complete_day;
 
     % Re-distribute to each tenant unit
-    sys_filt = damage.comp_ds_info.system == systems.id(sys); % identifies which ds idices are in this seqeunce  
+    sys_filt = damage.comp_ds_table.system' == systems.id(sys); % identifies which ds idices are in this seqeunce  
     for tu = 1:num_units
         is_damaged = damage.tenant_units{tu}.qnt_damaged(:,sys_filt) > 0;
         is_damaged = is_damaged*1;
