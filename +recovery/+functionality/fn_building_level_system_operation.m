@@ -29,7 +29,7 @@ function [ system_operation_day ] = fn_building_level_system_operation( damage, 
 %% Initial Setep
 num_stories = building_model.num_stories;
 num_reals = length(damage_consequences.red_tag);
-num_comps = length(damage.comp_ds_info.comp_id);
+num_comps = height(damage.comp_ds_table);
 
 system_operation_day.building.hvac_main = zeros(num_reals,1);
 
@@ -73,18 +73,18 @@ for tu = 1:num_stories
     
     % Redundant systems
     % only fail system when a sufficient number of component have failed
-    redundant_subsystems = unique(damage.comp_ds_info.subsystem_id(damage.fnc_filters.hvac_main_redundant));
+    redundant_subsystems = unique(damage.comp_ds_table.subsystem_id(damage.fnc_filters.hvac_main_redundant));
     main_redundant_sys_repair_day = zeros(num_reals,1);
     for s = 1:length(redundant_subsystems) % go through each redundant subsystem
-        this_redundant_sys = damage.fnc_filters.hvac_main_redundant & (damage.comp_ds_info.subsystem_id == redundant_subsystems(s));
-        n1_redundancy = max(damage.comp_ds_info.n1_redundancy(this_redundant_sys)); % should all be the same within a subsystem
+        this_redundant_sys = damage.fnc_filters.hvac_main_redundant & (damage.comp_ds_table.subsystem_id == redundant_subsystems(s))';
+        n1_redundancy = max(damage.comp_ds_table.n1_redundancy(this_redundant_sys)); % should all be the same within a subsystem
 
         % go through each component in this subsystem and find number of damaged units
-        comps = unique(damage.comp_ds_info.comp_idx(this_redundant_sys));
+        comps = unique(damage.comp_ds_table.comp_idx(this_redundant_sys));
         num_tot_comps = zeros(1,length(comps));
         num_damaged_comps = zeros(num_reals,length(comps));
         for c = 1:length(comps)
-            this_comp = this_redundant_sys & (damage.comp_ds_info.comp_idx == comps(c));
+            this_comp = this_redundant_sys & (damage.comp_ds_table.comp_idx == comps(c))';
             num_tot_comps(c) = max(total_num_comps .* this_comp); % number of units across all ds should be the same
             num_damaged_comps(:,c) = max(damaged_comps .* this_comp,[],2);
         end
@@ -107,7 +107,7 @@ for tu = 1:num_stories
             % normal level
             subsystem_failure = subsystem_num_damaged_comps > 1;
         else
-            % Use a predefined ratio (default to requirement 2/3 of components operational)
+            % Use a predefined ratio
             subsystem_failure = ratio_operating < functionality_options.required_ratio_operating_hvac_main;
         end
 

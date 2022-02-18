@@ -35,8 +35,8 @@ num_sys = height(systems);
 [num_reals, ~] = size(damage.tenant_units{1}.qnt_damaged);
 
 % Find which components potentially affect function accross any tenant unit
-affects_function = zeros(num_reals, length(damage.comp_ds_info.comp_id));
-for s = 1:length(damage.tenant_units)
+
+for s = 1:length(damage.tenant_units)affects_function = zeros(num_reals, height(damage.comp_ds_table));
     affects_function = affects_function | (damage.fnc_filters.affects_function & damage.tenant_units{s}.qnt_damaged);
 end
 
@@ -47,15 +47,7 @@ tmp_repaired = tmp_repair_complete_day < inf; % inf here means there is not temp
 sys_affects_function = zeros(num_reals, num_sys); % only prioritize the systems that potentially affect function
 sys_tmp_repaired = zeros(num_reals, num_sys); % dont prioitize the systems that are completely resolved by temporary repairs
 for sys = 1:num_sys
-% <<<<<<< HEAD
-% =======
-%     affects_function = zeros(num_reals, length(damage.comp_ds_info.comp_id));
-%     for s = 1:length(damage.tenant_units)
-%         affects_function = affects_function | (damage.fnc_filters.affects_function & damage.tenant_units{s}.qnt_damaged);
-%     end
-%     
-% >>>>>>> update_atc138_attributes
-    sys_filter = damage.comp_ds_info.system == sys;
+    sys_filter = damage.comp_ds_table.system' == sys;
     sys_affects_function(:,sys) = any(affects_function(:,sys_filter),2); % any damage that potentially affects function in this system
     sys_tmp_repaired(:,sys) = all(tmp_repaired(:,sys_filter),2); % all components must be resolved by temp repairs in this system
 end

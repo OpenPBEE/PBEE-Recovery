@@ -81,8 +81,8 @@ function [total_worker_days, num_workers, average_crew_size, max_crews_building]
 % Define Initial Parameters
 num_stories = length(damage.tenant_units);
 [num_reals, num_comps] = size(damage.tenant_units{1}.worker_days);
-sequence_filt = damage.comp_ds_info.system == sys; % identifies which ds idices are in this seqeunce  
-comp_types = unique(damage.comp_ds_info.comp_idx(sequence_filt)); % Types of components in this system
+sequence_filt = damage.comp_ds_table.system' == sys; % identifies which ds idices are in this seqeunce  
+comp_types = unique(damage.comp_ds_table.comp_idx(sequence_filt)); % Types of components in this system
 
 % Pre-allocatate variables
 total_worker_days = zeros(num_reals,num_stories);
@@ -98,14 +98,14 @@ for s = 1:num_stories
     is_damaged_building = is_damaged_building | is_damaged;
     
     for c = 1:length(comp_types)
-        num_damaged_comp_types(:,s) = num_damaged_comp_types(:,s) + any((damage.comp_ds_info.comp_idx == comp_types(c)) .* is_damaged,2);
+        num_damaged_comp_types(:,s) = num_damaged_comp_types(:,s) + any((damage.comp_ds_table.comp_idx' == comp_types(c)) .* is_damaged,2);
     end
 
     % Caluculate total worker days per story per sequeces
     total_worker_days(:,s) = sum(damage.tenant_units{s}.worker_days(:,sequence_filt),2); % perhaps consider doing when we first set up this damage data structure
     
     % Determine the required crew size needed for these repairs
-    repair_time_per_comp = damage.tenant_units{s}.worker_days ./  damage.comp_ds_info.crew_size;
+    repair_time_per_comp = damage.tenant_units{s}.worker_days ./  damage.comp_ds_table.crew_size';
     average_crew_size(:,s) = total_worker_days(:,s) ./ sum(repair_time_per_comp(:,sequence_filt),2);
 end
     
@@ -136,7 +136,7 @@ num_workers = average_crew_size .* num_crews;
 % building
 num_damaged_comp_types = zeros(num_reals,1);
 for c = 1:length(comp_types)
-    num_damaged_comp_types = num_damaged_comp_types + any((damage.comp_ds_info.comp_idx == comp_types(c)) .* is_damaged_building,2);
+    num_damaged_comp_types = num_damaged_comp_types + any((damage.comp_ds_table.comp_idx' == comp_types(c)) .* is_damaged_building,2);
 end
 max_crews_building = max_crews_per_comp_type .* num_damaged_comp_types;
 end
