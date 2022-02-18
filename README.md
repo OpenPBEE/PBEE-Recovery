@@ -10,7 +10,7 @@ The method is developed as part of the consequence module of the Performance-Bas
 The method is built using Matlab v2017a; running this implementation using other versions Matlab may not perform as expected.
 
 ## Running an Assessment
- - **Step 1**: Build the inputs matlab data file of simulated inputs. Title the file "simulated_inputs.mat" and place it in a directory of the model name within the "inputs" drirectory.
+ - **Step 1**: Build the inputs matlab data file of simulated inputs. Title the file "simulated_inputs.mat" and place it in a directory of the model name within the "inputs" drirectory. This matlab data file can either be constructed manually following the inputs schema or using the build script as discussed in the _Building the Inputs File section_ below.
  - **Step 2**: Open the matlab file "driver_PBEErecovery.m" and set the "model_name", "model_dir", and "outputs_dir" variables.
  - **Step 3**: Run the script
  - **Step 4**: Simulated assessment outputs will be saved as a Matlab data file in a directory of your choice
@@ -46,3 +46,36 @@ A brief description of the various input and output variables are provided below
    data structure containing the simulation of allocated workers throughout the repair process
  - **functionality.impeding_factors**: [_struct_]
    data structure containing the simulated impeding factors delaying the start of system repair
+
+## Building the Inputs File
+Instead of manually defining the inputs matlab data file based on the inputs schema, the inputs file can be built from a simpler set of building inputs, taking advantage of default assessment assumptions and component, system, and tenant attributes contained within the _static_data_ directory.
+
+### Instructions
+ - **Step 1**: Copy the scripts build_inputs.m and optional_inputs.m in the directory where you want to build the simulated_inputs.mat inputs file.
+ - **Step 2**: Add the requried building specific input files listed below to the same directory
+ - **Step 3**: Modify the optional_inputs.m file as needed.
+ - **Step 4**: Make sure the variable "static_data_dir" in build_inputs.m is correctly pointing to the location of the static data directory
+ - **Step 5**: Run the build script
+
+#### Option for customizing static data 
+If you would like to modify the static data tables listed below for a specifc model, simply copy the static data tables listed below to the build script directory, modify the files, and set the static_data_dir vairable to the point to the location of the modified files (same directory as the build script).
+
+### Required building specific data
+building_model.json
+tenant_unit_list.csv
+comp_ds_list.csv
+damage_consequences.json
+simulated_damage.json
+
+### Optional building specific data
+utility_downtime.json
+
+### Default Optional Inputs
+optional_inputs.m
+
+### Static data (copy from the static_data directory)
+component_attributes.csv
+damage_state_attribute_mapping.csv
+subsystems.csv
+tenant_function_requirements.csv
+
