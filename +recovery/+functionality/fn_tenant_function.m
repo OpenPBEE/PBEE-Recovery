@@ -1,5 +1,6 @@
 function [ recovery_day, comp_breakdowns ] = fn_tenant_function( damage, ...
-    building_model, system_operation_day, utilities, subsystems, tenant_units )
+    building_model, system_operation_day, utilities, subsystems, ...
+    tenant_units, functionality_options )
 % Check each tenant unit for damage that would cause that tenant unit 
 % to not be functional
 %
@@ -22,6 +23,8 @@ function [ recovery_day, comp_breakdowns ] = fn_tenant_function( damage, ...
 %   data table containing information about each subsystem's attributes
 % tenant_units: table
 %   attributes of each tenant unit within the building
+% functionality_options: struct
+%   recovery time optional inputs such as various damage thresholds
 %
 % Returns
 % -------
@@ -378,8 +381,8 @@ for tu = 1:num_units
                 % normal level
                 tenant_subsystem_failure = subsystem_num_damaged_comps > 1;
             else
-                % Use a predefined ratio (default to requirement 2/3 of components operational)
-                tenant_subsystem_failure = ratio_operating < repair_time_options.functionality.required_ratio_operating_hvac_unit;
+                % Use a predefined ratio
+                tenant_subsystem_failure = ratio_operating < functionality_options.required_ratio_operating_hvac_unit;
             end
             
             % Calculate recovery day and combine with other subsystems for this tenant unit
