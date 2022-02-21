@@ -43,7 +43,7 @@ import recovery.functionality.fn_extract_recovery_metrics
 
 %% Define the day each system becomes functionl - Tenant level
 [ recovery_day.tenant_function, comp_breakdowns.tenant_function ] = fn_tenant_function( damage, ...
-    building_model, system_operation_day, utilities, subsystems, tenant_units );
+    building_model, system_operation_day, utilities, subsystems, tenant_units, functionality_options );
 
 %% Combine Checks to determine per unit functionality
 % Each tenant unit is functional only if it is occupiable
