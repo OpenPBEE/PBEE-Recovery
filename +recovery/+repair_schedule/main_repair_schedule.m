@@ -1,5 +1,6 @@
 function [damage, worker_data, building_repair_schedule ] = main_repair_schedule(...
-    damage, building_model, damage_consequences, repair_time_options, systems, impeding_factors)
+    damage, building_model, simulated_red_tags, repair_time_options, ...
+    systems, impeding_factors, surge_factor)
 % Determine the repair time for a given damage simulation.
 %
 % Simulation of system and building level repair times based on a
@@ -13,9 +14,9 @@ function [damage, worker_data, building_repair_schedule ] = main_repair_schedule
 %   contains per damage state damage and loss data for each component in the building
 % building_model: struct
 %   data structure containing general information about the building
-% damage_consequences: struct
-%   data structure containing simulated building consequences, such as red
-%   tags and repair costs ratios
+% simulated_red_tags: logical array [num_realization x 1]
+%   for each realization of the Monte Carlo simulation, is the structure
+%   expected to be red-tagged
 % repair_time_options: struct
 %   general repair time options such as mitigation factors
 % systems: table
@@ -23,6 +24,9 @@ function [damage, worker_data, building_repair_schedule ] = main_repair_schedule
 %   provided in static tables directory
 % impeding_factors: struct
 %   simulated impedance times
+% surge_factor: number
+%   amplification factor for temporary repair times due to materials and
+%   labor impacts due to regional damage
 %
 % Returns
 % -------
@@ -61,19 +65,19 @@ max_workers_per_story = ...
 [ tmp_repair_complete_day ] = fn_simulate_tmp_repair_times( damage, ...
                               impeding_factors.breakdowns.inspection.complete_day,...
                               repair_time_options.temp_repair_beta, ...
-                              repair_time_options.surge_factor );
+                              surge_factor );
                           
 %% Step 4 - Set system repair priority
 [ sys_idx_priority_matrix ] = fn_prioritize_systems( systems, damage, tmp_repair_complete_day );
                           
 %% Step 5 - Define system repair constraints
-[ sys_constraint_matrix ] = fn_set_repair_constraints( systems, damage_consequences.red_tag );
+[ sys_constraint_matrix ] = fn_set_repair_constraints( systems, simulated_red_tags );
 
 %% Step 6 - Allocate workers among systems and determine the total days until repair is completed for each sequence
 [repair_complete_day_per_system, worker_data] = fn_allocate_workers_systems(...
     system_schedule.system_totals.repair_days, system_schedule.system_totals.num_workers, ...
      max_workers_per_building, sys_idx_priority_matrix, sys_constraint_matrix, ...
-    damage_consequences.red_tag, impeding_factors.time_sys );
+    simulated_red_tags, impeding_factors.time_sys );
                           
 %% Step 7 - Format Outputs 
 % Format outputs for Functionality calculations

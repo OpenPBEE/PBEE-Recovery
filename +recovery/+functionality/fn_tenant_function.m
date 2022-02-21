@@ -81,8 +81,8 @@ for tu = 1:num_units
             % elevators have simultaneous damage states, it is not possible
             % to count the number of damaged elevators without additional
             % information
-            num_elev_pgs = length(unique(damage.comp_ds_info.comp_idx(damage.fnc_filters.elevators)));
-            is_sim_ds = any(damage.comp_ds_info.is_sim_ds(damage.fnc_filters.elevators));
+            num_elev_pgs = length(unique(damage.comp_ds_table.comp_idx(damage.fnc_filters.elevators)));
+            is_sim_ds = any(damage.comp_ds_table.is_sim_ds(damage.fnc_filters.elevators)');
             if (num_elev_pgs > 1) && is_sim_ds
                 error('PBEE_Recovery:Function','Elevator Function check does not handle multiple performance groups with simultaneous damage states')
             end
@@ -119,8 +119,8 @@ for tu = 1:num_units
     
     %% Exterior Enclosure 
     % Perimeter Cladding (assuming all exterior components have either lf or sf units)
-    area_affected_lf_all_comps = damage.comp_ds_info.fraction_area_affected .* damage.comp_ds_info.unit_qty .* building_model.ht_per_story_ft(tu) .* damage.tenant_units{tu}.qnt_damaged;
-    area_affected_sf_all_comps = damage.comp_ds_info.fraction_area_affected .* damage.comp_ds_info.unit_qty .* damage.tenant_units{tu}.qnt_damaged;
+    area_affected_lf_all_comps = damage.comp_ds_table.fraction_area_affected' .* damage.comp_ds_table.unit_qty' .* building_model.ht_per_story_ft(tu) .* damage.tenant_units{tu}.qnt_damaged;
+    area_affected_sf_all_comps = damage.comp_ds_table.fraction_area_affected' .* damage.comp_ds_table.unit_qty' .* damage.tenant_units{tu}.qnt_damaged;
    
     comp_affected_area = zeros(num_reals,num_comps);
     comp_affected_area(:,damage.fnc_filters.exterior_seal_lf) = area_affected_lf_all_comps(:,damage.fnc_filters.exterior_seal_lf);
@@ -244,14 +244,14 @@ for tu = 1:num_units
     end
     
     %% Interior Area
-    area_affected_lf_all_comps    = damage.comp_ds_info.fraction_area_affected .* damage.comp_ds_info.unit_qty .* building_model.ht_per_story_ft(tu) .* damage.tenant_units{tu}.qnt_damaged;
-    area_affected_sf_all_comps    = damage.comp_ds_info.fraction_area_affected .* damage.comp_ds_info.unit_qty .* damage.tenant_units{tu}.qnt_damaged;
-    area_affected_bay_all_comps   = damage.comp_ds_info.fraction_area_affected .* building_model.struct_bay_area_per_story(tu) .* damage.tenant_units{tu}.qnt_damaged;
-    area_affected_build_all_comps = damage.comp_ds_info.fraction_area_affected .* building_model.total_area_sf .* damage.tenant_units{tu}.qnt_damaged;
+    area_affected_lf_all_comps    = damage.comp_ds_table.fraction_area_affected' .* damage.comp_ds_table.unit_qty' .* building_model.ht_per_story_ft(tu) .* damage.tenant_units{tu}.qnt_damaged;
+    area_affected_sf_all_comps    = damage.comp_ds_table.fraction_area_affected' .* damage.comp_ds_table.unit_qty' .* damage.tenant_units{tu}.qnt_damaged;
+    area_affected_bay_all_comps   = damage.comp_ds_table.fraction_area_affected' .* building_model.struct_bay_area_per_story(tu) .* damage.tenant_units{tu}.qnt_damaged;
+    area_affected_build_all_comps = damage.comp_ds_table.fraction_area_affected' .* building_model.total_area_sf .* damage.tenant_units{tu}.qnt_damaged;
     
     repair_complete_day_w_tmp_w_instabilities = repair_complete_day_w_tmp;
     if tu > 1
-        area_affected_below = damage.comp_ds_info.fraction_area_affected .* building_model.struct_bay_area_per_story(tu-1) .* damage.tenant_units{tu-1}.qnt_damaged;
+        area_affected_below = damage.comp_ds_table.fraction_area_affected' .* building_model.struct_bay_area_per_story(tu-1) .* damage.tenant_units{tu-1}.qnt_damaged;
         area_affected_bay_all_comps(:,damage.fnc_filters.vert_instabilities) ...
             = max(area_affected_below(:,damage.fnc_filters.vert_instabilities),area_affected_bay_all_comps(:,damage.fnc_filters.vert_instabilities));
         repair_time_below = damage.tenant_units{tu-1}.recovery.repair_complete_day_w_tmp;
@@ -265,7 +265,7 @@ for tu = 1:num_units
     comp_affected_area(:,damage.fnc_filters.interior_function_bay) = area_affected_bay_all_comps(:,damage.fnc_filters.interior_function_bay);
     comp_affected_area(:,damage.fnc_filters.interior_function_build) = area_affected_build_all_comps(:,damage.fnc_filters.interior_function_build);
 
-    frag_types_in_check = unique(damage.comp_ds_info.comp_type_id(damage.fnc_filters.interior_function_all));
+    frag_types_in_check = unique(damage.comp_ds_table.comp_type_id(damage.fnc_filters.interior_function_all));
     comps_day_repaired = repair_complete_day_w_tmp_w_instabilities;
 
     int_function_recovery_day = zeros(num_reals,1);
@@ -277,7 +277,7 @@ for tu = 1:num_units
         % types)
         diff_comp_areas = [];
         for cmp = 1:length(frag_types_in_check)
-            filt = strcmp(damage.comp_ds_info.comp_type_id,frag_types_in_check{cmp}); % check to see if it matches the first part of the ID (ie the type of comp)
+            filt = strcmp(damage.comp_ds_table.comp_type_id,frag_types_in_check{cmp})'; % check to see if it matches the first part of the ID (ie the type of comp)
             diff_comp_areas(:,cmp) = sum(comp_affected_area(:,filt),2);
         end
         area_affected = sqrt(sum(diff_comp_areas.^2,2)); % total area affected is the srss of the areas in the unit
@@ -347,18 +347,18 @@ for tu = 1:num_units
 
         % Redundant systems
         % only fail system when a sufficient number of component have failed
-        redundant_subsystems = unique(damage.comp_ds_info.subsystem_id(damage.fnc_filters.hvac_unit_redundant));
+        redundant_subsystems = unique(damage.comp_ds_table.subsystem_id(damage.fnc_filters.hvac_unit_redundant));
         redundant_sys_repair_day = zeros(num_reals,1);
         for s = 1:length(redundant_subsystems) % go through each redundant subsystem
-            this_redundant_sys = damage.fnc_filters.hvac_unit_redundant & (damage.comp_ds_info.subsystem_id == redundant_subsystems(s));
-            n1_redundancy = max(damage.comp_ds_info.n1_redundancy(this_redundant_sys)); % should all be the same within a subsystem
+            this_redundant_sys = damage.fnc_filters.hvac_unit_redundant & (damage.comp_ds_table.subsystem_id == redundant_subsystems(s))';
+            n1_redundancy = max(damage.comp_ds_table.n1_redundancy(this_redundant_sys)); % should all be the same within a subsystem
             
             % go through each component in this subsystem and find number of damaged units
-            comps = unique(damage.comp_ds_info.comp_idx(this_redundant_sys));
+            comps = unique(damage.comp_ds_table.comp_idx(this_redundant_sys));
             num_tot_comps = zeros(1,length(comps));
             num_damaged_comps = zeros(num_reals,length(comps));
             for c = 1:length(comps)
-                this_comp = this_redundant_sys & (damage.comp_ds_info.comp_idx == comps(c));
+                this_comp = this_redundant_sys & (damage.comp_ds_table.comp_idx' == comps(c));
                 num_tot_comps(c) = max(total_num_comps .* this_comp); % number of units across all ds should be the same
                 num_damaged_comps(:,c) = max(damaged_comps .* this_comp,[],2);
             end
@@ -412,7 +412,7 @@ for tu = 1:num_units
                 % Assess subsystem recovery day for this tenant unit
                 [subsystem_recovery_day, subsystem_comp_recovery_day] = fn_quantify_hvac_subsystem_recovery_day(...
                     damage.fnc_filters.(subsystem_handle{sub}), total_num_comps, repair_complete_day, initial_damaged, ...
-                    damaged_comps, subsystem_threshold, damage.comp_ds_info.comp_idx, damage.comp_ds_info.is_sim_ds);
+                    damaged_comps, subsystem_threshold, damage.comp_ds_table.comp_idx', damage.comp_ds_table.is_sim_ds');
 
                 % Compile with tenant unit performacne and component breakdowns
                 recovery_day.hvac(:,tu) = max(recovery_day.hvac(:,tu), subsystem_recovery_day);
