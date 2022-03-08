@@ -109,8 +109,8 @@ for tu = 1:num_stories
         end
 
         % Required egress with and without operational fire suppression system
-        required_stairs_w_fs = max(1,functionality_options.egress_threshold .* building_model.stairs_per_story(tu)); 
-        required_stairs_wo_fs = max(1,functionality_options.egress_threshold_wo_fs .* building_model.stairs_per_story(tu));
+        required_stairs_w_fs = max(functionality_options.min_egress_paths,functionality_options.egress_threshold .* building_model.stairs_per_story(tu)); 
+        required_stairs_wo_fs = max(functionality_options.min_egress_paths,functionality_options.egress_threshold_wo_fs .* building_model.stairs_per_story(tu));
 
         % Determine Stair Access
         sufficient_stair_access_w_fs  = functioning_stairs >= required_stairs_w_fs;

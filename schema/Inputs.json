@@ -148,6 +148,10 @@
 					"type": "number",
 					"description": "ratio of building egress paths required for building safety and access, assuming an non-operational fire suppression system"
 				},
+				"min_egress_paths": {
+					"type": "number",
+					"description": "minimum number of egress pathways that must be maintained at each story to maintain occupancy"
+				},
 				"required_ratio_operating_hvac_main": {
 					"type": "number",
 					"description": "ratio of hvac units, which service the entire building, required to maintain an operational hvac system; not applied to components with n+1 redundancy"
