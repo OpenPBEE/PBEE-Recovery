@@ -128,30 +128,30 @@ B1071\.3\w+,Interior Walls: Wood Light Frame,Structural,WLF,Walls,"Permanent rot
 B1071\.3\w+,Interior Walls: Wood Light Frame,Structural,WLF,Walls,"Fracture of studs, major sill plate cracking.",5,NA,0,3,0,0,0,0,0,0,1,1,1,1,component,6,1,7,0,full,1
 B2011\.(301|401),Exterior Walls: Wood Light Frame (non-sturcuural with siding),Non-structural,Enclosure,WLF,Slight separation of sheathing or nails which come loose.,1,NA,0,0,0,0,0,0,0,0,0,0,0,0,NA,4,0,0,0,rapid,0
 B2011\.(301|401),Exterior Walls: Wood Light Frame (non-sturcuural with siding),Non-structural,Enclosure,WLF,"Permanent rotation of sheathing, tear out of nails or sheathing.",2,NA,0,0,0,0,0,0,0,0,0,0,0,0,NA,6,0,0,0,rapid,0
-B2011\.(301|401),Exterior Walls: Wood Light Frame (non-sturcuural with siding),Non-structural,Enclosure,WLF,"Fracture of studs, major sill plate cracking.",3,NA,0,0,1,0,0,0,0,0,1,1,0,1,component,6,1,7,0,full,1
-B2011\.[12]31,Exterior Wood walls with diagonal let in bracing,Non-structural,Enclosure,WLF,Failure of diagonal bracing.,1,NA,0,0,1,0,0,0,0,0,1,1,0,1,component,6,1,7,0,full,1
+B2011\.(301|401),Exterior Walls: Wood Light Frame (non-sturcuural with siding),Non-structural,Enclosure,WLF,"Fracture of studs, major sill plate cracking.",3,NA,0,0,1,0,0,0,0,0,1,1,0,1,component,6,1,14,0,full,1
+B2011\.[12]31,Exterior Wood walls with diagonal let in bracing,Non-structural,Enclosure,WLF,Failure of diagonal bracing.,1,NA,0,0,1,0,0,0,0,0,1,1,0,1,component,6,1,14,0,full,1
 B2011\.0[12]1a,Exterior Walls: Cold Form Steel with X bracing or steel sheathing,Non-structural,Enclosure,CFS,??,1,NA,0,0,0,0,0,0,0,0,0,0,0,0,NA,6,0,0,0,rapid,0
-B2011\.0[12]1a,Exterior Walls: Cold Form Steel with X bracing or steel sheathing,Non-structural,Enclosure,CFS,??,2,NA,0,0,0,0,0,0,0,0,1,1,0,1,component,6,1,7,0,rapid,0
+B2011\.0[12]1a,Exterior Walls: Cold Form Steel with X bracing or steel sheathing,Non-structural,Enclosure,CFS,??,2,NA,0,0,0,0,0,0,0,0,1,1,0,1,component,6,1,14,0,rapid,0
 B2011\.0[12]1b,Exterior Walls: Cold Form Steel with X bracing or steel sheathing (heavy clad),Non-structural,Enclosure,CFS,??,1,NA,0,0,0,0,0,0,0,0,0,0,0,0,NA,6,0,0,0,rapid,0
-B2011\.0[12]1b,Exterior Walls: Cold Form Steel with X bracing or steel sheathing (heavy clad),Non-structural,Enclosure,CFS,??,2,NA,0,0,1,1,0,0,0,0,1,1,0,1,component,6,1,7,0,full,1
+B2011\.0[12]1b,Exterior Walls: Cold Form Steel with X bracing or steel sheathing (heavy clad),Non-structural,Enclosure,CFS,??,2,NA,0,0,1,1,0,0,0,0,1,1,0,1,component,6,1,14,0,full,1
 B2011\.001a,Exterior Walls: Cold Form Steel with wood sheathing,Non-structural,Enclosure,CFS,Sheathing faster pull through or tear out.  (20% of fasteners.),1,NA,0,0,0,0,0,0,0,0,0,0,0,0,NA,4,0,0,0,rapid,0
 B2011\.001a,Exterior Walls: Cold Form Steel with wood sheathing,Non-structural,Enclosure,CFS,Failure of structural panels.,2,NA,0,0,0,0,0,0,0,0,0,0,0,0,NA,6,0,0,0,rapid,0
-B2011\.001a,Exterior Walls: Cold Form Steel with wood sheathing,Non-structural,Enclosure,CFS,Failure of wall.,3,NA,0,0,1,0,0,0,0,0,1,1,0,1,component,6,1,7,0,full,1
+B2011\.001a,Exterior Walls: Cold Form Steel with wood sheathing,Non-structural,Enclosure,CFS,Failure of wall.,3,NA,0,0,1,0,0,0,0,0,1,1,0,1,component,6,1,14,0,full,1
 B2011\.001b,Exterior Walls: Cold Form Steel with wood sheathing (heavy clad),Non-structural,Enclosure,CFS,Sheathing faster pull through or tear out.  (20% of fasteners.),1,NA,0,0,0,0,0,0,0,0,0,0,0,0,NA,4,0,0,0,rapid,0
-B2011\.001b,Exterior Walls: Cold Form Steel with wood sheathing (heavy clad),Non-structural,Enclosure,CFS,Failure of structural panels.,2,NA,0,0,0,1,0,0,0,0,0,0,0,1,component,6,1,7,0,rapid,0
-B2011\.001b,Exterior Walls: Cold Form Steel with wood sheathing (heavy clad),Non-structural,Enclosure,CFS,Failure of wall.,3,NA,0,0,1,1,0,0,0,0,1,1,0,1,component,6,1,7,0,full,1
+B2011\.001b,Exterior Walls: Cold Form Steel with wood sheathing (heavy clad),Non-structural,Enclosure,CFS,Failure of structural panels.,2,NA,0,0,0,1,0,0,0,0,0,0,0,1,component,6,1,14,0,rapid,0
+B2011\.001b,Exterior Walls: Cold Form Steel with wood sheathing (heavy clad),Non-structural,Enclosure,CFS,Failure of wall.,3,NA,0,0,1,1,0,0,0,0,1,1,0,1,component,6,1,14,0,full,1
 B2011\.1(01|21),Exterior Walls: Wood Light Frame (non-sturctural),Non-structural,Enclosure,WLF,Slight separation of sheathing or nails which come loose.,1,NA,0,0,0,0,0,0,0,0,0,0,0,0,NA,4,0,0,0,rapid,0
 B2011\.1(01|21),Exterior Walls: Wood Light Frame (non-sturctural),Non-structural,Enclosure,WLF,"Permanent rotation of sheathing, tear out of nails or sheathing.",2,NA,0,0,0,0,0,0,0,0,0,0,0,0,NA,6,0,0,0,rapid,0
-B2011\.1(01|21),Exterior Walls: Wood Light Frame (non-sturctural),Non-structural,Enclosure,WLF,"Fracture of studs, major sill plate cracking.",3,NA,0,0,1,0,0,0,0,0,1,1,0,1,component,6,1,7,0,full,1
+B2011\.1(01|21),Exterior Walls: Wood Light Frame (non-sturctural),Non-structural,Enclosure,WLF,"Fracture of studs, major sill plate cracking.",3,NA,0,0,1,0,0,0,0,0,1,1,0,1,component,6,1,14,0,full,1
 B2011\.1(02|11),Exterior Walls: Wood Light Frame (heavy clad),Non-structural,Enclosure,WLF,Cracking of stucco.,1,NA,0,0,0,0,0,0,0,0,0,0,0,0,NA,4,0,0,0,rapid,0
-B2011\.1(02|11),Exterior Walls: Wood Light Frame (heavy clad),Non-structural,Enclosure,WLF,"Spalling of stucco, separation of stucco and sheathing from studs.",2,NA,0,0,0,1,0,0,0,0,0,0,0,1,component,6,1,7,0,rapid,0
-B2011\.1(02|11),Exterior Walls: Wood Light Frame (heavy clad),Non-structural,Enclosure,WLF,"Fracture of studs, major sill plate cracking.",3,NA,0,0,1,1,0,0,0,0,1,1,0,1,component,6,1,7,0,full,1
+B2011\.1(02|11),Exterior Walls: Wood Light Frame (heavy clad),Non-structural,Enclosure,WLF,"Spalling of stucco, separation of stucco and sheathing from studs.",2,NA,0,0,0,1,0,0,0,0,0,0,0,1,component,6,1,14,0,rapid,0
+B2011\.1(02|11),Exterior Walls: Wood Light Frame (heavy clad),Non-structural,Enclosure,WLF,"Fracture of studs, major sill plate cracking.",3,NA,0,0,1,1,0,0,0,0,1,1,0,1,component,6,1,14,0,full,1
 B2011\.201a,Precast Concrete Panels In Plane,Non-structural,Enclosure,Cladding,"Cladding units damaged by impact at corners at  column covers.  Damage in field is either attributed to natural edge chipping / damage,  or is deemed to not warrant full repair.  Repair assumes cosmetic chip patching.",1,1,0,0,0,0,0,0,0,0,0,0,0,0,NA,5,0,0,0,rapid,0
-B2011\.201a,Precast Concrete Panels In Plane,Non-structural,Enclosure,Cladding,Cladding units damaged by impact at corners at  column covers.,1,2,0,0,1,1,0,0,0,0,1,1,0,1,component,5,1,7,0,full,1
+B2011\.201a,Precast Concrete Panels In Plane,Non-structural,Enclosure,Cladding,Cladding units damaged by impact at corners at  column covers.,1,2,0,0,1,1,0,0,0,0,1,1,0,1,component,5,1,14,0,full,1
 B2011\.201b,Precast Concrete Panels OOP,Non-structural,Enclosure,Cladding,Cladding units damaged by out of plane anchorage failure.  Unit requires replacement.,1,NA,0,0,1,1,0,0,0,0,1,1,0,1,component,5,1,14,0,full,1
 B2011\.211,"Exterior Walls: Wood Light Frame (stucco, not sturctural)",Non-structural,Enclosure,WLF,Cracking of stucco.,1,NA,0,0,0,0,0,0,0,0,0,0,0,0,NA,4,0,0,0,rapid,0
-B2011\.211,"Exterior Walls: Wood Light Frame (stucco, not sturctural)",Non-structural,Enclosure,WLF,"Spalling of stucco, separation of stucco and sheathing from studs.",2,NA,0,0,0,1,0,0,0,0,0,0,0,1,component,6,1,7,0,rapid,0
-B2011\.211,"Exterior Walls: Wood Light Frame (stucco, not sturctural)",Non-structural,Enclosure,WLF,"Fracture of studs, major sill plate cracking.",3,NA,0,0,1,1,0,0,0,0,1,1,0,1,component,6,1,7,0,full,1
+B2011\.211,"Exterior Walls: Wood Light Frame (stucco, not sturctural)",Non-structural,Enclosure,WLF,"Spalling of stucco, separation of stucco and sheathing from studs.",2,NA,0,0,0,1,0,0,0,0,0,0,0,1,component,6,1,14,0,rapid,0
+B2011\.211,"Exterior Walls: Wood Light Frame (stucco, not sturctural)",Non-structural,Enclosure,WLF,"Fracture of studs, major sill plate cracking.",3,NA,0,0,1,1,0,0,0,0,1,1,0,1,component,6,1,14,0,full,1
 B2011\.3[246]1,Cripple Walls: No Stucco,Structural,WLF,Cripple Wall,Slight separation of sheathing or nails which come loose.,1,NA,0,0,0,0,0,0,0,0,0,0,0,0,NA,4,0,0,0,full,0
 B2011\.3[246]1,Cripple Walls: No Stucco,Structural,WLF,Cripple Wall,"Permanent rotation of sheathing, tear out of nails or sheathing.",2,NA,0,0,0,0,0,0,0,0,0,0,0,0,NA,6,0,0,0,full,1
 B2011\.3[246]1,Cripple Walls: No Stucco,Structural,WLF,Cripple Wall,"Delamination of sheathing, fracture of studs, sill plate damage possible.",3,NA,0,0,1,0,0,0,0,0,0,0,0,1,component,6,1,7,0,full,1
@@ -159,9 +159,9 @@ B2011\.4[246]1,Cripple Walls: Stucco,Structural,WLF,Cripple Wall,"Cracking of st
 B2011\.4[246]1,Cripple Walls: Stucco,Structural,WLF,Cripple Wall,"Spalling of stucco, significant cracking, onset of delamination of stucco from studs and bottom plate.",2,NA,0,0,0,0,0,0,0,0,0,0,0,0,NA,6,0,0,0,full,0
 B2011\.4[246]1,Cripple Walls: Stucco,Structural,WLF,Cripple Wall,Delamination of stucco at studs and bottom plate.,3,NA,0,0,1,0,0,0,0,0,0,0,0,1,component,6,1,7,0,full,1
 B2011\.411,"Exterior Walls: Wood Light Frame (stucco, sturctural)",Structural,Enclosure,WLF,Cracking of stucco.,1,NA,0,0,0,0,0,0,0,0,0,0,0,0,NA,4,0,0,0,full,0
-B2011\.411,"Exterior Walls: Wood Light Frame (stucco, sturctural)",Structural,Enclosure,WLF,"Spalling of stucco near openings and corners, widespread cracking of stucco.",2,NA,0,0,0,1,0,0,0,0,0,0,0,1,component,6,1,7,0,full,0
-B2011\.411,"Exterior Walls: Wood Light Frame (stucco, sturctural)",Structural,Enclosure,WLF,"Widespread spalling of stucco, delamination of stucco, framing connnections may be loosened.",3,NA,0,0,1,1,0,0,0,0,1,1,0,1,component,6,1,7,0,full,1
-B2011\.541,Cripple Walls: Horizontal Siding,Structural,WLF,Cripple Wall,"Failure of any bracing within framing, cripple wall will need replacement and stregthening.",1,NA,0,0,1,0,0,0,0,0,0,0,0,1,component,6,1,7,0,full,1
+B2011\.411,"Exterior Walls: Wood Light Frame (stucco, sturctural)",Structural,Enclosure,WLF,"Spalling of stucco near openings and corners, widespread cracking of stucco.",2,NA,0,0,0,1,0,0,0,0,0,0,0,1,component,6,1,14,0,full,0
+B2011\.411,"Exterior Walls: Wood Light Frame (stucco, sturctural)",Structural,Enclosure,WLF,"Widespread spalling of stucco, delamination of stucco, framing connnections may be loosened.",3,NA,0,0,1,1,0,0,0,0,1,1,0,1,component,6,1,14,0,full,1
+B2011\.541,Cripple Walls: Horizontal Siding,Structural,WLF,Cripple Wall,"Failure of any bracing within framing, cripple wall will need replacement and stregthening.",1,NA,0,0,1,0,0,0,0,0,0,0,0,1,component,6,1,14,0,full,1
 B2022\.(0[179]\w+|08[34]|[12]\w+),Curtain Walls (3DS),Non-structural,Enclosure,Glazing,Gasket seal failure.,1,NA,0,0,0,0,0,0,0,0,0,0,0,0,NA,5,0,0,0,rapid,0
 B2022\.(0[179]\w+|08[34]|[12]\w+),Curtain Walls (3DS),Non-structural,Enclosure,Glazing,Glass cracking.,2,NA,0,0,0,0,0,0,0,0,0,0,0,0,NA,5,0,0,0,rapid,0
 B2022\.(0[179]\w+|08[34]|[12]\w+),Curtain Walls (3DS),Non-structural,Enclosure,Glazing,Glass falls out.,3,NA,0,0,1,1,0,0,0,0,1,1,0,1,component,5,1,7,0,rapid,0
