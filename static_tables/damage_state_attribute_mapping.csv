@@ -164,12 +164,12 @@ B2011\.411,"Exterior Walls: Wood Light Frame (stucco, sturctural)",Structural,En
 B2011\.541,Cripple Walls: Horizontal Siding,Structural,WLF,Cripple Wall,"Failure of any bracing within framing, cripple wall will need replacement and stregthening.",1,NA,0,0,1,0,0,0,0,0,0,0,0,1,component,6,1,7,0,full,1
 B2022\.(0[179]\w+|08[34]|[12]\w+),Curtain Walls (3DS),Non-structural,Enclosure,Glazing,Gasket seal failure.,1,NA,0,0,0,0,0,0,0,0,0,0,0,0,NA,5,0,0,0,rapid,0
 B2022\.(0[179]\w+|08[34]|[12]\w+),Curtain Walls (3DS),Non-structural,Enclosure,Glazing,Glass cracking.,2,NA,0,0,0,0,0,0,0,0,0,0,0,0,NA,5,0,0,0,rapid,0
-B2022\.(0[179]\w+|08[34]|[12]\w+),Curtain Walls (3DS),Non-structural,Enclosure,Glazing,Glass falls out.,3,NA,0,0,1,1,0,0,0,0,1,1,0,1,component,5,1,3,0,rapid,0
+B2022\.(0[179]\w+|08[34]|[12]\w+),Curtain Walls (3DS),Non-structural,Enclosure,Glazing,Glass falls out.,3,NA,0,0,1,1,0,0,0,0,1,1,0,1,component,5,1,7,0,rapid,0
 B2022\.0([023456]\w+|8[12]),Curtain Walls (2DS),Non-structural,Enclosure,Glazing,Glass cracking.,1,NA,0,0,0,0,0,0,0,0,0,0,0,0,NA,5,0,0,0,rapid,0
-B2022\.0([023456]\w+|8[12]),Curtain Walls (2DS),Non-structural,Enclosure,Glazing,Glass falls from frame.,2,NA,0,0,1,1,0,0,0,0,1,1,0,1,component,5,1,3,0,rapid,0
+B2022\.0([023456]\w+|8[12]),Curtain Walls (2DS),Non-structural,Enclosure,Glazing,Glass falls from frame.,2,NA,0,0,1,1,0,0,0,0,1,1,0,1,component,5,1,7,0,rapid,0
 B2023\.0[0124]\w+,Storefronts (3 DS),Non-structural,Enclosure,Glazing,Gasket seal failure.,1,NA,0,0,0,0,0,0,0,0,0,0,0,0,NA,5,0,0,0,rapid,0
 B2023\.0[0124]\w+,Storefronts (3 DS),Non-structural,Enclosure,Glazing,Glass cracking.,2,NA,0,0,0,0,0,0,0,0,0,0,0,0,NA,5,0,0,0,rapid,0
-B2023\.0[0124]\w+,Storefronts (3 DS),Non-structural,Enclosure,Glazing,Glass falls out.,3,NA,0,0,1,1,0,0,0,0,1,1,0,1,component,5,1,3,0,rapid,0
+B2023\.0[0124]\w+,Storefronts (3 DS),Non-structural,Enclosure,Glazing,Glass falls out.,3,NA,0,0,1,1,0,0,0,0,1,1,0,1,component,5,1,7,0,rapid,0
 B2023\.03[0-4],"Storefronts (2 DS, monolithic)",Non-structural,Enclosure,Glazing,Glass cracking.,1,NA,0,0,0,0,0,0,0,0,0,0,0,0,NA,5,0,0,0,rapid,0
 B2023\.03[0-4],"Storefronts (2 DS, monolithic)",Non-structural,Enclosure,Glazing,Frame Damage,2,NA,0,0,0,0,0,0,0,0,0,0,0,0,NA,5,0,0,0,rapid,0
 B2023\.05[1-8],"Storefronts (2 DS, dual pane)",Non-structural,Enclosure,Glazing,Panel damage (no glass damage).,1,NA,0,0,0,0,0,0,0,0,0,0,0,0,NA,5,0,0,0,rapid,0
