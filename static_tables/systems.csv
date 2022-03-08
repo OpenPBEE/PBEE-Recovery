@@ -1,11 +1,11 @@
 id,name,priority,num_du_per_crew,max_crews_per_comp_type,imped_contractor_min_days,imped_contractor_max_days,imped_contractor_min_days_retainer,imped_contractor_max_days_retainer,imped_design_min_days,imped_design_max_days
 1,structural,1,10,10,28,364,7,182,14,182
-2,exterior,5,10,2,14,182,5,91,7,91
+2,exterior,8,10,2,14,182,5,91,7,91
 3,interior,9,999,1,5,56,1,30,0,0
 4,stairs,2,999,1,14,182,5,91,7,30
 5,elevators,7,999,1,5,56,1,30,0,0
-6,plumbing,3,999,1,5,56,1,30,0,0
-7,electrical,4,999,1,5,56,1,30,0,0
+6,plumbing,4,999,1,5,56,1,30,0,0
+7,electrical,5,999,1,5,56,1,30,0,0
 8,hvac,6,999,1,5,56,1,30,0,0
-9,fire,8,999,1,5,56,1,30,0,0
+9,fire,3,999,1,5,56,1,30,0,0
 10,contents,10,999,1,0,0,0,0,0,0
