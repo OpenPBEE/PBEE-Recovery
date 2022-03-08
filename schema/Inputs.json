@@ -136,6 +136,10 @@
 			"type": "object"
 			"description": "general functionality module inputs",
 			"properties": {
+				"red_tag_clear_time": {
+					"type": "number",
+					"description": "days after all red tag repairs are done before occupancy can be regained (i.e. time for permitting office to clear the tag)"
+				},
 				"door_racking_repair_day": {
 					"type": "number",
 					"description": "days after the earthquake required to repaired all racked doorways"

@@ -214,5 +214,9 @@ if any(damage.fnc_filters.fire_building) % only safe this when fire system exist
     comp_breakdowns.fire_egress = system_operation_day.comp.fire .* fs_operation_matters_for_entry_doors;
 end
 
+%% Delay Red Tag recovery by the time it takes to clear the tag
+recovery_day.red_tag = recovery_day.red_tag + functionality_options.red_tag_clear_time*damage_consequences.red_tag;
+comp_breakdowns.red_tag = comp_breakdowns.red_tag + functionality_options.red_tag_clear_time*(comp_breakdowns.red_tag > 0);
+
 end
 
