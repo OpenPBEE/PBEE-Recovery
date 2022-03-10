@@ -38,7 +38,9 @@ num_comps = height(damage.comp_ds_table);
 % Pre-allocate data
 recovery_day.stairs = zeros(num_reals,num_units);
 recovery_day.stair_doors = zeros(num_reals,num_units);
+recovery_day.fire_egress = zeros(num_reals,num_units);
 comp_breakdowns.stairs = zeros(num_reals,num_comps,num_units);
+comp_breakdowns.fire_egress = zeros(num_reals,num_comps,num_units);
 
 %% Go through each story and check if there is sufficient story access (stairs and stairdoors)
 if num_stories == 1 
@@ -141,28 +143,39 @@ for tu = 1:num_stories
         stairdoor_access_day = stairdoor_access_day + ~sufficient_stairdoor_access .* delta_day;
 
         if fs_exists
-            % Determine when fs operation actually matters for egress and add
-            % to the tally
+            % Determine when fs operation actually matters for egress
             fs_matters_for_stairs = sufficient_stair_access_w_fs & ~sufficient_stair_access;
             fs_matters_for_stairdoors = sufficient_stairdoor_access_w_fs & ~sufficient_stairdoor_access;
             fs_matters_for_access = fs_matters_for_stairs | fs_matters_for_stairdoors;
-            fire_access_day = fire_access_day + fs_matters_for_access .* delta_day;
+            
+            % Determine when fs operation matters for safety (based on fs watch)
+            if ~functionality_options.fire_watch
+                % If no fire watch is in place, non-operation of the fire
+                % sprinkler system will cause the space to not be
+                % occupiable
+                fs_matters_for_safety = ~fs_operational;
+                fs_matters = fs_matters_for_safety | fs_matters_for_access;
+            else
+                % If a fire watch is in place, only accont for fs effect on
+                % egress limitations
+                fs_matters = fs_matters_for_access;
+            end
+            fire_access_day = fire_access_day + fs_matters .* delta_day;
         end
 
         % Add days to components that are affecting occupancy
         contributing_stairs = ((damaged_comps .* damage.fnc_filters.stairs) > 0)  .* ~sufficient_stair_access; % Count any damaged stairs for realization that have loss of story access
-
+        contributing_stairs(:,end) = []; % remove added door column
+        comp_breakdowns.stairs(:,:,tu) = comp_breakdowns.stairs(:,:,tu) + contributing_stairs .* delta_day;
+        
         % Find fire sprinklers component that are contributing
         if fs_exists
-            % Count any fire component, only if fs operation matters foraccess
+            % Count any fire component, only if fs operation matters for access
             contributing_fire_comps = ((damaged_comps .* ...
-                (damage.fnc_filters.fire_drops | damage.fnc_filters.fire_building)) > 0) .* fs_matters_for_access; 
-            contributing_comps = contributing_stairs | contributing_fire_comps;
-        else
-            contributing_comps = contributing_stairs;
+                (damage.fnc_filters.fire_drops | damage.fnc_filters.fire_building)) > 0) .* fs_matters; 
+            contributing_fire_comps(:,end) = []; % remove added door column
+            comp_breakdowns.fire_egress(:,:,tu) = comp_breakdowns.fire_egress(:,:,tu) + contributing_fire_comps .* delta_day;
         end
-        contributing_comps(:,end) = []; % remove added door column
-        comp_breakdowns.stairs(:,:,tu) = comp_breakdowns.stairs(:,:,tu) + contributing_comps .* delta_day;
 
         % Change the comps for the next increment
         repair_complete_day = repair_complete_day - delta_day;
@@ -184,8 +197,7 @@ for tu = 1:num_stories
     recovery_day.stair_doors(:,tu) = stairdoor_access_day;
 
     % Damage to fire sprinkler drops only affects this story (full building
-    % fire sprinkler damage is adopted at every story, earlier in this
-    % script)
+    % fire sprinkler damage is adopted at every story earlier in this script)
     if fs_exists
         recovery_day.fire_egress(:,tu) = fire_access_day;
     end

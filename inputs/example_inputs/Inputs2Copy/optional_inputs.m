@@ -29,6 +29,7 @@ functionality_options.red_tag_clear_time = 7;
 functionality_options.door_racking_repair_day = 3;
 functionality_options.egress_threshold = 0.5;
 functionality_options.egress_threshold_wo_fs = 0.75;
+functionality_options.fire_watch = true;
 functionality_options.min_egress_paths = 2;
 functionality_options.required_ratio_operating_hvac_main = 0.6667;
 functionality_options.required_ratio_operating_hvac_unit = 0.6667;

@@ -37,7 +37,11 @@ num_comps = height(damage.comp_ds_table);
 % Initialize parameters
 recovery_day.red_tag = zeros(num_reals, 1);
 recovery_day.hazardous_material = zeros(num_reals, 1);
-system_operation_day.building.fire = 0;
+recovery_day.fire_egress = zeros(num_reals, 1);
+system_operation_day.building.fire = zeros(num_reals, 1);
+
+% check if building has fire supprsion system
+fs_exists = any(damage.fnc_filters.fire_building);
 
 % Check damage throughout the building
 for tu = 1:num_units
@@ -56,17 +60,17 @@ for tu = 1:num_units
     comp_breakdowns.red_tag(:,:,tu) = damage.fnc_filters.red_tag .* recovery_day.red_tag;
     
     %% Day the fire suppression system is operating again (for the whole building)
-    if sum(damage.fnc_filters.fire_building) > 0
+    if fs_exists
         % any major damage fails the system for the whole building so take the max
         system_operation_day.building.fire = max(system_operation_day.building.fire,max(repair_complete_day(:,damage.fnc_filters.fire_building),[],2));
+    
+        % Consider utilities (assume no backup water supply)
+        system_operation_day.building.fire = max(system_operation_day.building.fire,utilities.water); 
+
+        % Componet Breakdowns
+        system_operation_day.comp.fire(:,:,tu) = damage.fnc_filters.fire_building .* repair_complete_day;
     end
-    
-    % Consider utilities
-    system_operation_day.building.fire = max(system_operation_day.building.fire,utilities.water); % Assumes building does not have backup water supply
-    
-    % Componet Breakdowns
-    system_operation_day.comp.fire(:,:,tu) = damage.fnc_filters.fire_building .* repair_complete_day;
-    
+
     %% Hazardous Materials
     % note: hazardous materials are accounted for in building functional
     % assessment here, but are not currently quantified in the component
@@ -178,7 +182,8 @@ door_access_day = max(day_repair_racked,day_repair_fall_haz);
 % Find the days until door egress is regained from resolution of both
 % falling hazards or door racking
 cum_days = 0;
-recovery_day.entry_door_access = zeros(num_reals,1);
+entry_door_access_day = zeros(num_reals,1);
+fire_safety_day = zeros(num_reals,1);
 door_access_day_nan = door_access_day;
 door_access_day_nan(door_access_day_nan == 0) = NaN;
 num_repair_time_increments = building_model.num_entry_doors; % possible unique number of loop increments
@@ -193,13 +198,26 @@ for i = 1:num_repair_time_increments
         fs_operation_matters_for_entry_doors = sufficent_door_access_with_fs - sufficent_door_access_wo_fs;
     end
             
+    % Bean counting for this iteration
     delta_day = min(door_access_day_nan,[],2);
     delta_day(isnan(delta_day)) = 0;
     door_access_day_nan = door_access_day_nan - delta_day;
     cum_days = cum_days + delta_day;
     
-    recovery_day.entry_door_access = recovery_day.entry_door_access + delta_day .* ~entry_door_accessible;
+    % Save recovery time increments
+    entry_door_access_day = entry_door_access_day + delta_day .* ~entry_door_accessible;
+    if functionality_options.fire_watch
+        % if there is a fire watch, fire damage only affects door egress
+        % requirements
+        fire_safety_day = fire_safety_day + delta_day .* fs_operation_matters_for_entry_doors;
+    else
+        % If no fire watch, failure of fire system causes loss of occupancy
+        fire_safety_day = fire_safety_day + delta_day .* fire_system_failure;
+    end
 end
+
+% Save recovery day values
+recovery_day.entry_door_access = entry_door_access_day;
 
 % Determine when Exterior Falling Hazards or doors actually contribute to re-occupancy
 recovery_day.falling_hazard = min(recovery_day.entry_door_access,max(day_repair_fall_haz,[],2));
@@ -209,9 +227,16 @@ recovery_day.entry_door_racking = min(recovery_day.entry_door_access,max(day_rep
 comp_breakdowns.falling_hazard = min(recovery_day.entry_door_access,max(fall_haz_comps_day_rep,[],4));
 
 %% Determine when fire suppresion affects recovery
-if any(damage.fnc_filters.fire_building) % only safe this when fire system exists
-    recovery_day.fire_egress = system_operation_day.building.fire .* fs_operation_matters_for_entry_doors;
-    comp_breakdowns.fire_egress = system_operation_day.comp.fire .* fs_operation_matters_for_entry_doors;
+if fs_exists % only save this when fire system exists
+    recovery_day.fire_egress = fire_safety_day;
+    if functionality_options.fire_watch
+        % If fire watch is in place, only account for the damage that
+        % affects egress requirements
+        comp_breakdowns.fire_egress = system_operation_day.comp.fire .* fs_operation_matters_for_entry_doors;
+    else
+        % If no fire watch, take any damage that fails the system
+        comp_breakdowns.fire_egress = system_operation_day.comp.fire;
+    end
 end
 
 %% Delay Red Tag recovery by the time it takes to clear the tag
