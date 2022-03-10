@@ -1,5 +1,5 @@
-function contractor_mob_imped = fn_contractor( num_sys, num_reals, ...
-    surge_factor, sys_repair_trigger, trunc_pd, is_contractor_on_retainer )
+function contractor_mob_imped = fn_contractor( num_reals, surge_factor, ...
+    sys_repair_trigger, trunc_pd, contractor_options )
 % Simulute contractor mobilization time
 %
 % Parameters
@@ -15,8 +15,8 @@ function contractor_mob_imped = fn_contractor( num_sys, num_reals, ...
 %   systems that require repair for each realization
 % trunc_pd: matlab normal distribution object
 %   standard normal distrubtion, truncated at upper and lower bounds
-% is_contractor_on_retainer: logical
-%   is there a pre-arranged agreement with a contractor for priorization of repairs
+% contractor_options: struct
+%   various options that controll the contracting impedance time
 %
 % Returns
 % -------
@@ -24,14 +24,21 @@ function contractor_mob_imped = fn_contractor( num_sys, num_reals, ...
 %   Simulated contractor mobilization time for each system
 
 %% Define contractor distribution parameters
-if is_contractor_on_retainer
-    contr_med_upper = surge_factor * 7;
-    contr_med_lower = surge_factor * 3;
-    beta = 0.3;
-else
-    contr_med_upper = surge_factor * 21;
-    contr_med_lower = surge_factor * 7;
-    beta = 0.6;
+switch contractor_options.contractor_relationship
+    case 'retainer'
+        contr_med_upper = surge_factor * contractor_options.contractor_retainer_max;
+        contr_med_lower = surge_factor * contractor_options.contractor_retainer_min;
+        beta = 0.3;
+    case 'good'
+        contr_med_upper = surge_factor * 21;
+        contr_med_lower = surge_factor * 7;
+        beta = 0.6;
+    case 'none'
+        contr_med_upper = (1 + 2*(surge_factor-1)) * 42;
+        contr_med_lower = (1 + 2*(surge_factor-1)) * 21;
+        beta = 0.8;
+    otherwise
+        error('PBEE_Recovery:RepairSchedule', 'Invalid contractor relationship type, "%s", for impedance factor simulation', contractor_relationship)
 end
 
 %% Set median based on number of damaged systems

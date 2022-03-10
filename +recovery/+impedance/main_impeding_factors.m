@@ -138,9 +138,8 @@ if impedance_options.include_impedance.permitting
 end
 
 if impedance_options.include_impedance.contractor
-    duration.contractor_mob = fn_contractor( num_sys, num_reals, ...
-        surge_factor, sys_repair_trigger.any, trunc_pd, ...
-        impedance_options.mitigation.is_contractor_on_retainer );
+    duration.contractor_mob = fn_contractor( num_reals, surge_factor, ...
+        sys_repair_trigger.any, trunc_pd, impedance_options.mitigation );
 end
 
 if impedance_options.include_impedance.engineering

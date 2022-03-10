@@ -82,9 +82,17 @@
 							"type": "logical",
 							"description": "is an engineer contracted to be on retainer in case of post-earthquake damage"
 						},
-						"is_contractor_on_retainer": {
-							"type": "logical",
-							"description": "is a contractor contracted to be on retainer in case of post-earthquake damage"
+						"contractor_relationship": {
+							"type": "string",
+							"description": "string identifier that defines the state of existing relationships with contractors to perform repairs. Options include <'retainer', 'good', 'none'>"
+						},
+						"contractor_retainer_min": {
+							"type": "number",
+							"description": "lower bound of time, in days, from onset of damage to when repairs start previosly agreed upon in retainer agreement. Only applies when 'retainer' contractor_relationship is selected"
+						},
+						"contractor_retainer_max": {
+							"type": "number",
+							"description": "upper bound of time, in days, from onset of damage to when repairs start previosly agreed upon in retainer agreement. Only applies when 'retainer' contractor_relationship is selected"
 						},
 						"funding_source": {
 							"type": "string",
