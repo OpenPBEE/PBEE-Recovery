@@ -86,13 +86,9 @@
 							"type": "string",
 							"description": "string identifier that defines the state of existing relationships with contractors to perform repairs. Options include <'retainer', 'good', 'none'>"
 						},
-						"contractor_retainer_min": {
+						"contractor_retainer_time": {
 							"type": "number",
-							"description": "lower bound of time, in days, from onset of damage to when repairs start previosly agreed upon in retainer agreement. Only applies when 'retainer' contractor_relationship is selected"
-						},
-						"contractor_retainer_max": {
-							"type": "number",
-							"description": "upper bound of time, in days, from onset of damage to when repairs start previosly agreed upon in retainer agreement. Only applies when 'retainer' contractor_relationship is selected"
+							"description": "time, in days, from onset of damage to when repairs start previosly agreed upon in retainer agreement. Only applies when 'retainer' contractor_relationship is selected"
 						},
 						"funding_source": {
 							"type": "string",

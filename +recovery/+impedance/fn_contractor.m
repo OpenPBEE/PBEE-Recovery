@@ -26,25 +26,20 @@ function contractor_mob_imped = fn_contractor( num_reals, surge_factor, ...
 %% Define contractor distribution parameters
 switch contractor_options.contractor_relationship
     case 'retainer'
-        contr_med_upper = surge_factor * contractor_options.contractor_retainer_max;
-        contr_med_lower = surge_factor * contractor_options.contractor_retainer_min;
-        beta = 0.3;
+        med = surge_factor * contractor_options.contractor_retainer_time;
+        beta = 0.4;
     case 'good'
-        contr_med_upper = surge_factor * 21;
-        contr_med_lower = surge_factor * 7;
-        beta = 0.6;
+        med = (1 + 0.5*(surge_factor-1)) * 3;
+        beta = 0.4;
     case 'none'
-        contr_med_upper = (1 + 2*(surge_factor-1)) * 42;
-        contr_med_lower = (1 + 2*(surge_factor-1)) * 21;
+        med = surge_factor * 42;
         beta = 0.8;
     otherwise
         error('PBEE_Recovery:RepairSchedule', 'Invalid contractor relationship type, "%s", for impedance factor simulation', contractor_relationship)
 end
 
-%% Set median based on number of damaged systems
-num_damage_systems = sum(sys_repair_trigger,2);
-contr_med = contr_med_lower * ones(num_reals,1);
-contr_med(num_damage_systems > 2) = contr_med_upper;
+%% Set median for each realization
+contr_med = med * ones(num_reals,1);
 
 %% Simulate Impedance Time
 prob_sim = rand(num_reals, 1); % This assumes systems are correlated
