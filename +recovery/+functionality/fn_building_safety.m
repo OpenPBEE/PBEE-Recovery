@@ -211,7 +211,7 @@ for i = 1:num_repair_time_increments
     if functionality_options.fire_watch
         % if there is a fire watch, fire damage only affects door egress
         % requirements
-        fire_safety_day = fire_safety_day + delta_day .* fs_operation_matters_for_entry_doors;
+        fire_safety_day = fire_safety_day + delta_day .* fs_operation_matters_for_entry_doors .* fire_system_failure;
     else
         % If no fire watch, failure of fire system causes loss of occupancy
         fire_safety_day = fire_safety_day + delta_day .* fire_system_failure;
@@ -234,7 +234,7 @@ if fs_exists % only save this when fire system exists
     if functionality_options.fire_watch
         % If fire watch is in place, only account for the damage that
         % affects egress requirements
-        comp_breakdowns.fire_egress = system_operation_day.comp.fire .* fs_operation_matters_for_entry_doors;
+        comp_breakdowns.fire_egress = system_operation_day.comp.fire .* fs_operation_matters_for_entry_doors .* fire_system_failure;
     else
         % If no fire watch, take any damage that fails the system
         comp_breakdowns.fire_egress = system_operation_day.comp.fire;
