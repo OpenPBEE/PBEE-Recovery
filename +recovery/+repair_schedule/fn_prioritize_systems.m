@@ -35,8 +35,8 @@ num_sys = height(systems);
 [num_reals, ~] = size(damage.tenant_units{1}.qnt_damaged);
 
 % Find which components potentially affect function accross any tenant unit
-
-for s = 1:length(damage.tenant_units)affects_function = zeros(num_reals, height(damage.comp_ds_table));
+affects_function = zeros(num_reals, height(damage.comp_ds_table));
+for s = 1:length(damage.tenant_units)
     affects_function = affects_function | (damage.fnc_filters.affects_function & damage.tenant_units{s}.qnt_damaged);
 end
 

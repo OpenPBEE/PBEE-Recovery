@@ -4,6 +4,7 @@ impedance_options.include_impedance.financing = true;
 impedance_options.include_impedance.permitting = true;
 impedance_options.include_impedance.engineering = true;
 impedance_options.include_impedance.contractor = true;
+impedance_options.include_impedance.long_lead = false;
 impedance_options.system_design_time.f = 0.04;
 impedance_options.system_design_time.r = 175; 
 impedance_options.system_design_time.t = 1.3;

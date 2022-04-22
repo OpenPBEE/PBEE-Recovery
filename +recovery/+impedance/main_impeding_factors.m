@@ -62,6 +62,7 @@ duration.permitting = zeros(num_reals, num_sys);
 duration.contractor_mob = zeros(num_reals, num_sys);
 duration.eng_mob = zeros(num_reals, num_sys);
 duration.design = zeros(num_reals, num_sys);
+duration.long_lead = zeros(num_reals, num_sys);
 
 % System repair trigger
 % are there any repairs needed for this system
@@ -152,6 +153,31 @@ if impedance_options.include_impedance.engineering
         trunc_pd, beta, impeding_factor_medians);
 end
 
+if impedance_options.include_impedance.long_lead
+    for sys = 1:num_sys
+        sys_filt = damage.comp_ds_table.system' == sys; 
+        
+        % Simulate long lead times. Assume long lead times are correlated among
+        % all components within the system, but independant between systems
+        prob_sim = rand(num_reals, 1);
+        x_vals_std_n = icdf(trunc_pd, prob_sim);% Truncated lognormal distribution (via standard normal simulation)
+        sim_long_lead = exp(x_vals_std_n * beta + log(damage.comp_ds_table.long_lead_time'));
+        
+        for tu = 1:length(damage.tenant_units)
+            is_damaged = damage.tenant_units{tu}.qnt_damaged > 0;
+            
+            % Track if any damage exists that requires repair (assumes all
+            % damage requires repair). The long lead time for the system is
+            % the max long lead time for any component within the system
+            duration.long_lead(:,sys) = max( ...
+                duration.long_lead(:,sys), ...
+                max(is_damaged .* sys_filt .* sim_long_lead, [], 2) ...
+            );
+        end
+    end
+    
+end
+
 %% Aggregate experienced impedance time for each system/sequence and realization 
 % Figure out when each impeding factor finishes
 start_day.inspection = zeros(num_reals,num_sys);
@@ -171,6 +197,9 @@ complete_day.permitting = start_day.permitting + duration.permitting;
 
 start_day.contractor_mob = max(complete_day.inspection,start_day.financing);
 complete_day.contractor_mob = start_day.contractor_mob + duration.contractor_mob;
+
+start_day.long_lead = max(complete_day.inspection,start_day.financing);
+complete_day.long_lead = start_day.long_lead + duration.long_lead;
 
 % Combine all impedance factors by system
 impede_factors = fieldnames(complete_day);
@@ -199,6 +228,8 @@ for s = 1:height(systems)
     impeding_factors.breakdowns.permitting.(systems.name{s}).complete_day = complete_day.permitting(:,s);
     impeding_factors.breakdowns.contractor_mob.(systems.name{s}).start_day = start_day.contractor_mob(:,s);
     impeding_factors.breakdowns.contractor_mob.(systems.name{s}).complete_day = complete_day.contractor_mob(:,s);
+    impeding_factors.breakdowns.long_lead.(systems.name{s}).start_day = start_day.long_lead(:,s);
+    impeding_factors.breakdowns.v.(systems.name{s}).complete_day = complete_day.long_lead(:,s);
 end
 
 
