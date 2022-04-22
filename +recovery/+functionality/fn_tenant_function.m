@@ -448,7 +448,7 @@ end
 subsystem_failure = ratio_damaged > subsystem_threshold;
 
 % Calculate tenant unit recovery day for this subsystem
-subsystem_recovery_day = max(subsystem_failure .* repair_complete_day,[],2);
+subsystem_recovery_day = max(subsystem_filter .* subsystem_failure .* repair_complete_day,[],2);
 
 % Distrbute recovery day to the components affecting function for this subsystem
 subsystem_comp_recovery_day = subsystem_filter .* initial_damaged .* subsystem_recovery_day;

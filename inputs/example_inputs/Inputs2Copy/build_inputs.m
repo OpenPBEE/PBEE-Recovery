@@ -73,6 +73,12 @@ for fn = 1:length(names)
     building_model.(names{fn}) = building_model.(names{fn})';
 end
 
+% Translate edge length back to vertically oriented (2 sides) for single
+% story buildings
+if building_model.num_stories == 1
+    building_model.edge_lengths = building_model.edge_lengths';
+end
+
 % List of tenant units within the building and their basic attributes
 tenant_unit_list = readtable('tenant_unit_list.csv');
 
@@ -171,7 +177,7 @@ for c = 1:height(comp_ds_list)
     % Set Component Attributes
     comp_ds_info.system(c,1) = component_attributes.system_id(comp_attr_filt);
     comp_ds_info.subsystem_id(c,1) = component_attributes.subsystem_id(comp_attr_filt);
-    comp_ds_info.unit{c,1} = component_attributes.unit(comp_attr_filt);
+    comp_ds_info.unit{c,1} = component_attributes.unit{comp_attr_filt};
     comp_ds_info.unit_qty(c,1) = component_attributes.unit_qty(comp_attr_filt);
     comp_ds_info.service_location{c,1} = component_attributes.service_location{comp_attr_filt};
     

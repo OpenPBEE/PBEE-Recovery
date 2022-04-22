@@ -37,7 +37,7 @@ functionality_options.required_ratio_operating_hvac_main = 0.6667;
 functionality_options.required_ratio_operating_hvac_unit = 0.6667;
 functionality_options.exterior_safety_threshold = 0.1;
 functionality_options.interior_safety_threshold = 0.25;
-functionality_options.door_access_width_ft = 0.9;
+functionality_options.door_access_width_ft = 9;
 
 % Regional Impact
 regional_impact.surge_factor = 1;
