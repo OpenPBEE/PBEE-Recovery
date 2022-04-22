@@ -144,6 +144,10 @@
 					"type": "number",
 					"description": "days after all red tag repairs are done before occupancy can be regained (i.e. time for permitting office to clear the tag)"
 				},
+				"red_tag_clear_beta": {
+					"type": "number",
+					"description": "lognormal dispersion defining the uncertaitny in the red tag clear time"
+				},
 				"door_racking_repair_day": {
 					"type": "number",
 					"description": "days after the earthquake required to repaired all racked doorways"

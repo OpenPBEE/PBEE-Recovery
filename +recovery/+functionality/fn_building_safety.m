@@ -242,8 +242,10 @@ if fs_exists % only save this when fire system exists
 end
 
 %% Delay Red Tag recovery by the time it takes to clear the tag
-recovery_day.red_tag = recovery_day.red_tag + functionality_options.red_tag_clear_time*damage_consequences.red_tag;
-comp_breakdowns.red_tag = comp_breakdowns.red_tag + functionality_options.red_tag_clear_time*(comp_breakdowns.red_tag > 0);
+sim_red_tag_clear_time = ceil(lognrnd(log(functionality_options.red_tag_clear_time),...
+                                 functionality_options.red_tag_clear_beta,num_reals,1));
+recovery_day.red_tag = recovery_day.red_tag + sim_red_tag_clear_time .* damage_consequences.red_tag;
+comp_breakdowns.red_tag = comp_breakdowns.red_tag + sim_red_tag_clear_time .* (comp_breakdowns.red_tag > 0);
 
 end
 
