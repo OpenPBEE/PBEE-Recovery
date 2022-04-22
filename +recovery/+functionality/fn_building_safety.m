@@ -85,6 +85,8 @@ end
 % Simulate a random location of the doors on two sides of the building for
 % each realization. Location is defined at the center of the door as a
 % fraction of the building width on that side
+% This is acting a random p value to determine if the unknown location of
+% the door is within the falling hazard zone
 door_location = rand(num_reals,building_model.num_entry_doors);
 
 % Assign odd doors to side 1 and even doors to side two
@@ -141,8 +143,8 @@ for i = 1:num_repair_time_increments
         % add the door access width to the width of falling hazards to account
         % for the width of the door (ie if any part of the door access zone is
         % under the falling hazard, its a problem)
-        door_access_zone = functionality_options.door_access_width_ft / building_model.edge_lengths(1,door_side(d)); 
-        total_fall_haz_zone = fall_haz_zone + 2*door_access_zone;
+        door_access_zone = functionality_options.door_access_width_ft / building_model.edge_lengths(door_side(d),1); 
+        total_fall_haz_zone = fall_haz_zone + 2*door_access_zone; % this is approximating the probability the door is within the falling hazard zone
 
         % Determine if current damage affects occupancy
         % if the randonmly simulated door location is with falling hazard zone
