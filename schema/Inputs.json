@@ -42,6 +42,10 @@
 							"type": "logical",
 							"description": "flag to include contractor mobilization delays"
 						}
+						"long_lead": {
+							"type": "logical",
+							"description": "flag to include long lead delays"
+						}
 					}
 				},
 				"system_design_time": {
