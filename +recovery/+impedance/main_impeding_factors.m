@@ -229,7 +229,7 @@ for s = 1:height(systems)
     impeding_factors.breakdowns.contractor_mob.(systems.name{s}).start_day = start_day.contractor_mob(:,s);
     impeding_factors.breakdowns.contractor_mob.(systems.name{s}).complete_day = complete_day.contractor_mob(:,s);
     impeding_factors.breakdowns.long_lead.(systems.name{s}).start_day = start_day.long_lead(:,s);
-    impeding_factors.breakdowns.v.(systems.name{s}).complete_day = complete_day.long_lead(:,s);
+    impeding_factors.breakdowns.long_lead.(systems.name{s}).complete_day = complete_day.long_lead(:,s);
 end
 
 
