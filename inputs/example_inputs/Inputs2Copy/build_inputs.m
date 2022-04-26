@@ -160,7 +160,7 @@ for c = 1:height(comp_ds_list)
     % Basic Component and DS identifiers
     comp_ds_info.comp_id{c,1} = comp_ds_list.comp_id{c};
     comp_ds_info.comp_type_id{c,1} = comp_ds_list.comp_id{c}(1:5); % first 5 characters indicate the type
-    if c > 1 && ~strcmp(comp_ds_info.comp_id{c},comp_ds_info.comp_id{c-1})
+    if c > 1 && ~strcmp(string(comp_ds_info.comp_id{c}),string(comp_ds_info.comp_id{c-1}))
         % if not the same as the previous component
         comp_idx = comp_idx + 1;
     end
@@ -169,7 +169,7 @@ for c = 1:height(comp_ds_list)
     comp_ds_info.ds_sub_id(c,1) = comp_ds_list.ds_sub_id(c);
     
     % Find idx of this component in the  component attribute tables
-    comp_attr_filt = strcmp(component_attributes.fragility_id,comp_ds_info.comp_id{c,1});
+    comp_attr_filt = strcmp(string(component_attributes.fragility_id),string(comp_ds_info.comp_id{c,1}));
     if sum(comp_attr_filt) ~= 1
         error('Could not find component attrubutes')
     end
