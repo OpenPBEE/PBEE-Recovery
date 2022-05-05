@@ -91,8 +91,8 @@ fnc_filters.interior_function_all = fnc_filters.interior_function_lf | ...
                                            fnc_filters.interior_function_build;  
 
 % Elevators
-fnc_filters.elevators    = comp_ds_table.system == 5 & comp_ds_table.impairs_system_operation & ~comp_ds_table.subsystem_id == 2;
-fnc_filters.elevator_mcs = comp_ds_table.system == 5 & comp_ds_table.impairs_system_operation &  comp_ds_table.subsystem_id == 2;
+fnc_filters.elevators    = comp_ds_table.system == 5 & comp_ds_table.impairs_system_operation & comp_ds_table.subsystem_id ~= 2;
+fnc_filters.elevator_mcs = comp_ds_table.system == 5 & comp_ds_table.impairs_system_operation & comp_ds_table.subsystem_id == 2;
 
 % Electrical system
 fnc_filters.electrical_main = comp_ds_table.system == 7 & comp_ds_table.subsystem_id == 1 & strcmp(string(comp_ds_table.service_location),'building') & comp_ds_table.impairs_system_operation;
