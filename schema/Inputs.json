@@ -111,6 +111,10 @@
 				"impedance_truncation": {
 					"type": "number",
 					"description": "Truncation bounds of lognormal distribution of impedance time, input as the number of standard deviations above and below the mean. Default to 2",
+				},
+				"default_lead_time": {
+					"type": "number",
+					"description": "Lead time, in days, to replace select components (equipment or other less readily available components). This default lead time will be applied to all components with the long_lead flag in the inputs builder. To add custom lead times per component, update the long_lead_time attribute in the damage.comp_ds_table field.",
 				}
 			}
 		},

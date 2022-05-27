@@ -1,4 +1,4 @@
-fragility_id_regex,component_type,str_or_ns,major,minor,spirit_of_damage,ds_index,sub_ds_index,is_sim_ds,safety_class,affects_envelope_safety,exterior_falling_hazard,interior_falling_hazard,global_hazardous_material,local_hazardous_material,affects_access,damages_envelope_seal,obstructs_interior_space,impairs_system_operation,fraction_area_affected,area_affected_unit,crew_size,has_tmp_fix,tmp_fix_time,requires_shoring,permit_type,redesign,long_lead_time
+fragility_id_regex,component_type,str_or_ns,major,minor,spirit_of_damage,ds_index,sub_ds_index,is_sim_ds,safety_class,affects_envelope_safety,exterior_falling_hazard,interior_falling_hazard,global_hazardous_material,local_hazardous_material,affects_access,damages_envelope_seal,obstructs_interior_space,impairs_system_operation,fraction_area_affected,area_affected_unit,crew_size,has_tmp_fix,tmp_fix_time,requires_shoring,permit_type,redesign,long_lead
 B1029\.1\w+,Flexible Wood Diaphram for Tilt-Up Roof Systems,Structural,Roof,Flexible Diaphragm,Tearing of roofing materials and flashing at supports. Some nail slippage and withdrawl at the diaphragm center and corners.,1,NA,0,0,0,0,0,0,0,0,0,0,0,0,NA,4,0,0,0,full,0,0
 B1029\.1\w+,Flexible Wood Diaphram for Tilt-Up Roof Systems,Structural,Roof,Flexible Diaphragm,"Nails pull out, framing splitting and plywood tearing extends into the diaphragm.",2,NA,0,1,0,0,0,0,0,0,0,0,0,0.25,building,6,0,0,0,full,1,0
 B1029\.1\w+,Flexible Wood Diaphram for Tilt-Up Roof Systems,Structural,Roof,Flexible Diaphragm,"In addition to damage described for DS1 and DS2, plywood panels pull free of sub-framing and framing splits over approximately 25% of the diaphragm span at each diaphragm support.",3,NA,0,2,0,0,1,0,0,0,0,1,0,0.25,building,6,0,0,0,full,1,0
@@ -203,18 +203,18 @@ C3032\.00[134][a-d],Suspended Ceiling,Non-structural,Interior,Ceilings,5 % of ce
 C3032\.00[134][a-d],Suspended Ceiling,Non-structural,Interior,Ceilings,30% of ceiling grid and tile damage.,2,NA,0,0,0,0,1,0,0,0,0,1,0,0.3,component,3,1,3,0,rapid,0,0
 C3032\.00[134][a-d],Suspended Ceiling,Non-structural,Interior,Ceilings,50% of ceiling grid and tile damage.,3,NA,0,0,0,0,1,0,0,0,0,1,0,0.5,component,7,1,7,0,rapid,0,0
 C3034\.\w+,Independent Pendant Lighting,Non-structural,Interior,Lighting,"Disassembly of rod system at connections with horizontal light fixture, low cycle fatigue failure of the threaded rod, pullout of rods from ceiling assembly.",1,NA,0,0,0,0,1,0,0,0,0,1,0,100,component,3,1,7,0,rapid,0,0
-D1014\.0[34]1,Traction Elevators (HBRG): Machine Room,Non-structural,Conveying,Elevators,"Controller anchorage failure, machine anchorage failure, motor Generator anchorage failure, governor anchorage failure, and rope guard/tail sheave anchorage failure. ",1,NA,0,0,0,0,0,0,0,0,0,0,1,0,NA,2,0,0,0,rapid,0,182
-D1014\.0[34]2,Traction Elevators (HBRG): Cab and Counterweights,Non-structural,Conveying,Elevators,"Car guide shoes damaged, counterweight guide shoes damaged, counterweight  distorted frame, cab ceiling damaged, cab stabilizer brackets bent, and or cab walls, and or cab doors damaged.",1,NA,0,0,0,0,0,0,0,0,0,0,1,0,NA,2,0,0,0,rapid,0,182
-D1014\.0[34]3,Traction Elevators (HBRG): Guide Rails,Non-structural,Conveying,Elevators,Guide rail distortion,1,NA,0,0,0,0,0,0,0,0,0,0,1,0,NA,2,0,0,0,rapid,0,182
-D1014\.0[34]4,Traction Elevators (HBRG): Rail Brackets,Non-structural,Conveying,Elevators,"Intermediate guide rail brackets break or bend, car guide rail brackets break or bend, and counterweight guide rail brackets break or bend. ",1,NA,0,0,0,0,0,0,0,0,0,0,1,0,NA,2,0,0,0,rapid,0,182
-D1014\.01\w+,Traction Elevators,Non-structural,Conveying,Elevators,"Controller anchorage failed, and or machine anchorage failed, and or motor generator anchorage failed, and or governor anchorage failed, and or rope guard failures.",1,1,1,0,0,0,0,0,0,0,0,0,1,0,NA,2,0,0,0,rapid,0,182
-D1014\.01\w+,Traction Elevators,Non-structural,Conveying,Elevators,"Rail distortion, and or intermediate bracket separate and spread, and or counterweight bracket break or bend, and or car bracket break or bend, and or car guide shoes damaged, and or counterweight guide shoes damaged, and or counterweight frame distortion, and or tail sheave dislodged and/or twisted",1,2,1,0,0,0,0,0,0,0,0,0,1,0,NA,2,0,0,0,rapid,0,182
-D1014\.01\w+,Traction Elevators,Non-structural,Conveying,Elevators,"Cab stabilizers bent, or cab walls damaged, or cab doors damaged.",1,3,1,0,0,0,0,0,0,0,0,0,1,0,NA,2,0,0,0,rapid,0,182
-D1014\.01\w+,Traction Elevators,Non-structural,Conveying,Elevators,Cab ceiling damaged.,1,4,1,0,0,0,0,0,0,0,0,0,1,0,NA,2,0,0,0,rapid,0,182
-D1014\.02\w+,Hydraulic Elevators,Non-structural,Conveying,Elevators,Damaged controls.,1,1,1,0,0,0,0,0,0,0,0,0,1,0,NA,2,0,0,0,rapid,0,182
-D1014\.02\w+,Hydraulic Elevators,Non-structural,Conveying,Elevators,"Damaged vane and hoist-way switches, and or bent cab stabilizers, and or damaged car guide shoes.",1,2,1,0,0,0,0,0,0,0,0,0,1,0,NA,2,0,0,0,rapid,0,182
-D1014\.02\w+,Hydraulic Elevators,Non-structural,Conveying,Elevators,"Damaged entrance and car door, and or flooring damage.",1,3,1,0,0,0,0,0,0,0,0,0,1,0,NA,2,0,0,0,rapid,0,182
-D1014\.02\w+,Hydraulic Elevators,Non-structural,Conveying,Elevators,"Oil leak in hydraulic line, and or hydraulic tank failure.",1,4,1,0,0,0,0,0,0,0,0,0,1,0,NA,2,0,0,0,rapid,0,182
+D1014\.0[34]1,Traction Elevators (HBRG): Machine Room,Non-structural,Conveying,Elevators,"Controller anchorage failure, machine anchorage failure, motor Generator anchorage failure, governor anchorage failure, and rope guard/tail sheave anchorage failure. ",1,NA,0,0,0,0,0,0,0,0,0,0,1,0,NA,2,0,0,0,rapid,0,1
+D1014\.0[34]2,Traction Elevators (HBRG): Cab and Counterweights,Non-structural,Conveying,Elevators,"Car guide shoes damaged, counterweight guide shoes damaged, counterweight  distorted frame, cab ceiling damaged, cab stabilizer brackets bent, and or cab walls, and or cab doors damaged.",1,NA,0,0,0,0,0,0,0,0,0,0,1,0,NA,2,0,0,0,rapid,0,1
+D1014\.0[34]3,Traction Elevators (HBRG): Guide Rails,Non-structural,Conveying,Elevators,Guide rail distortion,1,NA,0,0,0,0,0,0,0,0,0,0,1,0,NA,2,0,0,0,rapid,0,1
+D1014\.0[34]4,Traction Elevators (HBRG): Rail Brackets,Non-structural,Conveying,Elevators,"Intermediate guide rail brackets break or bend, car guide rail brackets break or bend, and counterweight guide rail brackets break or bend. ",1,NA,0,0,0,0,0,0,0,0,0,0,1,0,NA,2,0,0,0,rapid,0,1
+D1014\.01\w+,Traction Elevators,Non-structural,Conveying,Elevators,"Controller anchorage failed, and or machine anchorage failed, and or motor generator anchorage failed, and or governor anchorage failed, and or rope guard failures.",1,1,1,0,0,0,0,0,0,0,0,0,1,0,NA,2,0,0,0,rapid,0,1
+D1014\.01\w+,Traction Elevators,Non-structural,Conveying,Elevators,"Rail distortion, and or intermediate bracket separate and spread, and or counterweight bracket break or bend, and or car bracket break or bend, and or car guide shoes damaged, and or counterweight guide shoes damaged, and or counterweight frame distortion, and or tail sheave dislodged and/or twisted",1,2,1,0,0,0,0,0,0,0,0,0,1,0,NA,2,0,0,0,rapid,0,1
+D1014\.01\w+,Traction Elevators,Non-structural,Conveying,Elevators,"Cab stabilizers bent, or cab walls damaged, or cab doors damaged.",1,3,1,0,0,0,0,0,0,0,0,0,1,0,NA,2,0,0,0,rapid,0,1
+D1014\.01\w+,Traction Elevators,Non-structural,Conveying,Elevators,Cab ceiling damaged.,1,4,1,0,0,0,0,0,0,0,0,0,1,0,NA,2,0,0,0,rapid,0,1
+D1014\.02\w+,Hydraulic Elevators,Non-structural,Conveying,Elevators,Damaged controls.,1,1,1,0,0,0,0,0,0,0,0,0,1,0,NA,2,0,0,0,rapid,0,1
+D1014\.02\w+,Hydraulic Elevators,Non-structural,Conveying,Elevators,"Damaged vane and hoist-way switches, and or bent cab stabilizers, and or damaged car guide shoes.",1,2,1,0,0,0,0,0,0,0,0,0,1,0,NA,2,0,0,0,rapid,0,1
+D1014\.02\w+,Hydraulic Elevators,Non-structural,Conveying,Elevators,"Damaged entrance and car door, and or flooring damage.",1,3,1,0,0,0,0,0,0,0,0,0,1,0,NA,2,0,0,0,rapid,0,1
+D1014\.02\w+,Hydraulic Elevators,Non-structural,Conveying,Elevators,"Oil leak in hydraulic line, and or hydraulic tank failure.",1,4,1,0,0,0,0,0,0,0,0,0,1,0,NA,2,0,0,0,rapid,0,1
 D2021\.01[12]b,"Cold Domestic Piping - Small diameter (brace only), SDC A-C",Non-structural,Piping,Domestic,Lateral Brace Failure - 1 failure per 1000 feet of pipe.,1,NA,0,0,0,0,0,0,0,0,0,0,0,0,NA,3,0,0,0,rapid,0,0
 D2021\.01[12]b,"Cold Domestic Piping - Small diameter (brace only), SDC A-C",Non-structural,Piping,Domestic,Vertical Brace Failure - 1 failure per 1000 feet of pipe,2,NA,0,0,0,0,0,0,0,0,0,0,0,0,NA,3,0,0,0,rapid,0,0
 D2021\.01[1234]a,Cold Domestic Piping - Small diameter (branches),Non-structural,Piping,Domestic,Minor leakage at flange connections - 1 leak per 1000 feet of pipe.,1,NA,0,0,0,0,0,0,0,0,0,0,0,0,NA,3,0,0,0,rapid,0,0
@@ -254,26 +254,26 @@ D2061\.02[1234]a,Steam Piping - Large diameter (mains),Non-structural,Piping,Ste
 D2061\.02[1234]a,Steam Piping - Large diameter (mains),Non-structural,Piping,Steam,Pipe Break - 1 break per 1000 feet of pipe.,2,NA,0,0,0,0,1,0,0,0,0,1,1,1,component,5,0,0,0,rapid,0,0
 D2061\.02[34]b,Steam Piping - Large diameter (bracing) SDC D+,Non-structural,Piping,Steam,Lateral Brace Failure - 1 failure per 1000 feet of pipe.,1,NA,0,0,0,0,0,0,0,0,0,0,0,0,NA,3,0,0,0,rapid,0,0
 D2061\.02[34]b,Steam Piping - Large diameter (bracing) SDC D+,Non-structural,Piping,Steam,Vertical Brace Failure - 1 failure per 1000 feet of pipe,2,NA,0,0,0,0,0,0,0,0,0,0,0,0,NA,3,0,0,0,rapid,0,0
-D3031\.01(1[abcd]|[23][behk]),Chiller Equipment,Non-structural,HVAC,Chiller,Inoperative equipment,1,NA,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,182
+D3031\.01(1[abcd]|[23][behk]),Chiller Equipment,Non-structural,HVAC,Chiller,Inoperative equipment,1,NA,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,1
 D3031\.01[23][adgj],Chiller Anchorage,Non-structural,HVAC,Chiller,Anchorage failure.,1,1,0,0,0,0,0,0,0,0,0,0,0,0,NA,3,0,0,0,rapid,0,0
-D3031\.01[23][adgj],Chiller Anchorage,Non-structural,HVAC,Chiller,Anchorage failure & Equipment damaged beyond repair.,1,2,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,182
+D3031\.01[23][adgj],Chiller Anchorage,Non-structural,HVAC,Chiller,Anchorage failure & Equipment damaged beyond repair.,1,2,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,1
 D3031\.01[23][cfil],Chiller Equipment Anchorage Combined,Non-structural,HVAC,Chiller,Anchorage failure.,1,1,0,0,0,0,0,0,0,0,0,0,0,0,NA,3,0,0,0,rapid,0,0
-D3031\.01[23][cfil],Chiller Equipment Anchorage Combined,Non-structural,HVAC,Chiller,Anchorage failure & Equipment damaged beyond repair.,1,2,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,182
-D3031\.01[23][cfil],Chiller Equipment Anchorage Combined,Non-structural,HVAC,Chiller,"Damaged, Inoperative but anchorage is OK.",1,3,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,182
-D3031\.02(1[abcd]|[23][behk]),Cooling Tower Equipment,Non-structural,HVAC,Cooling Tower,"Damaged equipment, requires replacement",1,NA,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,182
+D3031\.01[23][cfil],Chiller Equipment Anchorage Combined,Non-structural,HVAC,Chiller,Anchorage failure & Equipment damaged beyond repair.,1,2,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,1
+D3031\.01[23][cfil],Chiller Equipment Anchorage Combined,Non-structural,HVAC,Chiller,"Damaged, Inoperative but anchorage is OK.",1,3,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,1
+D3031\.02(1[abcd]|[23][behk]),Cooling Tower Equipment,Non-structural,HVAC,Cooling Tower,"Damaged equipment, requires replacement",1,NA,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,1
 D3031\.02[23][adgj],Cooling Tower Anchorage,Non-structural,HVAC,Cooling Tower,Anchorage failure.,1,1,0,0,0,0,0,0,0,0,0,0,0,0,NA,3,0,0,0,rapid,0,0
-D3031\.02[23][adgj],Cooling Tower Anchorage,Non-structural,HVAC,Cooling Tower,Anchorage failure & Equipment damaged beyond repair.,1,2,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,182
+D3031\.02[23][adgj],Cooling Tower Anchorage,Non-structural,HVAC,Cooling Tower,Anchorage failure & Equipment damaged beyond repair.,1,2,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,1
 D3031\.02[23][cfil],Cooling Tower Equipment Anchorage Combined,Non-structural,HVAC,Cooling Tower,Anchorage failure.,1,1,0,0,0,0,0,0,0,0,0,0,0,0,NA,3,0,0,0,rapid,0,0
-D3031\.02[23][cfil],Cooling Tower Equipment Anchorage Combined,Non-structural,HVAC,Cooling Tower,Anchorage failure & Equipment damaged beyond repair.,1,2,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,182
-D3031\.02[23][cfil],Cooling Tower Equipment Anchorage Combined,Non-structural,HVAC,Cooling Tower,Damaged equipment and attached piping but anchorage OK.,1,3,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,182
-D3032\.01(1[abcd]|[23][behk]),Compressor Equipment (RTU),Non-structural,HVAC,Compressor,"Equipment does not function, motor damaged (requires repair)",1,1,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,182
-D3032\.01(1[abcd]|[23][behk]),Compressor Equipment (RTU),Non-structural,HVAC,Compressor,"Equipment does not function, motor damaged beyond repair",1,2,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,182
+D3031\.02[23][cfil],Cooling Tower Equipment Anchorage Combined,Non-structural,HVAC,Cooling Tower,Anchorage failure & Equipment damaged beyond repair.,1,2,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,1
+D3031\.02[23][cfil],Cooling Tower Equipment Anchorage Combined,Non-structural,HVAC,Cooling Tower,Damaged equipment and attached piping but anchorage OK.,1,3,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,1
+D3032\.01(1[abcd]|[23][behk]),Compressor Equipment (RTU),Non-structural,HVAC,Compressor,"Equipment does not function, motor damaged (requires repair)",1,1,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,1
+D3032\.01(1[abcd]|[23][behk]),Compressor Equipment (RTU),Non-structural,HVAC,Compressor,"Equipment does not function, motor damaged beyond repair",1,2,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,1
 D3032\.01[23][adgj],Compressor Anchorage (RTU),Non-structural,HVAC,Compressor,Anchorage failure.,1,1,0,0,0,0,0,0,0,0,0,0,0,0,NA,3,0,0,0,rapid,0,0
-D3032\.01[23][adgj],Compressor Anchorage (RTU),Non-structural,HVAC,Compressor,Anchorage failure & Equipment damaged beyond repair.,1,2,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,182
+D3032\.01[23][adgj],Compressor Anchorage (RTU),Non-structural,HVAC,Compressor,Anchorage failure & Equipment damaged beyond repair.,1,2,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,1
 D3032\.01[23][cfil],Compressor Equip and Anchorage Combo,Non-structural,HVAC,Compressor,Anchorage failure.,1,1,0,0,0,0,0,0,0,0,0,0,0,0,NA,3,0,0,0,rapid,0,0
-D3032\.01[23][cfil],Compressor Equip and Anchorage Combo,Non-structural,HVAC,Compressor,Anchorage failure & Equipment damaged beyond repair.,1,2,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,182
-D3032\.01[23][cfil],Compressor Equip and Anchorage Combo,Non-structural,HVAC,Compressor,Motor damaged but anchorage is OK.,1,3,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,182
-D3032\.01[23][cfil],Compressor Equip and Anchorage Combo,Non-structural,HVAC,Compressor,Equipment damaged beyond repair but anchorage is OK.,1,4,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,182
+D3032\.01[23][cfil],Compressor Equip and Anchorage Combo,Non-structural,HVAC,Compressor,Anchorage failure & Equipment damaged beyond repair.,1,2,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,1
+D3032\.01[23][cfil],Compressor Equip and Anchorage Combo,Non-structural,HVAC,Compressor,Motor damaged but anchorage is OK.,1,3,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,1
+D3032\.01[23][cfil],Compressor Equip and Anchorage Combo,Non-structural,HVAC,Compressor,Equipment damaged beyond repair but anchorage is OK.,1,4,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,1
 D3041\.0[12]1[abcd],Air distribution systems: Ducting less than 6 sq ft (branches),Non-structural,HVAC,Air Dist,Individual supports fail and duct sags - 1 failed support per 1000 feet of ducting.,1,NA,0,0,0,0,0,0,0,0,0,0,0,0,NA,3,1,3,0,rapid,0,0
 D3041\.0[12]1[abcd],Air distribution systems: Ducting less than 6 sq ft (branches),Non-structural,HVAC,Air Dist,Several adjacent supports fail and sections of ducting fall - 60 feet of ducting fail and fall per 1000 foot of ducting.,2,NA,0,0,0,0,1,0,0,0,0,1,1,0.1,component,5,1,3,0,rapid,0,0
 D3041\.0[12]2[abcd],Air distribution systems: Ducting greater than 6 sq ft (mains),Non-structural,HVAC,Air Dist,Individual supports fail and duct sags - 1 failed support per 1000 feet of ducting.,1,NA,0,0,0,0,0,0,0,0,0,0,0,0,NA,3,1,3,0,rapid,0,0
@@ -283,20 +283,20 @@ D3041\.001[abcd],Air distribution systems: HVAC Fan with vibration isolator,Non-
 D3041\.002[abcd],Air distribution systems: HVAC Fan w/o vibration isolator,Non-structural,HVAC,Air Dist,Bellows fails at fans.,1,NA,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,0
 D3041\.03\w+,Air distribution systems: HVAC drops,Non-structural,HVAC,Air Dist,HVAC drops or diffusers dislodges and falls.,1,NA,0,0,0,0,1,0,0,0,0,1,1,10,component,3,0,0,0,rapid,0,0
 D3041\.04\w+,Air distribution systems: Variable Air Volume,Non-structural,HVAC,Air Dist,Coil damages connection to plumbing. Leakage of hot water.,1,NA,0,0,0,0,1,0,0,0,0,1,1,10,component,3,0,0,0,rapid,0,0
-D3041\.10(1a|[23]b),HVAC Fan Equipment (exhaust),Non-structural,HVAC,Air Dist,Inoperative equipment,1,NA,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,182
+D3041\.10(1a|[23]b),HVAC Fan Equipment (exhaust),Non-structural,HVAC,Air Dist,Inoperative equipment,1,NA,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,1
 D3041\.10[23]a,HVAC Fan Anchorage (exhaust),Non-structural,HVAC,Air Dist,Anchorage failure.,1,1,0,0,0,0,0,0,0,0,0,0,0,0,NA,3,0,0,0,rapid,0,0
-D3041\.10[23]a,HVAC Fan Anchorage (exhaust),Non-structural,HVAC,Air Dist,Anchorage failure & Equipment damaged beyond repair.,1,2,0,0,0,0,0,0,0,0,0,0,1,0,NA,5,0,0,0,rapid,0,182
+D3041\.10[23]a,HVAC Fan Anchorage (exhaust),Non-structural,HVAC,Air Dist,Anchorage failure & Equipment damaged beyond repair.,1,2,0,0,0,0,0,0,0,0,0,0,1,0,NA,5,0,0,0,rapid,0,1
 D3041\.10[23]c,HVAC Fan Equipment Anchorage Combined (exhaust),Non-structural,HVAC,Air Dist,Anchorage failure.,1,1,0,0,0,0,0,0,0,0,0,0,0,0,NA,3,0,0,0,rapid,0,0
-D3041\.10[23]c,HVAC Fan Equipment Anchorage Combined (exhaust),Non-structural,HVAC,Air Dist,Anchorage failure & Equipment damaged beyond repair.,1,2,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,182
-D3041\.10[23]c,HVAC Fan Equipment Anchorage Combined (exhaust),Non-structural,HVAC,Air Dist,"Damaged, Inoperative but anchorage is OK",1,3,0,0,0,0,0,0,0,0,0,0,1,0,NA,5,0,0,0,rapid,0,182
+D3041\.10[23]c,HVAC Fan Equipment Anchorage Combined (exhaust),Non-structural,HVAC,Air Dist,Anchorage failure & Equipment damaged beyond repair.,1,2,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,1
+D3041\.10[23]c,HVAC Fan Equipment Anchorage Combined (exhaust),Non-structural,HVAC,Air Dist,"Damaged, Inoperative but anchorage is OK",1,3,0,0,0,0,0,0,0,0,0,0,1,0,NA,5,0,0,0,rapid,0,1
 D3052\.01(1[abcd]|3[behk]),Air handeling Equipment,Non-structural,HVAC,AHU,Equipment damaged - repair,1,1,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,0
-D3052\.01(1[abcd]|3[behk]),Air handeling Equipment,Non-structural,HVAC,AHU,Equipment damaged - replace,1,2,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,182
+D3052\.01(1[abcd]|3[behk]),Air handeling Equipment,Non-structural,HVAC,AHU,Equipment damaged - replace,1,2,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,1
 D3052\.013[adgj],Air handeling Anchorage,Non-structural,HVAC,AHU,Anchorage failure.,1,1,0,0,0,0,0,0,0,0,0,0,0,0,NA,3,0,0,0,rapid,0,0
-D3052\.013[adgj],Air handeling Anchorage,Non-structural,HVAC,AHU,Anchorage failure & Equipment damaged beyond repair.,1,2,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,182
+D3052\.013[adgj],Air handeling Anchorage,Non-structural,HVAC,AHU,Anchorage failure & Equipment damaged beyond repair.,1,2,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,1
 D3052\.013[cfil],Air Handling Equipment and Anchorage,Non-structural,HVAC,AHU,Anchorage failure.,1,1,0,0,0,0,0,0,0,0,0,0,0,0,NA,3,0,0,0,rapid,0,0
-D3052\.013[cfil],Air Handling Equipment and Anchorage,Non-structural,HVAC,AHU,Anchorage failure & Equipment damaged beyond repair.,1,2,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,182
+D3052\.013[cfil],Air Handling Equipment and Anchorage,Non-structural,HVAC,AHU,Anchorage failure & Equipment damaged beyond repair.,1,2,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,1
 D3052\.013[cfil],Air Handling Equipment and Anchorage,Non-structural,HVAC,AHU,Damage to attached ducting or piping but anchorage is OK.,1,3,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,0
-D3052\.013[cfil],Air Handling Equipment and Anchorage,Non-structural,HVAC,AHU,Equipment damaged beyond repair but anchorage is OK.,1,4,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,182
+D3052\.013[cfil],Air Handling Equipment and Anchorage,Non-structural,HVAC,AHU,Equipment damaged beyond repair but anchorage is OK.,1,4,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,1
 D3067\.01(1a|2b),HVAC Control Panel Equipment,Non-structural,HVAC,Control Panel,"Equipment damaged - replace parts of equipment (relays, circuit boards)",1,NA,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,0
 D3067\.012a,HVAC Control Panel Anchorage,Non-structural,HVAC,Control Panel,Anchorage failure.,1,1,0,0,0,0,0,0,0,0,0,0,0,0,NA,3,0,0,0,rapid,0,0
 D3067\.012a,HVAC Control Panel Anchorage,Non-structural,HVAC,Control Panel,Anchorage failure & Equipment damaged beyond repair.,1,2,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,0
@@ -332,16 +332,16 @@ D5012\.033[adgj],Distribution Panel Anchorage,Non-structural,Electrical,Distribu
 D5012\.033[cfil],Distribution Panel Equipment Anchorage Combined,Non-structural,Electrical,Distribution,Anchorage failure.,1,1,0,0,0,0,0,0,0,0,0,0,0,0,NA,3,0,0,0,rapid,0,0
 D5012\.033[cfil],Distribution Panel Equipment Anchorage Combined,Non-structural,Electrical,Distribution,Anchorage failure & Equipment damaged beyond repair.,1,2,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,0
 D5012\.033[cfil],Distribution Panel Equipment Anchorage Combined,Non-structural,Electrical,Distribution,"Damaged, Inoperative but anchorage is OK.",1,3,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,0
-D5092\.01(1a|3b),Battery Rack Equipment,Non-structural,Electrical,Battery,"Batteries fall, crack cases, dislodge conductors, or are otherwise damaged",1,1,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,182
-D5092\.01(1a|3b),Battery Rack Equipment,Non-structural,Electrical,Battery,Batteries spill battery acid.,1,2,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,182
-D5092\.01(1a|3b),Battery Rack Equipment,Non-structural,Electrical,Battery,Battery rack collapses.,1,3,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,182
+D5092\.01(1a|3b),Battery Rack Equipment,Non-structural,Electrical,Battery,"Batteries fall, crack cases, dislodge conductors, or are otherwise damaged",1,1,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,1
+D5092\.01(1a|3b),Battery Rack Equipment,Non-structural,Electrical,Battery,Batteries spill battery acid.,1,2,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,1
+D5092\.01(1a|3b),Battery Rack Equipment,Non-structural,Electrical,Battery,Battery rack collapses.,1,3,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,1
 D5092\.013a,Battery Rack Anchorage,Non-structural,Electrical,Battery,Anchorage failure.,1,1,0,0,0,0,0,0,0,0,0,0,0,0,NA,3,0,0,0,rapid,0,0
-D5092\.013a,Battery Rack Anchorage,Non-structural,Electrical,Battery,Anchorage failure & Equipment damaged beyond repair.,1,2,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,182
+D5092\.013a,Battery Rack Anchorage,Non-structural,Electrical,Battery,Anchorage failure & Equipment damaged beyond repair.,1,2,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,1
 D5092\.013c,Battery Rack Equipment Anchorage Combined,Non-structural,Electrical,Battery,Anchorage failure.,1,1,0,0,0,0,0,0,0,0,0,0,0,0,NA,3,0,0,0,rapid,0,0
-D5092\.013c,Battery Rack Equipment Anchorage Combined,Non-structural,Electrical,Battery,Anchorage failure & Equipment damaged beyond repair.,1,2,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,182
-D5092\.013c,Battery Rack Equipment Anchorage Combined,Non-structural,Electrical,Battery,Equipment is damaged and inoperative.,1,3,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,182
-D5092\.013c,Battery Rack Equipment Anchorage Combined,Non-structural,Electrical,Battery,Equipment is damaged and inoperative.,1,4,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,182
-D5092\.013c,Battery Rack Equipment Anchorage Combined,Non-structural,Electrical,Battery,Equipment is damaged and inoperative.,1,5,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,182
+D5092\.013c,Battery Rack Equipment Anchorage Combined,Non-structural,Electrical,Battery,Anchorage failure & Equipment damaged beyond repair.,1,2,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,1
+D5092\.013c,Battery Rack Equipment Anchorage Combined,Non-structural,Electrical,Battery,Equipment is damaged and inoperative.,1,3,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,1
+D5092\.013c,Battery Rack Equipment Anchorage Combined,Non-structural,Electrical,Battery,Equipment is damaged and inoperative.,1,4,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,1
+D5092\.013c,Battery Rack Equipment Anchorage Combined,Non-structural,Electrical,Battery,Equipment is damaged and inoperative.,1,5,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,1
 D5092\.02(1a|3b),Battery Charger Equipment,Non-structural,Electrical,Battery,"Damaged, inoperative but anchorage is OK.",1,1,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,0
 D5092\.02(1a|3b),Battery Charger Equipment,Non-structural,Electrical,Battery,"Damaged, inoperative but anchorage is OK. Equipment damaged beyond repair.",1,2,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,0
 D5092\.023a,Battery Charger Anchorage,Non-structural,Electrical,Battery,Anchorage failure.,1,1,0,0,0,0,0,0,0,0,0,0,0,0,NA,3,0,0,0,rapid,0,0
@@ -350,17 +350,17 @@ D5092\.023c,Battery Charger Equipment Anchorage Combined,Non-structural,Electric
 D5092\.023c,Battery Charger Equipment Anchorage Combined,Non-structural,Electrical,Battery,Anchorage failure & Equipment damaged beyond repair.,1,2,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,0
 D5092\.023c,Battery Charger Equipment Anchorage Combined,Non-structural,Electrical,Battery,Equipment is damaged and inoperative.,1,3,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,0
 D5092\.023c,Battery Charger Equipment Anchorage Combined,Non-structural,Electrical,Battery,Equipment is damaged and inoperative.,1,4,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,0
-D5092\.03(1[abcd]|[23][behk]),Diesel Generator Equipment,Non-structural,Electrical,Generator, Pipes and nozzles damaged,1,1,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,182
-D5092\.03(1[abcd]|[23][behk]),Diesel Generator Equipment,Non-structural,Electrical,Generator,Drive shaft misalignment,1,2,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,182
-D5092\.03(1[abcd]|[23][behk]),Diesel Generator Equipment,Non-structural,Electrical,Generator,"Minor electrical damage, e.g., failed relay",1,3,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,182
-D5092\.03(1[abcd]|[23][behk]),Diesel Generator Equipment,Non-structural,Electrical,Generator,Exhaust line disconnected at expansion bellows,1,4,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,182
+D5092\.03(1[abcd]|[23][behk]),Diesel Generator Equipment,Non-structural,Electrical,Generator, Pipes and nozzles damaged,1,1,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,1
+D5092\.03(1[abcd]|[23][behk]),Diesel Generator Equipment,Non-structural,Electrical,Generator,Drive shaft misalignment,1,2,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,1
+D5092\.03(1[abcd]|[23][behk]),Diesel Generator Equipment,Non-structural,Electrical,Generator,"Minor electrical damage, e.g., failed relay",1,3,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,1
+D5092\.03(1[abcd]|[23][behk]),Diesel Generator Equipment,Non-structural,Electrical,Generator,Exhaust line disconnected at expansion bellows,1,4,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,1
 D5092\.03[23][adgj],Diesel Generator Anchorage,Non-structural,Electrical,Generator,Anchorage failure.,1,1,0,0,0,0,0,0,0,0,0,0,0,0,NA,3,0,0,0,rapid,0,0
-D5092\.03[23][adgj],Diesel Generator Anchorage,Non-structural,Electrical,Generator,Anchorage failure & Equipment damaged beyond repair.,1,2,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,182
+D5092\.03[23][adgj],Diesel Generator Anchorage,Non-structural,Electrical,Generator,Anchorage failure & Equipment damaged beyond repair.,1,2,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,1
 D5092\.03[23][cfil],Diesel Generator Equipment Anchorage Combined,Non-structural,Electrical,Generator,Anchorage failure.,1,1,0,0,0,0,0,0,0,0,0,0,0,0,NA,3,0,0,0,rapid,0,0
-D5092\.03[23][cfil],Diesel Generator Equipment Anchorage Combined,Non-structural,Electrical,Generator,Anchorage failure & Equipment damaged beyond repair.,1,2,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,182
-D5092\.03[23][cfil],Diesel Generator Equipment Anchorage Combined,Non-structural,Electrical,Generator,"Damaged, Inoperative but anchorage is OK",1,3,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,182
-D5092\.03[23][cfil],Diesel Generator Equipment Anchorage Combined,Non-structural,Electrical,Generator,Equipment is damaged and inoperative but anchorage is OK.,1,4,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,182
-D5092\.03[23][cfil],Diesel Generator Equipment Anchorage Combined,Non-structural,Electrical,Generator,Equipment is damaged and inoperative but anchorage is OK.,1,5,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,182
+D5092\.03[23][cfil],Diesel Generator Equipment Anchorage Combined,Non-structural,Electrical,Generator,Anchorage failure & Equipment damaged beyond repair.,1,2,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,1
+D5092\.03[23][cfil],Diesel Generator Equipment Anchorage Combined,Non-structural,Electrical,Generator,"Damaged, Inoperative but anchorage is OK",1,3,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,1
+D5092\.03[23][cfil],Diesel Generator Equipment Anchorage Combined,Non-structural,Electrical,Generator,Equipment is damaged and inoperative but anchorage is OK.,1,4,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,1
+D5092\.03[23][cfil],Diesel Generator Equipment Anchorage Combined,Non-structural,Electrical,Generator,Equipment is damaged and inoperative but anchorage is OK.,1,5,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,0,0,0,rapid,0,1
 F1012\.001,Storage Racks,Non-structural,Contents,Racks,Significant merchandise shedding from rack shelves.,1,1,0,0,0,0,1,0,0,0,0,1,0,1,component,3,1,3,0,rapid,0,0
 F1012\.001,Storage Racks,Non-structural,Contents,Racks,Significant structural damage to rack structure.,1,2,0,0,0,0,1,0,0,0,0,1,0,2,component,3,1,7,0,rapid,0,0
 E2022\.0[0-2][0-3],General tenant content on shelves and desks,Non-structural,Contents,General,Spilled and scattered contents,1,NA,0,0,0,0,0,0,0,0,0,1,0,10,component,3,1,3,0,rapid,0,0

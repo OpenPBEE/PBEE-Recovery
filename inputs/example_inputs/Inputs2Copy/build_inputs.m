@@ -215,7 +215,7 @@ for c = 1:height(comp_ds_list)
     comp_ds_info.requires_shoring(c,1) = damage_state_attribute_mapping.requires_shoring(ds_attr_filt);
     comp_ds_info.permit_type(c,1) = damage_state_attribute_mapping.permit_type(ds_attr_filt);
     comp_ds_info.redesign(c,1) = damage_state_attribute_mapping.redesign(ds_attr_filt);
-    comp_ds_info.long_lead_time(c,1) = damage_state_attribute_mapping.long_lead_time(ds_attr_filt);
+    comp_ds_info.long_lead_time(c,1) = impedance_options.default_lead_time * damage_state_attribute_mapping.long_lead(ds_attr_filt);
 
     % Find idx of this damage state in the subsystem attribute tables
     subsystem_filt = subsystems.id == comp_ds_info.subsystem_id(c,1);
