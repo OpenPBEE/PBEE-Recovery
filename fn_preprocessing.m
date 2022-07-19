@@ -129,6 +129,11 @@ end
 damage.fnc_filters = tmp_fnc_filt; % assign to damage data structure
 
 %% Simulate Temporary Repair Times for each component
+% In a perfect system this should be done alongside the other full repair
+% time simulation. However, I didnt want to add that burden on the user to
+% provide more inputs than they are already and compromise the backward
+% compatability of the code
+
 % Find total number of damamged components
 total_damaged = damage.tenant_units{1}.qnt_damaged;
 for tu = 2:length(damage.tenant_units)

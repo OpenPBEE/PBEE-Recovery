@@ -1,6 +1,6 @@
 function [impeding_factors] = main_impeding_factors(damage, ...
     impedance_options, repair_cost_ratio, inpsection_trigger, systems, ...
-    building_value, impeding_factor_medians, surge_factor)
+    tmp_repair_class, building_value, impeding_factor_medians, surge_factor)
 % Calculate ATC-138 impeding times for each system given simulation of damage
 %
 % Parameters
@@ -208,7 +208,51 @@ for i = 1:length(impede_factors)
     impeding_factors.time_sys = max(impeding_factors.time_sys,...
         complete_day.(impede_factors{i}));
 end
-                                            
+    
+%% Simulate Impeding Factors for Temporary Repairs
+% Determine median times for each system
+switch impedance_options.mitigation.contractor_relationship
+    case 'retainer'
+        temp_impede_med = [1, 2, 5, 7]; % days
+        beta = 0.4;
+    case 'good'
+        temp_impede_med = [1, 2, 5, 7]; % days
+        beta = 0.4;
+    case 'none'
+        temp_impede_med = [1, 28, 28, 28]; % days
+        beta = 0.8;
+    otherwise
+        error('PBEE_Recovery:RepairSchedule', 'Invalid contractor relationship type, "%s", for impedance factor simulation', contractor_relationship)
+end
+
+% Find the which realization have damage that can be resolved by temp
+% repairs
+tmp_repair_class_trigger = zeros(num_reals, height(tmp_repair_class));
+for sys = 1:height(tmp_repair_class) % hard code to 4 temp repair classes for now
+    sys_filt = damage.comp_ds_table.tmp_repair_class' == sys; 
+    for tu = 1:length(damage.tenant_units)
+        is_damaged = damage.tenant_units{tu}.qnt_damaged > 0;
+        % Track if any damage exists that requires repair (assumes all
+        % damage requires repair)
+        tmp_repair_class_trigger(:,sys) = max( ...
+            tmp_repair_class_trigger(:,sys), ...
+            max(is_damaged .* sys_filt, [], 2) ...
+        );
+    end
+end
+
+% Simulate Impedance Time
+prob_sim = rand(num_reals, 1); % This assumes systems are correlated
+x_vals_std_n = icdf(trunc_pd, prob_sim); % Truncated lognormal distribution (via standard normal simulation)
+tmp_impede_sys = exp(x_vals_std_n * beta + log(temp_impede_med));
+
+% Only use the simulated values for the realzation and system that
+% trigger temporary repair damage
+tmp_impede_sys = tmp_impede_sys .* tmp_repair_class_trigger;
+
+% Assume impedance always takes a full day
+impeding_factors.temp_repair.time_sys = ceil(tmp_impede_sys);
+
 %% Format Impedance times for Gantt Charts
 impeding_factors.breakdowns.inspection.start_day = max(start_day.inspection,[],2);
 impeding_factors.breakdowns.inspection.complete_day = max(complete_day.inspection,[],2);
