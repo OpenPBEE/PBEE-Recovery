@@ -46,21 +46,19 @@ function [damage, worker_data, building_repair_schedule ] = main_repair_schedule
 % Import Packages
 import recovery.repair_schedule.*
 
-%% Define max worker allocations
 % Define the maximum number of workers that can be on site, based on REDI
 max_workers_per_building = ...
     min(max(floor(building_model.total_area_sf * ...
     repair_time_options.max_workers_per_sqft_building + 10), ...
     repair_time_options.max_workers_building_min), ...
     repair_time_options.max_workers_building_max);
-
-% Define the maximum number of workers that can be on any given story,
-% based on FEMA P-58
+                          
+%% Determine repair schedule per system for Temporary Repairs 
+% Define the maximum number of workers that can be on any given story
 max_workers_per_story = ...
     ceil(building_model.area_per_story_sf * ...
-    repair_time_options.max_workers_per_sqft_story); 
-                          
-%% Determine repair schedule per system for Temporary Repairs   
+    repair_time_options.max_workers_per_sqft_story_temp_repair); 
+
 % Temporary Repairs
 repair_type = 'temp';
 [tmp_damage, tmp_worker_data] = fn_schedule_repairs(...
@@ -79,6 +77,11 @@ for tu = 1:length(tmp_damage.tenant_units)
 end
 
 %% Determine repair schedule per system for Full Repairs 
+% Define the maximum number of workers that can be on any given story
+max_workers_per_story = ...
+    ceil(building_model.area_per_story_sf * ...
+    repair_time_options.max_workers_per_sqft_story); 
+
 % Full Repairs
 repair_type = 'full';
 [damage, worker_data] = fn_schedule_repairs(...
