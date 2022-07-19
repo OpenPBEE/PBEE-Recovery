@@ -1,5 +1,7 @@
-function [repair_complete_day_per_system, worker_data] = fn_allocate_workers_systems(sys_repair_days, ...
-    sys_crew_size, max_workers_per_building, sys_idx_priority_matrix, sys_constraint_matrix, condition_tag, sys_impeding_factors)
+function [repair_complete_day_per_system, worker_data] = ...
+    fn_allocate_workers_systems(systems, sys_repair_days, sys_crew_size, ...
+    max_workers_per_building, sys_idx_priority_matrix, ...
+    sys_constraint_matrix, condition_tag, sys_impeding_factors)
 % Stager repair to each system and allocate workers based on the repair
 % constraints, priorities, and repair times of each system
 %
@@ -113,10 +115,10 @@ while sum(sum(priority_sys_repair_days)) > 0.01
         assigned_workers(enough_workers,s) = min(required_workers(enough_workers,s), available_workers(enough_workers));
 
         % Define Available Workers
-        % when in series limit available workers to the workers in this
-        % system, assumes when red tagged, first systems is always
-        % structural
-        in_series = condition_tag & s == 1;
+        % when in series limit available workers to the workers in this system 
+        % (occurs for structural systems when the building is red tagged
+        is_sturctural = strcmp(systems.name{s},'structural');
+        in_series = condition_tag & is_sturctural;
         available_workers(in_series & assigned_workers(:,s) > 0) = 0; 
         % when not in series, calc the remaining workers
         available_workers(~in_series) = available_workers(~in_series) - assigned_workers(~in_series,s); 

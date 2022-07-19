@@ -29,12 +29,13 @@ load([model_dir filesep model_name filesep 'simulated_inputs.mat'])
 systems = readtable(['static_tables' filesep 'systems.csv']);
 subsystems = readtable(['static_tables' filesep 'subsystems.csv']);
 impeding_factor_medians = readtable(['static_tables' filesep 'impeding_factors.csv']);
+tmp_repair_class = readtable(['static_tables' filesep 'temp_repair_class.csv']);
 
 %% Run Recovery Method
 [functionality] = main_PBEErecovery(damage, damage_consequences, ...
-    building_model, tenant_units, systems, subsystems, impedance_options, ...
-    impeding_factor_medians,  regional_impact, repair_time_options, ...
-    functionality, functionality_options);
+    building_model, tenant_units, systems, subsystems, tmp_repair_class, ...
+    impedance_options, impeding_factor_medians,  regional_impact, ...
+    repair_time_options, functionality, functionality_options);
 
 %% Save Outputs
 if ~exist(outputs_dir,'dir')

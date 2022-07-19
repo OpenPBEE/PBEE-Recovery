@@ -1,4 +1,4 @@
-function [ sys_constraint_matrix ] = fn_set_repair_constraints( systems, conditionTag )
+function [ sys_constraint_matrix ] = fn_set_repair_constraints( systems, repair_type, conditionTag )
 % Define a constraint matrix to be used by repair schedule
 %
 % Delelops a matrix of various constriants between each system (i.e. what
@@ -32,14 +32,16 @@ num_reals = length(conditionTag);
 sys_constraint_matrix = zeros(num_reals, num_sys);
 
 %% Interior Constraints
-% Interiors are delayed by structural repairs
-interiors_idx = find(strcmp(systems.name,'interior'));
-structure_idx = find(strcmp(systems.name,'structural'));
-sys_constraint_matrix(:,interiors_idx) = structure_idx;
+if strcmp(repair_type,'full') % only for full repair schedule
+    % Interiors are delayed by structural repairs
+    interiors_idx = find(strcmp(systems.name,'interior'));
+    structure_idx = find(strcmp(systems.name,'structural'));
+    sys_constraint_matrix(:,interiors_idx) = structure_idx;
 
-% Red Tag Constraints
-% All systems blocked by structural when red tagged
-sys_constraint_matrix(logical(conditionTag),~strcmp(systems.name,'structural')) = structure_idx;
+    % Red Tag Constraints
+    % All systems blocked by structural when red tagged
+    sys_constraint_matrix(logical(conditionTag),~strcmp(systems.name,'structural')) = structure_idx;
+end
 
 
 end

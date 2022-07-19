@@ -1,4 +1,4 @@
-function [schedule] = fn_calc_system_repair_time(damage, systems, max_workers_per_building, max_workers_per_story)
+function [schedule] = fn_calc_system_repair_time(damage, repair_type, systems, max_workers_per_building, max_workers_per_story)
 % Determine the repair time for each system if repaired in isolation 
 %
 % Parameters
@@ -46,14 +46,16 @@ schedule.system_totals.num_workers = zeros(num_reals,height(systems));
 for sys = 1:height(systems)
     % Define the Crew workers and total workers days for this sequence
     % in arrays of [num reals by num stories]
-    [ total_worker_days, num_workers, average_crew_size, max_crews_building ] = fn_repair_sequence_parameters( ...
-        damage, ...
-        systems.id(sys), ...
-        systems.num_du_per_crew(sys), ...
-        systems.max_crews_per_comp_type(sys), ...
-        max_workers_per_story, ...
-        max_workers_per_building ...
-    );
+    [ total_worker_days, num_workers, average_crew_size, max_crews_building ] ...
+        = fn_repair_sequence_parameters( ...
+            damage, ...
+            repair_type, ...
+            systems.id(sys), ...
+            systems.num_du_per_crew(sys), ...
+            systems.max_crews_per_comp_type(sys), ...
+            max_workers_per_story, ...
+            max_workers_per_building ...
+            );
     
     % Allocate workers to each story and determine the total days until
     % repair is complete for each story and sequence
@@ -73,15 +75,28 @@ end
 
 
 function [total_worker_days, num_workers, average_crew_size, max_crews_building] = fn_repair_sequence_parameters( ...
-    damage, sys, num_du_per_crew, max_crews_per_comp_type, max_workers_per_story, max_workers_per_building)
+    damage, repair_type, sys, num_du_per_crew, max_crews_per_comp_type, max_workers_per_story, max_workers_per_building)
 % Define crew sizes, workers, and repair times for each story of a given
 % system. Based on worker limiations, and component worker days data from
 % the FEMA P-58 assessment.
 
+% Define Repair Type Variables (variable within the damage object)
+if strcmp(repair_type,'full')
+    repair_time_var = 'worker_days';
+    system_var = 'system';
+    crew_size_var = 'crew_size';
+elseif strcmp(repair_type,'temp')
+    repair_time_var = 'tmp_worker_day';
+    system_var = 'tmp_repair_class';
+    crew_size_var = 'tmp_crew_size';
+else
+    error('Unexpected Repair Type')
+end
+
 % Define Initial Parameters
 num_stories = length(damage.tenant_units);
 [num_reals, num_comps] = size(damage.tenant_units{1}.worker_days);
-sequence_filt = damage.comp_ds_table.system' == sys; % identifies which ds idices are in this seqeunce  
+sequence_filt = damage.comp_ds_table.(system_var)' == sys; % identifies which ds idices are in this seqeunce  
 comp_types = unique(damage.comp_ds_table.comp_idx(sequence_filt)); % Types of components in this system
 
 % Pre-allocatate variables
@@ -102,10 +117,10 @@ for s = 1:num_stories
     end
 
     % Caluculate total worker days per story per sequeces
-    total_worker_days(:,s) = sum(damage.tenant_units{s}.worker_days(:,sequence_filt),2); % perhaps consider doing when we first set up this damage data structure
+    total_worker_days(:,s) = sum(damage.tenant_units{s}.(repair_time_var)(:,sequence_filt),2); % perhaps consider doing when we first set up this damage data structure
     
     % Determine the required crew size needed for these repairs
-    repair_time_per_comp = damage.tenant_units{s}.worker_days ./  damage.comp_ds_table.crew_size';
+    repair_time_per_comp = damage.tenant_units{s}.(repair_time_var) ./  damage.comp_ds_table.(crew_size_var)';
     average_crew_size(:,s) = total_worker_days(:,s) ./ sum(repair_time_per_comp(:,sequence_filt),2);
 end
     

@@ -1,4 +1,4 @@
-function [ sys_idx_priority_matrix ] = fn_prioritize_systems( systems, damage, tmp_repair_complete_day )
+function [ sys_idx_priority_matrix ] = fn_prioritize_systems( systems, repair_type, damage, tmp_repair_complete_day, impeding_factors )
 % Determine the priority of worker allocation for each system and realization
 % based on default table priorities, whether they have the potential to 
 % affect reoccupancy or function and whether they are resolved by 
@@ -31,6 +31,15 @@ function [ sys_idx_priority_matrix ] = fn_prioritize_systems( systems, damage, t
 % coupled with the function assessment
 
 %% Initial Setup
+% Define Repair Type Variables (variable within the damage object)
+if strcmp(repair_type,'full')
+    system_var = 'system';
+elseif strcmp(repair_type,'temp')
+    system_var = 'tmp_repair_class';
+else
+    error('Unexpected Repair Type')
+end
+
 % initialize variables
 num_sys = height(systems);
 [num_reals, ~] = size(damage.tenant_units{1}.qnt_damaged);
@@ -47,18 +56,21 @@ for s = 1:length(damage.tenant_units)
     affects_function = affects_function | (damage.fnc_filters.affects_function & damage.tenant_units{s}.qnt_damaged);
 end
 
-% identify component damage that is resolved by temporary repairs
-tmp_repaired = tmp_repair_complete_day < inf; % inf here means there is not temp repair
-   
 %% Define ranks for each system 
 sys_affects_reoccupancy = zeros(num_reals, num_sys); % only prioritize the systems that potentially affect function
 sys_affects_function = zeros(num_reals, num_sys); % only prioritize the systems that potentially affect function
 sys_tmp_repaired = zeros(num_reals, num_sys); % dont prioitize the systems that are completely resolved by temporary repairs
 for sys = 1:num_sys
-    sys_filter = damage.comp_ds_table.system' == sys;
-    sys_affects_reoccupancy(:,sys) = any(affects_reoccupancy(:,sys_filter),2); % any damage that potentially affects reoccupancy in this system
-    sys_affects_function(:,sys) = any(affects_function(:,sys_filter),2); % any damage that potentially affects function in this system
-    sys_tmp_repaired(:,sys) = all(tmp_repaired(:,sys_filter),2); % all components must be resolved by temp repairs in this system
+    sys_filter = damage.comp_ds_table.(system_var)' == sys;
+    if any(sys_filter) % Only if this system is present
+        sys_affects_reoccupancy(:,sys) = any(affects_reoccupancy(:,sys_filter),2); % any damage that potentially affects reoccupancy in this system
+        sys_affects_function(:,sys) = any(affects_function(:,sys_filter),2); % any damage that potentially affects function in this system
+        if ~isempty(tmp_repair_complete_day) % Only if temp repair data is passed in
+            all_sys_tmp_repaired = all(tmp_repair_complete_day(:,sys_filter)<inf | isnan(tmp_repair_complete_day(:,sys_filter)),2); % is every single damaged component resolved by temp repairs
+            tmp_repair_quick = max(tmp_repair_complete_day(:,sys_filter),[],2) < impeding_factors.time_sys(:,sys); % Are the temp repairs for this system resolved before impeding factors are complete
+            sys_tmp_repaired(:,sys) = all_sys_tmp_repaired & tmp_repair_quick; % damage is quickly resolved by temp repair
+        end
+    end
 end
 prioritize_system_reoccupancy = sys_affects_reoccupancy & ~sys_tmp_repaired;
 prioritize_system_function_only = sys_affects_function & ~prioritize_system_reoccupancy & ~sys_tmp_repaired;

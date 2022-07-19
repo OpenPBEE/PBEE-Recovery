@@ -31,8 +31,10 @@ def build_inputs(input_dir, build_file_dir):
         shutil.copyfile(bld_script, input_dir + '/' + d + '/build_inputs.m')
         shutil.copyfile(opt_script, input_dir + '/' + d + '/optional_inputs.m')
 
-        # Delete old simulated inputs file
-        os.remove(input_dir + '/' + d + '/simulated_inputs.mat')
+        # Delete old simulated inputs file (if it exists)
+        file_exists = os.path.exists(input_dir + '/' + d + '/simulated_inputs.mat')
+        if file_exists:
+            os.remove(input_dir + '/' + d + '/simulated_inputs.mat')
 
         # Excecute Matlab build script
         bld_path = os.path.abspath(input_dir + '/' + d + '/build_inputs.m')

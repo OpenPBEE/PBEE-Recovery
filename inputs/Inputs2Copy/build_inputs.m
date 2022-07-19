@@ -210,12 +210,30 @@ for c = 1:height(comp_ds_list)
     comp_ds_info.fraction_area_affected(c,1) = damage_state_attribute_mapping.fraction_area_affected(ds_attr_filt);
     comp_ds_info.area_affected_unit(c,1) = damage_state_attribute_mapping.area_affected_unit(ds_attr_filt);
     comp_ds_info.crew_size(c,1) = damage_state_attribute_mapping.crew_size(ds_attr_filt);
-    comp_ds_info.tmp_fix(c,1) = damage_state_attribute_mapping.has_tmp_fix(ds_attr_filt);
-    comp_ds_info.tmp_fix_time(c,1) = damage_state_attribute_mapping.tmp_fix_time(ds_attr_filt);
-    comp_ds_info.requires_shoring(c,1) = damage_state_attribute_mapping.requires_shoring(ds_attr_filt);
     comp_ds_info.permit_type(c,1) = damage_state_attribute_mapping.permit_type(ds_attr_filt);
     comp_ds_info.redesign(c,1) = damage_state_attribute_mapping.redesign(ds_attr_filt);
     comp_ds_info.long_lead_time(c,1) = impedance_options.default_lead_time * damage_state_attribute_mapping.long_lead(ds_attr_filt);
+    comp_ds_info.tmp_fix(c,1) = damage_state_attribute_mapping.has_tmp_fix(ds_attr_filt);
+    comp_ds_info.requires_shoring(c,1) = damage_state_attribute_mapping.requires_shoring(ds_attr_filt);
+    comp_ds_info.tmp_repair_class(c,1) = damage_state_attribute_mapping.tmp_repair_class(ds_attr_filt);
+    comp_ds_info.tmp_repair_time_lower(c,1) = damage_state_attribute_mapping.tmp_repair_time_lower(ds_attr_filt);
+    comp_ds_info.tmp_repair_time_upper(c,1) = damage_state_attribute_mapping.tmp_repair_time_upper(ds_attr_filt);
+    if comp_ds_info.tmp_repair_class(c,1) > 0 % only grab values for components with temp repair times
+        time_lower_quantity = damage_state_attribute_mapping.time_lower_quantity(ds_attr_filt);
+        time_upper_quantity = damage_state_attribute_mapping.time_upper_quantity(ds_attr_filt);
+        if iscell(time_lower_quantity)
+            time_lower_quantity = str2double(time_lower_quantity);
+        end
+        if iscell(time_upper_quantity)
+            time_upper_quantity = str2double(time_upper_quantity);
+        end
+        comp_ds_info.tmp_repair_time_lower_qnty(c,1) = time_lower_quantity;
+        comp_ds_info.tmp_repair_time_upper_qnty(c,1) = time_upper_quantity;
+    else
+        comp_ds_info.tmp_repair_time_lower_qnty(c,1) = NaN;
+        comp_ds_info.tmp_repair_time_upper_qnty(c,1) = NaN;
+    end
+    comp_ds_info.tmp_crew_size(c,1) = damage_state_attribute_mapping.tmp_crew_size(ds_attr_filt);
 
     % Find idx of this damage state in the subsystem attribute tables
     subsystem_filt = subsystems.id == comp_ds_info.subsystem_id(c,1);

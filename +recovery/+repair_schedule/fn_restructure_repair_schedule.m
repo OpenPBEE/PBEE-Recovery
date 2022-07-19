@@ -1,5 +1,5 @@
 function [ damage ] = fn_restructure_repair_schedule( damage, system_schedule, ...
-    repair_complete_day_per_system, systems, tmp_repair_complete_day)
+    repair_complete_day_per_system, systems, repair_type)
 % Redistribute repair schedule data from the system and story level to the component level for use 
 % in the functionality assessment (ie, put repair schedule data into the
 % damage object)
@@ -28,10 +28,39 @@ function [ damage ] = fn_restructure_repair_schedule( damage, system_schedule, .
 %
 % Notes
 % -----
+% In the repair start day outputs:
+%    - Zero = Starts immediately
+%    - NaN = Repairs never started (likely because not damaged)
+% In the repair complete day outputs:
+%    - NaN = No damage
+%    - Inf = Is damaged, but has no System/RepairClass assignment (or no temp repair)
+% 
 
 %% Initialize Parameters
 num_sys = height(systems);
 num_units = length(damage.tenant_units);
+
+% Define Repair Type Variables (variable within the damage object)
+if strcmp(repair_type,'full')
+    system_var = 'system';
+elseif strcmp(repair_type,'temp')
+    system_var = 'tmp_repair_class';
+else
+    error('Unexpected Repair Type')
+end
+
+% Initialize recovery field
+for tu = 1:num_units
+    % Set to inf as a null repair time (will remain inf for components with
+    % no attributed system) - matters for temp repairs, shouldnt matter for
+    % full repair
+    damage.tenant_units{tu}.recovery.repair_start_day = nan(size(damage.tenant_units{tu}.qnt_damaged));
+    damage.tenant_units{tu}.recovery.repair_complete_day = inf(size(damage.tenant_units{tu}.qnt_damaged));
+    
+    % if not damaged, set repair complete time to zero
+    is_damaged = damage.tenant_units{tu}.qnt_damaged > 0;
+    damage.tenant_units{tu}.recovery.repair_complete_day(~is_damaged) = NaN; 
+end
 
 %% Redistribute repair schedule data
 for sys = 1:num_sys
@@ -42,7 +71,7 @@ for sys = 1:num_sys
     story_complete_day = start_day + system_schedule.per_system{sys}.repair_complete_day;
 
     % Re-distribute to each tenant unit
-    sys_filt = damage.comp_ds_table.system' == systems.id(sys); % identifies which ds idices are in this seqeunce  
+    sys_filt = damage.comp_ds_table.(system_var)' == systems.id(sys); % identifies which ds idices are in this seqeunce  
     for tu = 1:num_units
         is_damaged = damage.tenant_units{tu}.qnt_damaged(:,sys_filt) > 0;
         is_damaged = is_damaged*1;
@@ -53,22 +82,6 @@ for sys = 1:num_sys
         damage.tenant_units{tu}.recovery.repair_complete_day(:,sys_filt) = is_damaged .* story_complete_day(:,tu);
     end
 end
-    
-% Post process for temp repairs
-for tu = 1:num_units
-    % Calculate the day repairs are completed considering temporary repairs
-    repair_complete_day_no_NaN = max(damage.tenant_units{tu}.recovery.repair_complete_day,0);
-    damage.tenant_units{tu}.recovery.repair_complete_day_w_tmp = min(repair_complete_day_no_NaN, tmp_repair_complete_day);
-
-    % Calculate the day repairs start considering temporary repairs
-    damage.tenant_units{tu}.recovery.start_day_w_tmp = damage.tenant_units{tu}.recovery.repair_start_day;
-    damage.tenant_units{tu}.recovery.tmp_day_controls = damage.tenant_units{tu}.recovery.repair_complete_day_w_tmp < repair_complete_day_no_NaN;
-    damage.tenant_units{tu}.recovery.repair_start_day_w_tmp(damage.tenant_units{tu}.recovery.tmp_day_controls) = 0;
-
-    % Change zeros in complete day back to NaN (ie no damage)
-    damage.tenant_units{tu}.recovery.repair_complete_day_w_tmp(damage.tenant_units{tu}.recovery.repair_complete_day_w_tmp == 0) = NaN;
-end
-
 
 end
 
