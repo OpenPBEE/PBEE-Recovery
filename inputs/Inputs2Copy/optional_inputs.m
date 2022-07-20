@@ -19,6 +19,8 @@ impedance_options.mitigation.capital_available_ratio = 0.1;
 impedance_options.impedance_beta = 0.6;
 impedance_options.impedance_truncation = 2;
 impedance_options.default_lead_time = 182;
+impedance_options.scaffolding_lead_time = 5;
+impedance_options.scaffolding_erect_time = 2;
 
 % Repair Schedule Options
 repair_time_options.temp_repair_beta = 0.6;

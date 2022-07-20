@@ -1,6 +1,6 @@
 function [reoccupancy] = fn_calculate_reoccupancy(...
     damage, damage_consequences, utilities, building_model, subsystems,...
-    functionality_options, tenant_units )
+    functionality_options, tenant_units, impeding_temp_repairs )
 % Calcualte the loss and recovery of building re-occupancy 
 % based on global building damage, local component damage, and extenernal factors
 %
@@ -39,7 +39,8 @@ import recovery.functionality.fn_extract_recovery_metrics
     
 %% Stage 1: Quantify the effect that component damage has on the building safety
 [ recovery_day.building_safety, comp_breakdowns.building_safety, system_operation_day ] = ...
-    fn_building_safety( damage, building_model, damage_consequences, utilities, functionality_options );
+    fn_building_safety( damage, building_model, damage_consequences, ...,
+    utilities, functionality_options, impeding_temp_repairs );
 
 %% Stage 2: Quantify the accessibility of each story in the building
 [ recovery_day.story_access, comp_breakdowns.story_access ] = ...

@@ -1,5 +1,6 @@
 function [ recovery_day, comp_breakdowns, system_operation_day ] = fn_building_safety( ...
-    damage, building_model, damage_consequences, utilities, functionality_options )
+    damage, building_model, damage_consequences, utilities, ...
+    functionality_options, impeding_temp_repairs )
 % Check damage that would cause the whole building to be shut down due to
 % issues of safety
 %
@@ -103,8 +104,20 @@ door_side(rem(door_numbers, 2) == 0) = 2;
 day_repair_fall_haz = zeros(num_reals,building_model.num_entry_doors);
 fall_haz_comps_day_rep = zeros(num_reals,num_comps,num_units,building_model.num_entry_doors);
 comp_affected_area = zeros(num_reals,num_comps,num_units);
+scaffold_filt = logical(damage.comp_ds_table.resolved_by_scaffolding');
 for tu = 1:num_units
-    repair_complete_day_w_tmp(:,:,tu) = damage.tenant_units{tu}.recovery.repair_complete_day_w_tmp;
+    tmp_or_full_complete_day = damage.tenant_units{tu}.recovery.repair_complete_day_w_tmp;
+    
+    % Effect of falling hazards on building safety are resolved either by
+    % full repair, local temp repair, or erecting scaffolding. Whatever
+    % occurs first
+    isdamaged = 1*(damage.tenant_units{tu}.qnt_damaged > 0);
+    isdamaged(isdamaged == 0) = NaN; % mark undamaged cases as NaN to help combine factors below
+    scaffold_day = impeding_temp_repairs.scaffold_day .*  isdamaged(:,scaffold_filt);
+    complete_day_w_scaffold = tmp_or_full_complete_day;
+    complete_day_w_scaffold(:,scaffold_filt) = ...
+        min(tmp_or_full_complete_day(:,scaffold_filt),scaffold_day);
+    repair_complete_day_w_tmp(:,:,tu) = complete_day_w_scaffold;
 end
 
 % Loop through component repair times to determine the day it stops affecting re-occupancy

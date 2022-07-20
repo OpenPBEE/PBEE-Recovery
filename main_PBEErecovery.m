@@ -69,6 +69,6 @@ import recovery.functionality.main_functionality
 %% Calculate the Recovery of Building Reoccupancy and Function
 [ functionality.recovery ] = main_functionality( damage, building_model, ...
     damage_consequences, functionality.utilities, functionality_options, ...
-    tenant_units, subsystems );
+    tenant_units, subsystems, functionality.impeding_factors.temp_repair );
 
 end

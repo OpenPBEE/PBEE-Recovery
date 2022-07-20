@@ -214,13 +214,10 @@ end
 switch impedance_options.mitigation.contractor_relationship
     case 'retainer'
         temp_impede_med = [1, 2, 5, 7]; % days
-        beta = 0.4;
     case 'good'
         temp_impede_med = [1, 2, 5, 7]; % days
-        beta = 0.4;
     case 'none'
         temp_impede_med = [1, 28, 28, 28]; % days
-        beta = 0.8;
     otherwise
         error('PBEE_Recovery:RepairSchedule', 'Invalid contractor relationship type, "%s", for impedance factor simulation', contractor_relationship)
 end
@@ -252,6 +249,15 @@ tmp_impede_sys = tmp_impede_sys .* tmp_repair_class_trigger;
 
 % Assume impedance always takes a full day
 impeding_factors.temp_repair.time_sys = ceil(tmp_impede_sys);
+
+% Temporary Scaffolding for falling hazards
+prob_sim = rand(num_reals, 1);
+x_vals_std_n = icdf(trunc_pd, prob_sim);% Truncated lognormal distribution (via standard normal simulation)
+scaffold_impede_time = ceil(exp(x_vals_std_n * beta + log(impedance_options.scaffolding_lead_time))); % always round up
+prob_sim = rand(num_reals, 1); % repair time is not correlated to impedance time
+x_vals_std_n = icdf(trunc_pd, prob_sim);% Truncated lognormal distribution (via standard normal simulation)
+scaffold_repair_time = exp(x_vals_std_n * beta + log(impedance_options.scaffolding_erect_time)); 
+impeding_factors.temp_repair.scaffold_day = ceil(scaffold_impede_time + scaffold_repair_time); % round up (dont resolve issue on the same day repairs are complete)
 
 %% Format Impedance times for Gantt Charts
 impeding_factors.breakdowns.inspection.start_day = max(start_day.inspection,[],2);
