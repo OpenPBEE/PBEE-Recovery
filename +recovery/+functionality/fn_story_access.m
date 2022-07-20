@@ -38,9 +38,9 @@ num_comps = height(damage.comp_ds_table);
 % Pre-allocate data
 recovery_day.stairs = zeros(num_reals,num_units);
 recovery_day.stair_doors = zeros(num_reals,num_units);
-recovery_day.fire_egress = zeros(num_reals,num_units);
+recovery_day.fire_suppression = zeros(num_reals,num_units);
 comp_breakdowns.stairs = zeros(num_reals,num_comps,num_units);
-comp_breakdowns.fire_egress = zeros(num_reals,num_comps,num_units);
+comp_breakdowns.fire_suppression = zeros(num_reals,num_comps,num_units);
 
 %% Go through each story and check if there is sufficient story access (stairs and stairdoors)
 if num_stories == 1 
@@ -174,7 +174,7 @@ for tu = 1:num_stories
             contributing_fire_comps = ((damaged_comps .* ...
                 (damage.fnc_filters.fire_drops | damage.fnc_filters.fire_building)) > 0) .* fs_matters; 
             contributing_fire_comps(:,end) = []; % remove added door column
-            comp_breakdowns.fire_egress(:,:,tu) = comp_breakdowns.fire_egress(:,:,tu) + contributing_fire_comps .* delta_day;
+            comp_breakdowns.fire_suppression(:,:,tu) = comp_breakdowns.fire_suppression(:,:,tu) + contributing_fire_comps .* delta_day;
         end
 
         % Change the comps for the next increment
@@ -199,7 +199,7 @@ for tu = 1:num_stories
     % Damage to fire sprinkler drops only affects this story (full building
     % fire sprinkler damage is adopted at every story earlier in this script)
     if fs_exists
-        recovery_day.fire_egress(:,tu) = fire_access_day;
+        recovery_day.fire_suppression(:,tu) = fire_access_day;
     end
 end
 

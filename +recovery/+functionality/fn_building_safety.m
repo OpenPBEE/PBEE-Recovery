@@ -37,8 +37,9 @@ num_comps = height(damage.comp_ds_table);
 %% Calculate effect of red tags and fire suppression system
 % Initialize parameters
 recovery_day.red_tag = zeros(num_reals, 1);
+recovery_day.shoring = zeros(num_reals, 1);
 recovery_day.hazardous_material = zeros(num_reals, 1);
-recovery_day.fire_egress = zeros(num_reals, 1);
+recovery_day.fire_suppression = zeros(num_reals, 1);
 system_operation_day.building.fire = zeros(num_reals, 1);
 
 % check if building has fire supprsion system
@@ -48,6 +49,7 @@ fs_exists = any(damage.fnc_filters.fire_building);
 for tu = 1:num_units
     % Grab tenant and damage info for this tenant unit
     repair_complete_day = damage.tenant_units{tu}.recovery.repair_complete_day;
+    repair_complete_day_w_tmp = damage.tenant_units{tu}.recovery.repair_complete_day_w_tmp;
     
     %% Red Tags
     % The day the red tag is resolved is the day when all damage (anywhere in building) that has
@@ -59,6 +61,19 @@ for tu = 1:num_units
     
     % Componet Breakdowns
     comp_breakdowns.red_tag(:,:,tu) = damage.fnc_filters.red_tag .* recovery_day.red_tag;
+    
+    %% Local Shoring
+    % Any unresolved damage (temporary or otherwise) that requires shoring,
+    % blocks occupancy to the whole building
+    shoring_filt = logical(damage.comp_ds_table.requires_shoring');
+    if any(shoring_filt)
+        recovery_day.shoring = max(recovery_day.shoring, ...
+            max(repair_complete_day_w_tmp(:,shoring_filt),[],2)); 
+    end
+    
+    % Componet Breakdowns (the time it takes to shore or fully repair each
+    % component is the time it blocks occupancy for)
+    comp_breakdowns.shoring(:,:,tu) = shoring_filt .* repair_complete_day_w_tmp;
     
     %% Day the fire suppression system is operating again (for the whole building)
     if fs_exists
@@ -80,7 +95,6 @@ for tu = 1:num_units
         % Any global hazardous material shuts down the entire building
         recovery_day.hazardous_material = max(recovery_day.hazardous_material, max(repair_complete_day(:,damage.fnc_filters.global_hazardous_material),[],2)); 
     end
-    
 end
 
 %% Building Egress
@@ -243,14 +257,14 @@ comp_breakdowns.falling_hazard = min(recovery_day.entry_door_access,max(fall_haz
 
 %% Determine when fire suppresion affects recovery
 if fs_exists % only save this when fire system exists
-    recovery_day.fire_egress = fire_safety_day;
+    recovery_day.fire_suppression = fire_safety_day;
     if functionality_options.fire_watch
         % If fire watch is in place, only account for the damage that
         % affects egress requirements
-        comp_breakdowns.fire_egress = system_operation_day.comp.fire .* fs_operation_matters_for_entry_doors .* fire_system_failure;
+        comp_breakdowns.fire_suppression = system_operation_day.comp.fire .* fs_operation_matters_for_entry_doors .* fire_system_failure;
     else
         % If no fire watch, take any damage that fails the system
-        comp_breakdowns.fire_egress = system_operation_day.comp.fire;
+        comp_breakdowns.fire_suppression = system_operation_day.comp.fire;
     end
 end
 
