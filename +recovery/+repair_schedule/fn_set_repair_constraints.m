@@ -32,7 +32,7 @@ num_reals = length(conditionTag);
 sys_constraint_matrix = zeros(num_reals, num_sys);
 
 %% Interior Constraints
-if strcmp(repair_type,'full') % only for full repair schedule
+if strcmp(repair_type,'full') 
     % Interiors are delayed by structural repairs
     interiors_idx = find(strcmp(systems.name,'interior'));
     structure_idx = find(strcmp(systems.name,'structural'));
@@ -41,6 +41,14 @@ if strcmp(repair_type,'full') % only for full repair schedule
     % Red Tag Constraints
     % All systems blocked by structural when red tagged
     sys_constraint_matrix(logical(conditionTag),~strcmp(systems.name,'structural')) = structure_idx;
+elseif strcmp(repair_type,'temp')
+    % All temp repairs are blocked by shoring
+    shoring_id = 5;
+    shoring_filt = systems.id == shoring_id;
+    shoring_idx = find(shoring_filt);
+    sys_constraint_matrix(:,~shoring_filt') = shoring_idx; % all classes that are not shoring idx are blocked by the shoring idx
+else
+    error('Unexpected Repair Type')
 end
 
 
