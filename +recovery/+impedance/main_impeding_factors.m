@@ -213,11 +213,11 @@ end
 % Determine median times for each system
 switch impedance_options.mitigation.contractor_relationship
     case 'retainer'
-        temp_impede_med = surge_factor*[1, 2, 5, 7]; % days
+        temp_impede_med = surge_factor*tmp_repair_class.impeding_time'; % days
     case 'good'
-        temp_impede_med = surge_factor*[1, 2, 5, 7]; % days
+        temp_impede_med = surge_factor*tmp_repair_class.impeding_time'; % days
     case 'none'
-        temp_impede_med = surge_factor*[1, 28, 28, 28]; % days
+        temp_impede_med = surge_factor*tmp_repair_class.impeding_time_no_contractor'; % days
     otherwise
         error('PBEE_Recovery:RepairSchedule', 'Invalid contractor relationship type, "%s", for impedance factor simulation', contractor_relationship)
 end
@@ -225,7 +225,7 @@ end
 % Find the which realization have damage that can be resolved by temp
 % repairs
 tmp_repair_class_trigger = zeros(num_reals, height(tmp_repair_class));
-for sys = 1:height(tmp_repair_class) % hard code to 4 temp repair classes for now
+for sys = 1:height(tmp_repair_class) 
     sys_filt = damage.comp_ds_table.tmp_repair_class' == sys; 
     for tu = 1:length(damage.tenant_units)
         is_damaged = damage.tenant_units{tu}.qnt_damaged > 0;
