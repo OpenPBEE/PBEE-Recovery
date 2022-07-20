@@ -213,11 +213,11 @@ end
 % Determine median times for each system
 switch impedance_options.mitigation.contractor_relationship
     case 'retainer'
-        temp_impede_med = [1, 2, 5, 7]; % days
+        temp_impede_med = surge_factor*[1, 2, 5, 7]; % days
     case 'good'
-        temp_impede_med = [1, 2, 5, 7]; % days
+        temp_impede_med = surge_factor*[1, 2, 5, 7]; % days
     case 'none'
-        temp_impede_med = [1, 28, 28, 28]; % days
+        temp_impede_med = surge_factor*[1, 28, 28, 28]; % days
     otherwise
         error('PBEE_Recovery:RepairSchedule', 'Invalid contractor relationship type, "%s", for impedance factor simulation', contractor_relationship)
 end
@@ -250,10 +250,10 @@ tmp_impede_sys = tmp_impede_sys .* tmp_repair_class_trigger;
 % Assume impedance always takes a full day
 impeding_factors.temp_repair.time_sys = ceil(tmp_impede_sys);
 
-% Temporary Scaffolding for falling hazards
+% Temporary scaffolding for falling hazards
 prob_sim = rand(num_reals, 1);
 x_vals_std_n = icdf(trunc_pd, prob_sim);% Truncated lognormal distribution (via standard normal simulation)
-scaffold_impede_time = ceil(exp(x_vals_std_n * beta + log(impedance_options.scaffolding_lead_time))); % always round up
+scaffold_impede_time = ceil(surge_factor*exp(x_vals_std_n * beta + log(impedance_options.scaffolding_lead_time))); % always round up
 prob_sim = rand(num_reals, 1); % repair time is not correlated to impedance time
 x_vals_std_n = icdf(trunc_pd, prob_sim);% Truncated lognormal distribution (via standard normal simulation)
 scaffold_repair_time = exp(x_vals_std_n * beta + log(impedance_options.scaffolding_erect_time)); 
