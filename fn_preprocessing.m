@@ -46,7 +46,7 @@ fnc_filters.red_tag = comp_ds_table.safety_class > 0;
 fnc_filters.fire_building = comp_ds_table.system == 9 & strcmp(string(comp_ds_table.service_location),'building') & comp_ds_table.impairs_system_operation;
 
 % fire suppresion damage that affects each tenant unit
-fnc_filters.fire_drops = comp_ds_table.subsystem_id == 23;
+fnc_filters.fire_drops = comp_ds_table.subsystem_id == 23 & comp_ds_table.impairs_system_operation;
 
 % Hazardous materials
 fnc_filters.global_hazardous_material = comp_ds_table.global_hazardous_material;
