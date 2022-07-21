@@ -140,6 +140,6 @@ function [damage, worker_data] = ...
     
     %% Step 5 - Format outputs for Functionality calculations
     [ damage ] = fn_restructure_repair_schedule( damage, system_schedule, ...
-                 repair_complete_day_per_system, systems, repair_type);
+                 repair_complete_day_per_system, systems, repair_type, simulated_red_tags);
 
 end
