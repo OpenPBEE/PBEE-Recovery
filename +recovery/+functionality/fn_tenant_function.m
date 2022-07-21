@@ -165,7 +165,7 @@ for tu = 1:num_units
         num_comp_damaged = damage.fnc_filters.roof_structure .* damage.tenant_units{tu}.qnt_damaged;
         num_roof_comps = damage.fnc_filters.roof_structure .* damage.tenant_units{tu}.num_comps;
 
-        comps_day_repaired = repair_complete_day;
+        comps_day_repaired = repair_complete_day_w_tmp;
         roof_structure_recovery_day = zeros(num_reals,1);
         all_comps_day_roof_struct = zeros(num_reals,num_comps);
         num_repair_time_increments = sum(damage.fnc_filters.roof_structure); % possible unique number of loop increments
@@ -202,7 +202,7 @@ for tu = 1:num_units
         num_comp_damaged = damage.fnc_filters.roof_weatherproofing .* damage.tenant_units{tu}.qnt_damaged;
         num_roof_comps = damage.fnc_filters.roof_weatherproofing .* damage.tenant_units{tu}.num_comps;
 
-        comps_day_repaired = repair_complete_day;
+        comps_day_repaired = repair_complete_day_w_tmp;
         roof_weather_recovery_day = zeros(num_reals,1);
         all_comps_day_roof_weather = zeros(num_reals,num_comps);
         num_repair_time_increments = sum(damage.fnc_filters.roof_weatherproofing); % possible unique number of loop increments
