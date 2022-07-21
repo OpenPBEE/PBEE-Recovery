@@ -148,7 +148,7 @@ for tu = 1:num_stories
             fs_matters_for_stairdoors = sufficient_stairdoor_access_w_fs & ~sufficient_stairdoor_access;
             fs_matters_for_access = fs_matters_for_stairs | fs_matters_for_stairdoors;
             
-            % Determine when fs operation matters for safety (based on fs watch)
+            % Determine when fs operation matters for safety (based on fire watch)
             if ~functionality_options.fire_watch
                 % If no fire watch is in place, non-operation of the fire
                 % sprinkler system will cause the space to not be
@@ -170,11 +170,11 @@ for tu = 1:num_stories
         
         % Find fire sprinklers component that are contributing
         if fs_exists
-            % Count any fire component, only if fs operation matters for access
-            contributing_fire_comps = ((damaged_comps .* ...
-                (damage.fnc_filters.fire_drops | damage.fnc_filters.fire_building)) > 0) .* fs_matters; 
-            contributing_fire_comps(:,end) = []; % remove added door column
-            comp_breakdowns.fire_suppression(:,:,tu) = comp_breakdowns.fire_suppression(:,:,tu) + contributing_fire_comps .* delta_day;
+             % Count when the fire sprinkler drops affects fs operation and matters for access
+                                             % Its damaged  |  its a fire sprinkler drop   |  its affecting access | because damage is beyond the threshold for fire sprinkler drops
+            contributing_fire_drop_comps = ((damaged_comps .* damage.fnc_filters.fire_drops ) > 0) .* fs_matters .* ~sufficient_fs_drop; 
+            contributing_fire_drop_comps(:,end) = []; % remove added door column
+            comp_breakdowns.fire_suppression(:,:,tu) = comp_breakdowns.fire_suppression(:,:,tu) + contributing_fire_drop_comps .* delta_day;
         end
 
         % Change the comps for the next increment
