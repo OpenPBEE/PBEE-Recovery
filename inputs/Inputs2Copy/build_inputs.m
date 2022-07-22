@@ -107,6 +107,10 @@ else
     functionality.utilities.gas = zeros(num_reals,1);
 end
 
+% Simulated replacement cases
+% assumes all realizations will be repaired
+damage_consequences.simulated_replacement = nan(size(damage_consequences.red_tag));
+
 % Simulated component damage per tenant unit for each realization of the
 % monte carlo simulation
 sim_tenant_unit_damage = jsondecode(fileread('simulated_damage.json'));

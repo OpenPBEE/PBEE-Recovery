@@ -317,6 +317,10 @@
 					"description": "simulated logical of red tags, TRUE = building is red tagged", 
 					"$ref": "#/definitions/arrayOfNumbers"
 				},
+				"simulated_replacement": {
+					"description": "simulated replacement time in days for all realizations where replacement is required, NaN = building does not need replaced and is scheduled for repairs. Note: to not consider building replacement, pass in an array of NaNs", 
+					"$ref": "#/definitions/arrayOfNumbers"
+				},
 				"racked_stair_doors_per_story": {
 					"description": "simulated number of racked stairway doors per story", 
 					"$ref": "#/definitions/arrayOfArraysOfNumbers"

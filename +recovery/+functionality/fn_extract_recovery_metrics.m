@@ -1,5 +1,5 @@
 function [ recovery ] = fn_extract_recovery_metrics( tentant_unit_recovery_day, ...
-   recovery_day, comp_breakdowns, comp_id )
+   recovery_day, comp_breakdowns, comp_id, simulated_replacement )
 % Reformant tenant level recovery outcomes into outcomes at the building level, 
 % system level, and compoennt level
 %
@@ -16,6 +16,10 @@ function [ recovery ] = fn_extract_recovery_metrics( tentant_unit_recovery_day, 
 %   list of each fragility id associated with the per component damage
 %   state structure of the damage object. With of array is the same as the
 %   arrays in the comp_breakdowns structure
+% simulated_replacement: array [num_reals x 1]
+%   simulated time when the building needs to be replaced, and how long it
+%   will take (in days). NaN represents no replacement needed (ie
+%   building will be repaired)
 %
 % Returns
 % -------
@@ -47,10 +51,19 @@ function [ recovery ] = fn_extract_recovery_metrics( tentant_unit_recovery_day, 
 %% Initial Setup
 num_units = size(tentant_unit_recovery_day,2);
 
+% Define performance targets
+perform_targ_days = [0, 3, 7, 14, 30, 60, 90, 120, 182, 270, 365]; % Number of days for each performance target stripe
+
+% Determine replacement cases
+replace_cases = ~isnan(simulated_replacement);
+
 %% Post process tenant-level recovery times
 % Overwrite NaNs in tenant_unit_day_functional
 % Only NaN where never had functional loss, therefore set to zero
 tentant_unit_recovery_day(isnan(tentant_unit_recovery_day)) = 0;
+
+% Overwrite building replacment cases to replacement time
+tentant_unit_recovery_day(replace_cases,:) = simulated_replacement(replace_cases)*ones(1,num_units);
 
 %% Save building-level outputs to occupancy structure
 % Tenant Unit level outputs
@@ -58,7 +71,9 @@ recovery.tenant_unit.recovery_day = tentant_unit_recovery_day;
 
 % Building level outputs
 recovery.building_level.recovery_day = max(tentant_unit_recovery_day,[],2);
-recovery.building_level.initial_percent_affected = mean(tentant_unit_recovery_day > 0,2);
+recovery.building_level.initial_percent_affected = mean(tentant_unit_recovery_day > 0,2); % percent of building affected, not the percent of realizations
+recovery.building_level.perform_targ_days = perform_targ_days;
+recovery.building_level.prob_of_target = mean(recovery.building_level.recovery_day > perform_targ_days);
 
 %% Recovery Trajectory -- calcualte from the tenant breakdowns
 recovery.recovery_trajectory.recovery_day = sort([tentant_unit_recovery_day, tentant_unit_recovery_day],2);
@@ -82,6 +97,9 @@ end
 % aka time each component's DS affects recovery anywhere in the building
 component_breakdowns = max(component_breakdowns_per_story,[],3);
 
+% Ignore repalcement cases
+component_breakdowns(replace_cases,:) = []; 
+
 %% Format and Save System-level breakdowns
 % Find the day each system stops affecting recovery for any story
 
@@ -94,6 +112,9 @@ for i = 1:length(fault_tree_events_LV1)
         % Combine among all stories or tenant units to represent the events
         % effect anywhere in the building 
         building_recovery_day = max(recovery_day.(fault_tree_events_LV1{i}).(fault_tree_events_LV2{j}),[],2);
+        
+        % Ignore repalcement cases
+        building_recovery_day(replace_cases,:) = []; 
         
         % Save per "system", which typically represents the fault tree level 2
         if isfield(system_breakdowns,fault_tree_events_LV2{j})
@@ -109,8 +130,6 @@ for i = 1:length(fault_tree_events_LV1)
 end
 
 %% Format breakdowns as performance targets
-% Define performance targets
-perform_targ_days = [0, 3, 7, 14, 30, 182, 365]; % Number of days for each performance target stripe
 system_names = fieldnames(system_breakdowns);
 
 % pre-allocating variables
@@ -135,6 +154,18 @@ end
 recovery.breakdowns.perform_targ_days = perform_targ_days;
 recovery.breakdowns.system_names = system_names;
 recovery.breakdowns.comp_names = comps';
+
+%% Save specific breakdowns for red tags
+% Note for future updates: Perhaps instead, all realizations of red tag time
+% should be output andthe statistics calculated here should be done as a post process
+if isfield(recovery_day, 'building_safety')
+    red_tag_time = recovery_day.building_safety.red_tag;
+    red_tag_time(replace_cases,:) = []; % Ignore replacement cases
+    recovery.red_tag.probability = mean(red_tag_time > 0);
+    recovery.red_tag.mean = mean(red_tag_time);
+    recovery.red_tag.median = median(red_tag_time);
+    recovery.red_tag.fractile_90 = prctile(red_tag_time, 90);
+end
 
 end
 

@@ -23,7 +23,6 @@ impedance_options.scaffolding_lead_time = 5;
 impedance_options.scaffolding_erect_time = 2;
 
 % Repair Schedule Options
-repair_time_options.temp_repair_beta = 0.6;
 repair_time_options.max_workers_per_sqft_story = 0.001;
 repair_time_options.max_workers_per_sqft_story_temp_repair = 0.005;
 repair_time_options.max_workers_per_sqft_building = 0.00025;

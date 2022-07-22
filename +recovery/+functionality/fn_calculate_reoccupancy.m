@@ -72,7 +72,8 @@ day_tentant_unit_reoccupiable = max(max(day_building_safe, day_story_accessible)
 
 %% Reformat outputs into occupancy data strucutre
 [ reoccupancy ] = fn_extract_recovery_metrics( day_tentant_unit_reoccupiable, ...
-     recovery_day, comp_breakdowns, damage.comp_ds_table.comp_id' );
+     recovery_day, comp_breakdowns, damage.comp_ds_table.comp_id', ...
+     damage_consequences.simulated_replacement );
 
 
 end
