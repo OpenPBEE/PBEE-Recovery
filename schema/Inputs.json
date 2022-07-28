@@ -393,11 +393,11 @@
 				},
 				"exterior": {
 					"type": "number"
-					"description": "ratio of non-severely damaged perimeter area of the tenant-unit required to tenant function"
+					"description": "tolerance for damage to exterior systems required for tenant function (0 = any damage causes loss of function, 0.999 = everything must be damage for loss of tenant function). Ratio of the perimeter area of severely damaged exterior components within the tenant-unit to the total perimeter area of the tenant unit (i.e., what percent of the exterior walls must be sufficiently damaged to cause tenants to not be able to function in this space)."
 				},
 				"interior": {
 					"type": "number"
-					"description":  "ratio of unobstructued interior area within the tenant-unit required for tenant function"
+					"description":  "tolerance for damage to interior systems required for tenant function (0 = any damage causes loss of function, 0.999 = everything must be damage for loss of tenant function). Ratio of the interior plan area of severely damaged interior components within the tenant-unit to the total plan area of the tenant unit (i.e., what percent of the interior space must be hindered to cause tenants to not be able to function in this space)."
 				},
 				"occ_per_elev": {
 					"type": "number"

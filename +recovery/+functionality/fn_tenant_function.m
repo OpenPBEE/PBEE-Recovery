@@ -139,7 +139,7 @@ for tu = 1:num_units
         % Determine if current damage affects function for this tenant unit
         % if the area of exterior wall damage is greater than what is
         % acceptable by the tenant 
-        affects_function = percent_area_affected >= unit.exterior; 
+        affects_function = percent_area_affected > unit.exterior; 
         
         % Add days in this increment to the tally
         delta_day = min(comps_day_repaired(:,damage.fnc_filters.exterior_seal_all),[],2);
@@ -286,7 +286,7 @@ for tu = 1:num_units
         % Determine if current damage affects function for this tenant unit
         % affects function if the area of interior damage is greater than what is
         % acceptable by the tenant 
-        affects_function = percent_area_affected >= unit.interior; 
+        affects_function = percent_area_affected > unit.interior; 
         
         % Add days in this increment to the tally
         delta_day = min(comps_day_repaired(:,damage.fnc_filters.interior_function_all),[],2);
