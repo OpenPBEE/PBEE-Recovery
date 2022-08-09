@@ -1,6 +1,6 @@
 function [damage, worker_data, building_repair_schedule ] = main_repair_schedule(...
     damage, building_model, simulated_red_tags, repair_time_options, ...
-    systems, tmp_repair_class, impeding_factors, surge_factor)
+    systems, tmp_repair_class, impeding_factors, simulated_replacement)
 % Determine the repair time for a given damage simulation.
 %
 % Simulation of system and building level repair times based on a
@@ -27,9 +27,10 @@ function [damage, worker_data, building_repair_schedule ] = main_repair_schedule
 %   attributes. Attributes are similar to those in the systems table.
 % impeding_factors: struct
 %   simulated impedance times
-% surge_factor: number
-%   amplification factor for temporary repair times due to materials and
-%   labor impacts due to regional damage
+% simulated_replacement: array [num_reals x 1]
+%   simulated time when the building needs to be replaced, and how long it
+%   will take (in days). NaN represents no replacement needed (ie
+%   building will be repaired)
 %
 % Returns
 % -------
@@ -107,7 +108,9 @@ end
 
 %% Format Outputs 
 % Format Start and Stop Time Data for Gantt Chart plots 
-[ building_repair_schedule ] = fn_format_gantt_chart_data( damage, systems );
+% This is also the main data structure used for calculating full repair time
+% outputs
+[ building_repair_schedule ] = fn_format_gantt_chart_data( damage, systems, simulated_replacement );
 
 end
 
