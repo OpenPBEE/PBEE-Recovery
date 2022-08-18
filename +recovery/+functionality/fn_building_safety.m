@@ -53,6 +53,14 @@ for tu = 1:num_units
     
     is_damaged = (damage.stories{tu}.qnt_damaged > 0);
     
+    if isfield(damage, 'red_tag_impact')
+        % assume the same for all tenant units (works out in the end)
+        affectes_red_tag = damage.red_tag_impact;
+    else
+        % no better information, just assume that if the component is damaged it affects red tag
+        affectes_red_tag = is_damaged;
+    end
+    
     %% Red Tags
     % The day the red tag is resolved is the day when all damage (anywhere in building) that has
     % the potentail to cause a red tag is fixed (ie max day)
@@ -62,7 +70,7 @@ for tu = 1:num_units
     end
     
     % Componet Breakdowns
-    comp_breakdowns.red_tag(:,:,tu) = damage.fnc_filters.red_tag .* recovery_day.red_tag .* is_damaged;
+    comp_breakdowns.red_tag(:,:,tu) = damage.fnc_filters.red_tag .* recovery_day.red_tag .* affectes_red_tag;
     
     %% Local Shoring
     % Any unresolved damage (temporary or otherwise) that requires shoring,
