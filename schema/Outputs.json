@@ -221,7 +221,7 @@
 											"$ref": "#/definitions/arrayOfArraysOfNumbers"
 										},
 										"component_breakdowns": {
-											"description": "fraction of realization affected by loss of function anywhere in the building, broken down by component",
+											"description": "fraction of realization affected by loss of function, not including reoccupancy, anywhere in the building, broken down by component",
 											"$ref": "#/definitions/arrayOfArraysOfNumbers"
 										},
 										"perform_targ_days": {
@@ -235,6 +235,10 @@
 										"comp_names": {
 											"description": "names of each of the components in the component_breakdowns field",
 											"$ref": "#/definitions/arrayOfStrings"
+										},
+										"component_combined": {
+											"description": "fraction of realization affected by loss of function, including reocupancy, anywhere in the building, broken down by component",
+											"$ref": "#/definitions/arrayOfArraysOfNumbers"
 										}
 									}
 								}

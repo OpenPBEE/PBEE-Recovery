@@ -306,7 +306,12 @@
 							}
 						}
 					}
+				},
+				"red_tag_impact": {
+					"description": "OPTIONAL INPUT: logicals identifying the component damage state and realizations that caused the red tag"
+					"$ref": "#/definitions/arrayOfArraysOfNumbers"
 				}
+				
 			}
 		},
 		"damage_consequences": {
