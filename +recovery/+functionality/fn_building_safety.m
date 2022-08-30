@@ -51,7 +51,7 @@ for tu = 1:num_units
     repair_complete_day = damage.tenant_units{tu}.recovery.repair_complete_day;
     repair_complete_day_w_tmp = damage.tenant_units{tu}.recovery.repair_complete_day_w_tmp;
     
-    is_damaged = (damage.stories{tu}.qnt_damaged > 0);
+    is_damaged = (damage.tenant_units{tu}.qnt_damaged > 0);
     
     if isfield(damage, 'red_tag_impact')
         % assume the same for all tenant units (works out in the end)

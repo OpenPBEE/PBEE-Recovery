@@ -37,7 +37,6 @@ function [ recovery ] = main_functionality( damage, building_model, ...
 %% Import Packages
 import recovery.functionality.fn_calculate_reoccupancy
 import recovery.functionality.fn_calculate_functionality
-import recovery.functionality.fn_combine_comp_breakdown
 
 %% Calaculate Building Functionality Restoration Curves
 % Downtime including external delays
@@ -46,19 +45,6 @@ import recovery.functionality.fn_combine_comp_breakdown
 
 [recovery.functional] =  fn_calculate_functionality( damage, damage_consequences, utilities,  ...
     building_model, subsystems, recovery.reoccupancy, functionality_options, tenant_units );
-
-% get the combined component breakdown
-recovery.combined_breakdown = fn_combine_comp_breakdown( ...
-    damage.comp_ds_table, ...
-    recovery.functional.breakdowns.perform_targ_days, ... % assumes names are consistent in both objects
-    recovery.reoccupancy.breakdowns.comp_names, ... % assumes names are consistent in both objects
-    recovery.reoccupancy.breakdowns.component_breakdowns_all_reals, ...
-    recovery.functional.breakdowns.component_breakdowns_all_reals ...
-);
-
-% delete all the extra per-realization data
-recovery.reoccupancy.breakdowns = rmfield(recovery.reoccupancy.breakdowns, 'component_breakdowns_all_reals');
-recovery.functional.breakdowns = rmfield(recovery.functional.breakdowns, 'component_breakdowns_all_reals');
 
 end
 
