@@ -1,4 +1,4 @@
-function [ repair_schedule ] = fn_format_gantt_chart_data( damage, systems )
+function [ repair_schedule ] = fn_format_gantt_chart_data( damage, systems, simulated_replacement )
 % Reformat data from the damage structure into data that is used for the
 % gantt charts
 %
@@ -8,6 +8,10 @@ function [ repair_schedule ] = fn_format_gantt_chart_data( damage, systems )
 %   contains per damage state damage and loss data for each component in the building
 % systems: table
 %   data table containing information about each system's attributes
+% simulated_replacement: array [num_reals x 1]
+%   simulated time when the building needs to be replaced, and how long it
+%   will take (in days). NaN represents no replacement needed (ie
+%   building will be repaired)
 %
 % Returns
 % -------
@@ -28,6 +32,9 @@ function [ repair_schedule ] = fn_format_gantt_chart_data( damage, systems )
 num_stories = length(damage.tenant_units);
 [num_reals, ~] = size(damage.tenant_units{1}.recovery.repair_start_day);
 comps = unique(damage.comp_ds_table.comp_id);
+
+% Determine replacement cases
+replace_cases = ~isnan(simulated_replacement);
 
 %% Reformate repair schedule data into various breakdowns
 % Per component
@@ -88,6 +95,16 @@ for sys = 1:height(systems)
         repair_schedule.repair_start_day.per_story_system(:,id) = min([repair_schedule.repair_start_day.per_story_system(:,id), damage.tenant_units{s}.recovery.repair_start_day(:,sys_filt)],[],2);
         repair_schedule.repair_complete_day.per_story_system(:,id) = max([repair_schedule.repair_complete_day.per_story_system(:,id), damage.tenant_units{s}.recovery.repair_complete_day(:,sys_filt)],[],2);
     end
+end
+
+
+%% Overwrite realization for demo and replace cases
+formats = fieldnames(repair_schedule.repair_start_day);
+for f = 1:length(formats)
+    repair_schedule.repair_start_day.(formats{f})(replace_cases,:) = 0;
+    
+    [~, format_width] = size(repair_schedule.repair_complete_day.(formats{f})); % apply replacement time to all comps / systems / stories / etc
+    repair_schedule.repair_complete_day.(formats{f})(replace_cases,:) = simulated_replacement(replace_cases)*ones(1,format_width);
 end
 
 end

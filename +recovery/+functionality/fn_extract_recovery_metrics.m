@@ -150,6 +150,9 @@ for c = 1:length(comps)
     recovery.breakdowns.component_breakdowns(c,:) = mean(max(component_breakdowns(:,comp_filt'),[],2) > perform_targ_days);
 end
 
+% store this so we can properly overalap the reoccupancy and functionality
+recovery.breakdowns.component_breakdowns_all_reals = component_breakdowns;
+
 % Save other variables
 recovery.breakdowns.perform_targ_days = perform_targ_days;
 recovery.breakdowns.system_names = system_names;

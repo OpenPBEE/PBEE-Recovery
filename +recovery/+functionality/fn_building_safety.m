@@ -51,6 +51,16 @@ for tu = 1:num_units
     repair_complete_day = damage.tenant_units{tu}.recovery.repair_complete_day;
     repair_complete_day_w_tmp = damage.tenant_units{tu}.recovery.repair_complete_day_w_tmp;
     
+    is_damaged = (damage.tenant_units{tu}.qnt_damaged > 0);
+    
+    if isfield(damage, 'red_tag_impact')
+        % assume the same for all tenant units (works out in the end)
+        affectes_red_tag = damage.red_tag_impact;
+    else
+        % no better information, just assume that if the component is damaged it affects red tag
+        affectes_red_tag = is_damaged;
+    end
+    
     %% Red Tags
     % The day the red tag is resolved is the day when all damage (anywhere in building) that has
     % the potentail to cause a red tag is fixed (ie max day)
@@ -60,7 +70,7 @@ for tu = 1:num_units
     end
     
     % Componet Breakdowns
-    comp_breakdowns.red_tag(:,:,tu) = damage.fnc_filters.red_tag .* recovery_day.red_tag;
+    comp_breakdowns.red_tag(:,:,tu) = damage.fnc_filters.red_tag .* recovery_day.red_tag .* affectes_red_tag;
     
     %% Local Shoring
     % Any unresolved damage (temporary or otherwise) that requires shoring,
@@ -73,7 +83,7 @@ for tu = 1:num_units
     
     % Componet Breakdowns (the time it takes to shore or fully repair each
     % component is the time it blocks occupancy for)
-    comp_breakdowns.shoring(:,:,tu) = shoring_filt .* repair_complete_day_w_tmp;
+    comp_breakdowns.shoring(:,:,tu) = shoring_filt .* repair_complete_day_w_tmp .* is_damaged;
     
     %% Day the fire suppression system is operating again (for the whole building)
     if fs_exists
@@ -253,7 +263,7 @@ recovery_day.falling_hazard = min(recovery_day.entry_door_access,max(day_repair_
 recovery_day.entry_door_racking = min(recovery_day.entry_door_access,max(day_repair_racked,[],2));
 
 % Component Breakdown
-comp_breakdowns.falling_hazard = min(recovery_day.entry_door_access,max(fall_haz_comps_day_rep,[],4));
+comp_breakdowns.falling_hazard = min(recovery_day.entry_door_access, max(fall_haz_comps_day_rep,[],4));
 
 %% Determine when fire suppresion affects recovery
 if fs_exists % only save this when fire system exists

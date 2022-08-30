@@ -1,4 +1,4 @@
-function [functionality] = fn_calculate_functionality(damage, damage_consequences, utilities, ...
+function [functional] = fn_calculate_functionality(damage, damage_consequences, utilities, ...
     building_model, subsystems, reoccupancy, functionality_options, tenant_units )
 % Calcualte the loss and recovery of building functionality based on global building
 % damage, local component damage, and extenernal factors
@@ -36,6 +36,7 @@ function [functionality] = fn_calculate_functionality(damage, damage_consequence
 import recovery.functionality.fn_building_level_system_operation
 import recovery.functionality.fn_tenant_function
 import recovery.functionality.fn_extract_recovery_metrics
+import recovery.functionality.fn_combine_comp_breakdown
 
 %% Define the day each system becomes functionl - Building level
 [ system_operation_day ] = fn_building_level_system_operation( damage, damage_consequences, ...
@@ -56,9 +57,22 @@ for i = 1:length(fault_tree_events)
 end
 
 %% Reformat outputs into functionality data strucutre
-[ functionality ] = fn_extract_recovery_metrics( day_tentant_unit_functional, ...
+[ functional ] = fn_extract_recovery_metrics( day_tentant_unit_functional, ...
     recovery_day, comp_breakdowns, damage.comp_ds_table.comp_id', ...
     damage_consequences.simulated_replacement );
+
+% get the combined component breakdown
+functional.breakdowns.component_combined = fn_combine_comp_breakdown( ...
+    damage.comp_ds_table, ...
+    functional.breakdowns.perform_targ_days, ... % assumes names are consistent in both objects
+    functional.breakdowns.comp_names, ...        % assumes names are consistent in both objects
+    reoccupancy.breakdowns.component_breakdowns_all_reals, ...
+    functional.breakdowns.component_breakdowns_all_reals ...
+);
+
+% delete all the extra per-realization data
+reoccupancy.breakdowns = rmfield(reoccupancy.breakdowns, 'component_breakdowns_all_reals');
+functional.breakdowns = rmfield(functional.breakdowns, 'component_breakdowns_all_reals');
 
 end
 
