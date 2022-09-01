@@ -100,9 +100,14 @@ fnc_filters.elevator_mcs = comp_ds_table.system == 5 & comp_ds_table.impairs_sys
 fnc_filters.electrical_main = comp_ds_table.system == 7 & comp_ds_table.subsystem_id == 1 & strcmp(string(comp_ds_table.service_location),'building') & comp_ds_table.impairs_system_operation;
 fnc_filters.electrical_unit = comp_ds_table.system == 7 & comp_ds_table.subsystem_id == 1 & strcmp(string(comp_ds_table.service_location),'unit') & comp_ds_table.impairs_system_operation;
 
-% Water and Plumbing
-fnc_filters.water_main = comp_ds_table.system == 6 & strcmp(string(comp_ds_table.service_location),'building') & comp_ds_table.impairs_system_operation;
-fnc_filters.water_unit = comp_ds_table.system == 6 & strcmp(string(comp_ds_table.service_location),'unit') & comp_ds_table.impairs_system_operation; 
+% Potable Water Plumbing
+fnc_filters.water_main = comp_ds_table.system == 6 & comp_ds_table.subsystem_id == 8 & strcmp(string(comp_ds_table.service_location),'building') & comp_ds_table.impairs_system_operation;
+fnc_filters.water_unit = comp_ds_table.system == 6 & comp_ds_table.subsystem_id == 8 & strcmp(string(comp_ds_table.service_location),'unit') & comp_ds_table.impairs_system_operation; 
+
+% Sanitary Plumbing
+fnc_filters.sewer_main = comp_ds_table.system == 6 & comp_ds_table.subsystem_id == 9 & strcmp(string(comp_ds_table.service_location),'building') & comp_ds_table.impairs_system_operation;
+fnc_filters.sewer_unit = comp_ds_table.system == 6 & comp_ds_table.subsystem_id == 9 & strcmp(string(comp_ds_table.service_location),'unit') & comp_ds_table.impairs_system_operation; 
+
 
 % HVAC
 hvac_equip = comp_ds_table.system == 8 & ismember(comp_ds_table.subsystem_id,[15,16,17,18,19,20]);

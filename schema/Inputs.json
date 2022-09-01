@@ -416,9 +416,13 @@
 					"type": "logical"
 					"description": "is an operational electrical system required for tenant function"
 				},
-				"is_water_required": {
+				"is_water_potable_required": {
 					"type": "logical"
-					"description": "is an operational plumbing system required for tenant function"
+					"description": "is an operational potable water plumbing system required for tenant function"
+				},
+				"is_water_sanitary_required": {
+					"type": "logical"
+					"description": "is an operational sanitary waste plumbing system required for tenant function"
 				},
 				"is_hvac_required": {
 					"type": "logical"

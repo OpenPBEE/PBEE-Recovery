@@ -1,5 +1,5 @@
-id,occupancy_id,occupancy_name,exterior,interior,occ_per_elev,is_elevator_required,max_walkable_story,is_electrical_required,is_water_required,is_hvac_required
-1,0,Non-Occupied Space,1,1,0,0,0,0,0,0
-2,1,Commercial Office,0.5,0.25,1000,1,3,1,1,1
-3,7,Multi-Unit Residential,0.75,0.5,1000,1,5,1,1,1
-4,11,Single-Unit Residential,0.75,0.5,1000,1,5,1,1,1
+id,occupancy_id,occupancy_name,exterior,interior,occ_per_elev,is_elevator_required,max_walkable_story,is_electrical_required,is_water_potable_required,is_water_sanitary_required,is_hvac_required
+1,0,Non-Occupied Space,1,1,0,0,0,0,0,0,0
+2,1,Commercial Office,0.5,0.25,1000,1,3,1,1,1,1
+3,7,Multi-Unit Residential,0.75,0.5,1000,1,5,1,1,1,1
+4,11,Single-Unit Residential,0.75,0.5,1000,1,5,1,1,1,1

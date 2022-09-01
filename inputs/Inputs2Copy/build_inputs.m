@@ -152,7 +152,8 @@ for tu = 1:height(tenant_unit_list)
         tenant_units.is_elevator_required(tu) = 0;
     end
     tenant_units.is_electrical_required(tu) = tenant_function_requirements.is_electrical_required(fnc_requirements_filt);
-    tenant_units.is_water_required(tu) = tenant_function_requirements.is_water_required(fnc_requirements_filt);
+    tenant_units.is_water_potable_required(tu) = tenant_function_requirements.is_water_potable_required(fnc_requirements_filt);
+    tenant_units.is_water_sanitary_required(tu) = tenant_function_requirements.is_water_sanitary_required(fnc_requirements_filt);
     tenant_units.is_hvac_required(tu) = tenant_function_requirements.is_hvac_required(fnc_requirements_filt);
 end
 

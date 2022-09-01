@@ -307,19 +307,34 @@ for tu = 1:num_units
     recovery_day.interior(:,tu) = int_function_recovery_day;
     comp_breakdowns.interior(:,:,tu) = int_comps_day_repaired;
     
-    %% Water and Plumbing System
-    if unit.is_water_required
+    %% Potable Water System
+    if unit.is_water_potable_required
         % determine effect on funciton at this tenant unit
         % any major damage to the branch pipes (small diameter) failes for this tenant unit
         tenant_sys_recovery_day = max(repair_complete_day .* damage.fnc_filters.water_unit,[],2); 
-        recovery_day.water(:,tu) = max(system_operation_day.building.water_main,tenant_sys_recovery_day);
+        recovery_day.water_potable(:,tu) = max(system_operation_day.building.water_potable_main,tenant_sys_recovery_day);
         
         % Consider effect of external water network
         utility_repair_day = utilities.water;
-        recovery_day.water = max(recovery_day.water,utility_repair_day);
+        recovery_day.water_potable = max(recovery_day.water_potable,utility_repair_day);
         
         % distribute effect to the components
-        comp_breakdowns.water(:,:,tu) = max(system_operation_day.comp.water_main, repair_complete_day .* damage.fnc_filters.water_unit);
+        comp_breakdowns.water_potable(:,:,tu) = max(system_operation_day.comp.water_potable_main, repair_complete_day .* damage.fnc_filters.water_unit);
+    end
+    
+    %% Sanitary Waste System
+    if unit.is_water_sanitary_required
+        % determine effect on funciton at this tenant unit
+        % any major damage to the branch pipes (small diameter) failes for this tenant unit
+        tenant_sys_recovery_day = max(repair_complete_day .* damage.fnc_filters.sewer_unit,[],2); 
+        recovery_day.water_sanitary(:,tu) = max(system_operation_day.building.water_sanitary_main,tenant_sys_recovery_day);
+        
+        % Consider effect of external water network
+        utility_repair_day = utilities.water;
+        recovery_day.water_sanitary = max(recovery_day.water_sanitary,utility_repair_day);
+        
+        % distribute effect to the components
+        comp_breakdowns.water_sanitary(:,:,tu) = max(system_operation_day.comp.water_sanitary_main, repair_complete_day .* damage.fnc_filters.sewer_unit);
     end
     
     %% Electrical Power System

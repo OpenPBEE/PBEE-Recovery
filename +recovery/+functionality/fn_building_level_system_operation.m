@@ -36,7 +36,8 @@ system_operation_day.building.hvac_main = zeros(num_reals,1);
 system_operation_day.comp.elev_quant_damaged = zeros(num_reals,num_comps);
 system_operation_day.comp.elev_day_repaired = zeros(num_reals,num_comps);
 system_operation_day.comp.electrical_main = zeros(num_reals,num_comps);
-system_operation_day.comp.water_main = zeros(num_reals,num_comps);
+system_operation_day.comp.water_potable_main = zeros(num_reals,num_comps);
+system_operation_day.comp.water_sanitary_main = zeros(num_reals,num_comps);
 system_operation_day.comp.hvac_main = zeros(num_reals,num_comps);
 system_operation_day.comp.elevator_mcs = zeros(num_reals,num_comps);
 system_operation_day.comp.hvac_mcs = zeros(num_reals,num_comps);
@@ -63,9 +64,13 @@ for tu = 1:num_stories
     system_operation_day.comp.elevator_mcs = ...
         max(system_operation_day.comp.elevator_mcs, repair_complete_day .* damage.fnc_filters.elevator_mcs);
     
-    % Water
-    system_operation_day.comp.water_main = ...
-        max(system_operation_day.comp.water_main, repair_complete_day .* damage.fnc_filters.water_main);
+    % Water: Potable
+    system_operation_day.comp.water_potable_main = ...
+        max(system_operation_day.comp.water_potable_main, repair_complete_day .* damage.fnc_filters.water_main);
+    
+    % Water: Sanitary
+    system_operation_day.comp.water_sanitary_main = ...
+        max(system_operation_day.comp.water_sanitary_main, repair_complete_day .* damage.fnc_filters.sewer_main);
     
     % HVAC Equipment and Distribution - Building Level
     % non redundant systems
@@ -166,7 +171,8 @@ end
 
 %% Calculate building level consequences for systems where any major main damage leads to system failure
 system_operation_day.building.electrical_main = max(system_operation_day.comp.electrical_main,[],2);  % any major damage to the main equipment fails the system for the entire building
-system_operation_day.building.water_main = max(system_operation_day.comp.water_main,[],2);  % any major damage to the main pipes fails the system for the entire building
+system_operation_day.building.water_potable_main = max(system_operation_day.comp.water_potable_main,[],2);  % any major damage to the main pipes fails the system for the entire building
+system_operation_day.building.water_sanitary_main = max(system_operation_day.comp.water_sanitary_main,[],2);  % any major damage to the main pipes fails the system for the entire building
 system_operation_day.building.elevator_mcs = max(system_operation_day.comp.elevator_mcs,[],2); % any major damage fails the system for the whole building so take the max
 system_operation_day.building.hvac_mcs = max(system_operation_day.comp.hvac_mcs,[],2); % any major damage fails the system for the whole building so take the max
 end
