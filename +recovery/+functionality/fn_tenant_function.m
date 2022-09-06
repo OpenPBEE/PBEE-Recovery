@@ -39,18 +39,12 @@ import recovery.functionality.fn_redunant_component
 num_units = length(damage.tenant_units);
 [num_reals, num_comps] = size(damage.tenant_units{1}.qnt_damaged);
 num_stories = building_model.num_stories;
-
 recovery_day.elevators = zeros(num_reals,num_units);
 recovery_day.exterior = zeros(num_reals,num_units);
 recovery_day.interior = zeros(num_reals,num_units);
-recovery_day.water_potable = zeros(num_reals,num_units);
-recovery_day.water_sanitary = zeros(num_reals,num_units);
 recovery_day.electrical = zeros(num_reals,num_units);
 comp_breakdowns.elevators = zeros(num_reals,num_comps,num_units);
-comp_breakdowns.water_potable = zeros(num_reals,num_comps,num_units);
-comp_breakdowns.water_sanitary = zeros(num_reals,num_comps,num_units);
 comp_breakdowns.electrical = zeros(num_reals,num_comps,num_units);
-
 
 %% Go through each tenant unit, define system level performacne and determine tenant unit recovery time
 for tu = 1:num_units
@@ -309,34 +303,35 @@ for tu = 1:num_units
     comp_breakdowns.interior(:,:,tu) = int_comps_day_repaired;
     
     %% Potable Water System
-    if unit.is_water_potable_required
-        % determine effect on funciton at this tenant unit
-        % any major damage to the branch pipes (small diameter) failes for this tenant unit
-        tenant_sys_recovery_day = max(repair_complete_day .* damage.fnc_filters.water_unit,[],2); 
-        recovery_day.water_potable(:,tu) = max(system_operation_day.building.water_potable_main,tenant_sys_recovery_day);
-        
-        % Consider effect of external water network
-        utility_repair_day = utilities.water;
-        recovery_day.water_potable = max(recovery_day.water_potable,utility_repair_day);
-        
-        % distribute effect to the components
-        comp_breakdowns.water_potable(:,:,tu) = max(system_operation_day.comp.water_potable_main, repair_complete_day .* damage.fnc_filters.water_unit);
-    end
+    % determine effect on funciton at this tenant unit
+    % any major damage to the branch pipes (small diameter) failes for this tenant unit
+    tenant_sys_recovery_day = max(repair_complete_day .* damage.fnc_filters.water_unit,[],2); 
+    recovery_day.water_potable(:,tu) = max(system_operation_day.building.water_potable_main,tenant_sys_recovery_day);
+
+    % Consider effect of external water network
+    utility_repair_day = utilities.water;
+    recovery_day.water_potable = max(recovery_day.water_potable,utility_repair_day);
+
+    % distribute effect to the components
+    comp_breakdowns.water_potable(:,:,tu) = max(system_operation_day.comp.water_potable_main, repair_complete_day .* damage.fnc_filters.water_unit);
     
     %% Sanitary Waste System
-    if unit.is_water_sanitary_required
-        % determine effect on funciton at this tenant unit
-        % any major damage to the branch pipes (small diameter) failes for this tenant unit
-        tenant_sys_recovery_day = max(repair_complete_day .* damage.fnc_filters.sewer_unit,[],2); 
-        recovery_day.water_sanitary(:,tu) = max(system_operation_day.building.water_sanitary_main,tenant_sys_recovery_day);
-        
-        % Consider effect of external water network
-        utility_repair_day = utilities.water;
-        recovery_day.water_sanitary = max(recovery_day.water_sanitary,utility_repair_day);
-        
-        % distribute effect to the components
-        comp_breakdowns.water_sanitary(:,:,tu) = max(system_operation_day.comp.water_sanitary_main, repair_complete_day .* damage.fnc_filters.sewer_unit);
-    end
+    % determine effect on funciton at this tenant unit
+    % any major damage to the branch pipes (small diameter) failes for this tenant unit
+    tenant_sys_recovery_day = max(repair_complete_day .* damage.fnc_filters.sewer_unit,[],2); 
+    recovery_day.water_sanitary(:,tu) = max(system_operation_day.building.water_sanitary_main,tenant_sys_recovery_day);
+
+    % distribute effect to the components
+    comp_breakdowns.water_sanitary(:,:,tu) = max(system_operation_day.comp.water_sanitary_main, repair_complete_day .* damage.fnc_filters.sewer_unit);
+
+    % Sanitary waste operation at this tenant unit depends on the 
+    % operation of the potable water system at this tenant unit
+    recovery_day.water_sanitary(:,tu) = max(recovery_day.water_sanitary(:,tu),recovery_day.water_potable(:,tu));
+    comp_breakdowns.water_sanitary(:,:,tu) = max(comp_breakdowns.water_sanitary(:,:,tu), comp_breakdowns.water_potable(:,:,tu));
+
+    % Consider effect of external water network
+    utility_repair_day = utilities.water;
+    recovery_day.water_sanitary(:,tu) = max(recovery_day.water_sanitary(:,tu),utility_repair_day);
     
     %% Electrical Power System
     % Does not consider effect of backup systems
@@ -386,26 +381,38 @@ for tu = 1:num_units
     [recovery_day.hvac_exhaust(:,tu), comp_breakdowns.hvac_exhaust(:,:,tu)] = ...
         subsystem_recovery('hvac_exhaust', damage, repair_complete_day, ...
                      total_num_comps, damaged_comps, initial_damaged, dependancy);
+                 
+                 
+    %% Post process for tenant-specific requirements 
+    % Zero out systems that are not required by the tenant
+    % Still need to calculate above due to dependancies between options
+    if ~unit.is_water_potable_required
+        recovery_day.water_potable = zeros(num_reals,num_units);
+        comp_breakdowns.water_potable = zeros(num_reals,num_comps,num_units);
+    end
+    if ~unit.is_water_sanitary_required
+        recovery_day.water_sanitary = zeros(num_reals,num_units);
+        comp_breakdowns.water_sanitary = zeros(num_reals,num_comps,num_units);
+    end
+    if ~unit.is_hvac_ventilation_required
+        recovery_day.hvac_ventilation = zeros(num_reals,num_units);
+        comp_breakdowns.hvac_ventilation = zeros(num_reals,num_comps,num_units);
+    end
+    if ~unit.is_hvac_heating_required
+        recovery_day.hvac_heating = zeros(num_reals,num_units);
+        comp_breakdowns.hvac_heating = zeros(num_reals,num_comps,num_units);
+    end
+    if ~unit.is_hvac_cooling_required
+        recovery_day.hvac_cooling = zeros(num_reals,num_units);
+        comp_breakdowns.hvac_cooling = zeros(num_reals,num_comps,num_units);
+    end
+    if ~unit.is_hvac_exhaust_required
+        recovery_day.hvac_exhaust = zeros(num_reals,num_units);
+        comp_breakdowns.hvac_exhaust = zeros(num_reals,num_comps,num_units);
+    end
 end
 
-% Zero out systems that are not required by the tenant
-% Still need to calculate above due to dependancies between options
-if ~unit.is_hvac_ventilation_required
-    recovery_day.hvac_ventilation = zeros(num_reals,num_units);
-    comp_breakdowns.hvac_ventilation = zeros(num_reals,num_comps,num_units);
-end
-if ~unit.is_hvac_heating_required
-    recovery_day.hvac_heating = zeros(num_reals,num_units);
-    comp_breakdowns.hvac_heating = zeros(num_reals,num_comps,num_units);
-end
-if ~unit.is_hvac_cooling_required
-    recovery_day.hvac_cooling = zeros(num_reals,num_units);
-    comp_breakdowns.hvac_cooling = zeros(num_reals,num_comps,num_units);
-end
-if ~unit.is_hvac_exhaust_required
-    recovery_day.hvac_exhaust = zeros(num_reals,num_units);
-    comp_breakdowns.hvac_exhaust = zeros(num_reals,num_comps,num_units);
-end
+
 
 end % Function
 
