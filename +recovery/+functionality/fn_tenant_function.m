@@ -1,6 +1,5 @@
 function [ recovery_day, comp_breakdowns ] = fn_tenant_function( damage, ...
-    building_model, system_operation_day, utilities, subsystems, ...
-    tenant_units, functionality_options )
+    building_model, system_operation_day, utilities, subsystems, tenant_units )
 % Check each tenant unit for damage that would cause that tenant unit 
 % to not be functional
 %
@@ -23,8 +22,6 @@ function [ recovery_day, comp_breakdowns ] = fn_tenant_function( damage, ...
 %   data table containing information about each subsystem's attributes
 % tenant_units: table
 %   attributes of each tenant unit within the building
-% functionality_options: struct
-%   recovery time optional inputs such as various damage thresholds
 %
 % Returns
 % -------
@@ -35,6 +32,10 @@ function [ recovery_day, comp_breakdowns ] = fn_tenant_function( damage, ...
 %   simulation of each components contributions to each of the fault tree events 
 
 %% Initial Setup
+% import packages
+import recovery.functionality.fn_redunant_component
+
+% Initialize Variables
 num_units = length(damage.tenant_units);
 [num_reals, num_comps] = size(damage.tenant_units{1}.qnt_damaged);
 num_stories = building_model.num_stories;
@@ -42,14 +43,14 @@ num_stories = building_model.num_stories;
 recovery_day.elevators = zeros(num_reals,num_units);
 recovery_day.exterior = zeros(num_reals,num_units);
 recovery_day.interior = zeros(num_reals,num_units);
-recovery_day.water = zeros(num_reals,num_units);
+recovery_day.water_potable = zeros(num_reals,num_units);
+recovery_day.water_sanitary = zeros(num_reals,num_units);
 recovery_day.electrical = zeros(num_reals,num_units);
-recovery_day.hvac = zeros(num_reals,num_units);
-
 comp_breakdowns.elevators = zeros(num_reals,num_comps,num_units);
-comp_breakdowns.water = zeros(num_reals,num_comps,num_units);
+comp_breakdowns.water_potable = zeros(num_reals,num_comps,num_units);
+comp_breakdowns.water_sanitary = zeros(num_reals,num_comps,num_units);
 comp_breakdowns.electrical = zeros(num_reals,num_comps,num_units);
-comp_breakdowns.hvac = zeros(num_reals,num_comps,num_units);
+
 
 %% Go through each tenant unit, define system level performacne and determine tenant unit recovery time
 for tu = 1:num_units
@@ -354,118 +355,85 @@ for tu = 1:num_units
     end
     
     %% HVAC System
-    % HVAC Equipment - Tenant Level
-    if unit.is_hvac_required
-        % Nonredundant equipment
-        % any major damage to the equipment servicing this tenant unit fails the system for this tenant unit
-        nonredundant_sys_repair_day = max(repair_complete_day .* damage.fnc_filters.hvac_unit_nonredundant,[],2); 
+    % HVAC: Control System
+    recovery_day_hvac_control = system_operation_day.building.hvac_control;
+    comp_breakdowns_hvac_control = system_operation_day.comp.hvac_control;
 
-        % Redundant systems
-        % only fail system when a sufficient number of component have failed
-        redundant_subsystems = unique(damage.comp_ds_table.subsystem_id(damage.fnc_filters.hvac_unit_redundant));
-        redundant_sys_repair_day = zeros(num_reals,1);
-        for s = 1:length(redundant_subsystems) % go through each redundant subsystem
-            this_redundant_sys = damage.fnc_filters.hvac_unit_redundant & (damage.comp_ds_table.subsystem_id == redundant_subsystems(s))';
-            n1_redundancy = max(damage.comp_ds_table.n1_redundancy(this_redundant_sys)); % should all be the same within a subsystem
-            
-            % go through each component in this subsystem and find number of damaged units
-            comps = unique(damage.comp_ds_table.comp_idx(this_redundant_sys));
-            num_tot_comps = zeros(1,length(comps));
-            num_damaged_comps = zeros(num_reals,length(comps));
-            for c = 1:length(comps)
-                this_comp = this_redundant_sys & (damage.comp_ds_table.comp_idx' == comps(c));
-                num_tot_comps(c) = max(total_num_comps .* this_comp); % number of units across all ds should be the same
-                num_damaged_comps(:,c) = max(damaged_comps .* this_comp,[],2);
-            end
-                
-            % sum together multiple components in this subsystem
-            subsystem_num_comps = sum(num_tot_comps);
-            subsystem_num_damaged_comps = sum(num_damaged_comps,2);
-            ratio_damaged = subsystem_num_damaged_comps ./ subsystem_num_comps;
-            ratio_operating = 1 - ratio_damaged;
-            
-            % Check failed component against the ratio of components required for system operation
-            % system fails when there is an insufficient number of operating components
-            if subsystem_num_comps == 0 % Not components at this level
-                tenant_subsystem_failure = zeros(num_reals,1);
-            elseif subsystem_num_comps == 1 % Not actually redundant
-                tenant_subsystem_failure = subsystem_num_damaged_comps == 0;
-            elseif n1_redundancy
-                % These components are designed to have N+1 redundncy rates,
-                % meaning they are designed to lose one component and still operate at
-                % normal level
-                tenant_subsystem_failure = subsystem_num_damaged_comps > 1;
-            else
-                % Use a predefined ratio
-                tenant_subsystem_failure = ratio_operating < functionality_options.required_ratio_operating_hvac_unit;
-            end
-            
-            % Calculate recovery day and combine with other subsystems for this tenant unit
-            % assumes all quantities in each subsystem are repaired at
-            % once, which is true for our current repair schedule (ie
-            % system level at each story)
-            redundant_sys_repair_day = max(redundant_sys_repair_day, ...
-                max(tenant_subsystem_failure .*  this_redundant_sys .* repair_complete_day,[],2)); 
-        end
+    % HVAC: Ventilation
+    dependancy.recovery_day = max(recovery_day_hvac_control,system_operation_day.building.hvac_ventilation);
+    dependancy.comp_breakdown = max(comp_breakdowns_hvac_control,system_operation_day.comp.hvac_ventilation);
+    [recovery_day.hvac_ventilation(:,tu), comp_breakdowns.hvac_ventilation(:,:,tu)] = ...
+        subsystem_recovery('hvac_ventilation', damage, repair_complete_day, ...
+                     total_num_comps, damaged_comps, initial_damaged, dependancy);
 
-        % Combine tenant level equipment with main building level equipment
-        tenant_hvac_fnc_recovery_day = max(redundant_sys_repair_day, nonredundant_sys_repair_day); 
-        recovery_day.hvac(:,tu) = max(tenant_hvac_fnc_recovery_day,system_operation_day.building.hvac_main);
-        
-        % distribute the the components affecting function
-        % (note these components anytime they cause specific system failure)
-        nonredundant_comps_day = damage.fnc_filters.hvac_unit_nonredundant .* initial_damaged .* nonredundant_sys_repair_day;
-        redundant_comps_day = damage.fnc_filters.hvac_unit_redundant .* initial_damaged .* redundant_sys_repair_day;
-        comp_breakdowns.hvac(:,:,tu) = max(max(nonredundant_comps_day, redundant_comps_day), system_operation_day.comp.hvac_main);
+    % HVAC: Heating
+    dependancy.recovery_day = max(recovery_day.hvac_ventilation(:,tu),system_operation_day.building.hvac_heating);
+    dependancy.comp_breakdown = max(comp_breakdowns.hvac_ventilation(:,:,tu),system_operation_day.comp.hvac_heating);
+    [recovery_day.hvac_heating(:,tu), comp_breakdowns.hvac_heating(:,:,tu)] = ...
+        subsystem_recovery('hvac_heating', damage, repair_complete_day, ...
+                     total_num_comps, damaged_comps, initial_damaged, dependancy);
 
-        % HVAC Distribution - Tenant Level - subsystems
-        subsystem_handle = {'hvac_duct_braches', 'hvac_in_line_fan', 'hvac_duct_drops', 'hvac_vav_boxes'};
-        for sub = 1:length(subsystem_handle)
-            if sum(damage.fnc_filters.hvac_duct_braches) > 0
-                subsystem_threshold = subsystems.redundancy_threshold(strcmp(subsystems.handle,subsystem_handle{sub}));
+    % HVAC: Cooling
+    dependancy.recovery_day = max(recovery_day.hvac_ventilation(:,tu),system_operation_day.building.hvac_cooling);
+    dependancy.comp_breakdown = max(comp_breakdowns.hvac_ventilation(:,:,tu),system_operation_day.comp.hvac_cooling);
+    [recovery_day.hvac_cooling(:,tu), comp_breakdowns.hvac_cooling(:,:,tu)] = ...
+        subsystem_recovery('hvac_cooling', damage, repair_complete_day, ...
+                     total_num_comps, damaged_comps, initial_damaged, dependancy);
 
-                % Assess subsystem recovery day for this tenant unit
-                [subsystem_recovery_day, subsystem_comp_recovery_day] = fn_quantify_hvac_subsystem_recovery_day(...
-                    damage.fnc_filters.(subsystem_handle{sub}), total_num_comps, repair_complete_day, initial_damaged, ...
-                    damaged_comps, subsystem_threshold, damage.comp_ds_table.comp_idx', damage.comp_ds_table.is_sim_ds');
-
-                % Compile with tenant unit performacne and component breakdowns
-                recovery_day.hvac(:,tu) = max(recovery_day.hvac(:,tu), subsystem_recovery_day);
-                comp_breakdowns.hvac(:,:,tu) = max(comp_breakdowns.hvac(:,:,tu), subsystem_comp_recovery_day);
-            end
-        end
-    end
+    % HVAC: Exhast
+    dependancy.recovery_day = recovery_day_hvac_control;
+    dependancy.comp_breakdown = comp_breakdowns_hvac_control;
+    [recovery_day.hvac_exhaust(:,tu), comp_breakdowns.hvac_exhaust(:,:,tu)] = ...
+        subsystem_recovery('hvac_exhaust', damage, repair_complete_day, ...
+                     total_num_comps, damaged_comps, initial_damaged, dependancy);
 end
 
+% Zero out systems that are not required by the tenant
+% Still need to calculate above due to dependancies between options
+if ~unit.is_hvac_ventilation_required
+    recovery_day.hvac_ventilation = zeros(num_reals,num_units);
+    comp_breakdowns.hvac_ventilation = zeros(num_reals,num_comps,num_units);
+end
+if ~unit.is_hvac_heating_required
+    recovery_day.hvac_heating = zeros(num_reals,num_units);
+    comp_breakdowns.hvac_heating = zeros(num_reals,num_comps,num_units);
+end
+if ~unit.is_hvac_cooling_required
+    recovery_day.hvac_cooling = zeros(num_reals,num_units);
+    comp_breakdowns.hvac_cooling = zeros(num_reals,num_comps,num_units);
+end
+if ~unit.is_hvac_exhaust_required
+    recovery_day.hvac_exhaust = zeros(num_reals,num_units);
+    comp_breakdowns.hvac_exhaust = zeros(num_reals,num_comps,num_units);
 end
 
-function [subsystem_recovery_day, subsystem_comp_recovery_day] = fn_quantify_hvac_subsystem_recovery_day(...
-    subsystem_filter, total_num_comps, repair_complete_day, initial_damaged, damaged_comps, subsystem_threshold, pg_id, is_sim_ds)
+end % Function
 
-% Determine the ratio of damaged components that affect system operation
-sub_sys_pg_id = unique(pg_id(subsystem_filter));
-num_comp = 0;
-for c = 1:length(sub_sys_pg_id)
-    sub_sys_pg_filt = subsystem_filter & (pg_id == sub_sys_pg_id(c));
-    num_comp = num_comp + max(total_num_comps(sub_sys_pg_filt));
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%% SUBFUNCTIONS %%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+function [recovery_day_all, comp_breakdowns_all] = subsystem_recovery(...
+    subsystem, damage, repair_complete_day, total_num_comps, damaged_comps, ...
+    initial_damaged, dependancy)
+
+% import packages
+import recovery.functionality.fn_calc_subsystem_recovery
+
+% Set variables
+recovery_day_all = dependancy.recovery_day;
+comp_breakdowns_all = dependancy.comp_breakdown;
+
+% Go through each component group in this subsystem and determine recovery
+% based on impact of system operation at the tenant unit level
+subs = fieldnames(damage.fnc_filters.hvac.tenant.(subsystem));
+for b = 1:length(subs)
+    filt = damage.fnc_filters.hvac.tenant.(subsystem).(subs{b})';
+    [recovery_day] = fn_calc_subsystem_recovery( filt, damage, repair_complete_day, total_num_comps, damaged_comps );
+    comps_breakdown = filt .* initial_damaged .* recovery_day;
+    recovery_day_all = max(recovery_day_all,recovery_day); % combine with previous stories
+    comp_breakdowns_all = max(comp_breakdowns_all,comps_breakdown);
 end
-tot_num_comp_dam = sum(damaged_comps .* subsystem_filter,2); % Assumes damage states are never simultaneous
-ratio_damaged = tot_num_comp_dam ./ num_comp;   
 
-% Check to make sure its not simeltanous
-% Quantification of number of damaged comp
-if any(is_sim_ds(subsystem_filter))
-    error('PBEE_Recovery:Function','HVAC Function check does not handle performance groups with simultaneous damage states')
-end
-
-% If ratio of component in this subsystem is greater than the
-% threshold, the system fails for this tenant unit
-subsystem_failure = ratio_damaged > subsystem_threshold;
-
-% Calculate tenant unit recovery day for this subsystem
-subsystem_recovery_day = max(subsystem_filter .* subsystem_failure .* repair_complete_day,[],2);
-
-% Distrbute recovery day to the components affecting function for this subsystem
-subsystem_comp_recovery_day = subsystem_filter .* initial_damaged .* subsystem_recovery_day;
-           
-end
+end % Function

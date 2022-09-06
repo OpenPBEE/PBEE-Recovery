@@ -108,23 +108,30 @@ fnc_filters.water_unit = comp_ds_table.system == 6 & comp_ds_table.subsystem_id 
 fnc_filters.sewer_main = comp_ds_table.system == 6 & comp_ds_table.subsystem_id == 9 & strcmp(string(comp_ds_table.service_location),'building') & comp_ds_table.impairs_system_operation;
 fnc_filters.sewer_unit = comp_ds_table.system == 6 & comp_ds_table.subsystem_id == 9 & strcmp(string(comp_ds_table.service_location),'unit') & comp_ds_table.impairs_system_operation; 
 
+% HVAC: Control System
+fnc_filters.hvac.building.hvac_control.mcs = comp_ds_table.system == 8 & comp_ds_table.subsystem_id == 2 & comp_ds_table.impairs_system_operation;
+fnc_filters.hvac.building.hvac_control.control_panel = comp_ds_table.system == 8 & comp_ds_table.subsystem_id == 20 & comp_ds_table.impairs_system_operation ;
 
-% HVAC
-hvac_equip = comp_ds_table.system == 8 & ismember(comp_ds_table.subsystem_id,[15,16,17,18,19,20]);
-fnc_filters.hvac_main = hvac_equip & strcmp(string(comp_ds_table.service_location),'building') & comp_ds_table.impairs_system_operation;
-fnc_filters.hvac_main_nonredundant = fnc_filters.hvac_main & ~comp_ds_table.parallel_operation;
-fnc_filters.hvac_main_redundant = fnc_filters.hvac_main & comp_ds_table.parallel_operation;
-fnc_filters.hvac_duct_mains = comp_ds_table.system == 8 & comp_ds_table.subsystem_id == 4 & strcmp(string(comp_ds_table.service_location),'building') & comp_ds_table.impairs_system_operation;
-fnc_filters.hvac_cooling_piping = comp_ds_table.system == 8 & comp_ds_table.subsystem_id == 11 & comp_ds_table.impairs_system_operation;
-fnc_filters.hvac_heating_piping = comp_ds_table.system == 8 & comp_ds_table.subsystem_id == 10 & comp_ds_table.impairs_system_operation;
-fnc_filters.hvac_unit = hvac_equip & strcmp(string(comp_ds_table.service_location),'unit') & comp_ds_table.impairs_system_operation;
-fnc_filters.hvac_unit_nonredundant = fnc_filters.hvac_unit & ~comp_ds_table.parallel_operation;
-fnc_filters.hvac_unit_redundant = fnc_filters.hvac_unit & comp_ds_table.parallel_operation;
-fnc_filters.hvac_duct_braches = comp_ds_table.system == 8 & comp_ds_table.subsystem_id == 4 & strcmp(string(comp_ds_table.service_location),'unit') & comp_ds_table.impairs_system_operation;
-fnc_filters.hvac_in_line_fan = comp_ds_table.system == 8 & comp_ds_table.subsystem_id == 5 & strcmp(string(comp_ds_table.service_location),'unit') & comp_ds_table.impairs_system_operation; 
-fnc_filters.hvac_duct_drops = comp_ds_table.system == 8 & comp_ds_table.subsystem_id == 6 & strcmp(string(comp_ds_table.service_location),'unit') & comp_ds_table.impairs_system_operation;
-fnc_filters.hvac_vav_boxes = comp_ds_table.system == 8 & comp_ds_table.subsystem_id == 7 & strcmp(string(comp_ds_table.service_location),'unit') & comp_ds_table.impairs_system_operation;
-fnc_filters.hvac_mcs = comp_ds_table.system == 8 & comp_ds_table.impairs_system_operation & comp_ds_table.subsystem_id == 2;
+% HVAC: Ventilation
+fnc_filters.hvac.building.hvac_ventilation.duct_mains = comp_ds_table.system == 8 & comp_ds_table.subsystem_id == 24 & strcmp(string(comp_ds_table.service_location),'building') & comp_ds_table.impairs_system_operation;
+fnc_filters.hvac.tenant.hvac_ventilation.duct_braches = comp_ds_table.system == 8 & comp_ds_table.subsystem_id == 4 & strcmp(string(comp_ds_table.service_location),'unit') & comp_ds_table.impairs_system_operation;
+fnc_filters.hvac.tenant.hvac_ventilation.in_line_fan = comp_ds_table.system == 8 & comp_ds_table.subsystem_id == 5 & strcmp(string(comp_ds_table.service_location),'unit') & comp_ds_table.impairs_system_operation; 
+fnc_filters.hvac.tenant.hvac_ventilation.duct_drops = comp_ds_table.system == 8 & comp_ds_table.subsystem_id == 6 & strcmp(string(comp_ds_table.service_location),'unit') & comp_ds_table.impairs_system_operation;
+fnc_filters.hvac.tenant.hvac_ventilation.ahu = comp_ds_table.system == 8 & comp_ds_table.subsystem_id == 19 & comp_ds_table.impairs_system_operation;
+fnc_filters.hvac.tenant.hvac_ventilation.rtu = comp_ds_table.system == 8 & comp_ds_table.subsystem_id == 17 & comp_ds_table.impairs_system_operation;
+
+% HVAC: Heating
+fnc_filters.hvac.building.hvac_heating.piping = comp_ds_table.system == 8 & comp_ds_table.subsystem_id == 10 & comp_ds_table.impairs_system_operation; 
+fnc_filters.hvac.tenant.hvac_heating.vav = comp_ds_table.system == 8 & comp_ds_table.subsystem_id == 7 & comp_ds_table.impairs_system_operation; 
+
+% HVAC: Cooling
+fnc_filters.hvac.building.hvac_cooling.piping = comp_ds_table.system == 8 & comp_ds_table.subsystem_id == 11 & comp_ds_table.impairs_system_operation; 
+fnc_filters.hvac.building.hvac_cooling.chiller = comp_ds_table.system == 8 & comp_ds_table.subsystem_id == 15 & comp_ds_table.impairs_system_operation; 
+fnc_filters.hvac.building.hvac_cooling.cooling_tower = comp_ds_table.system == 8 & comp_ds_table.subsystem_id == 16 & comp_ds_table.impairs_system_operation; 
+fnc_filters.hvac.tenant.hvac_cooling.vav = comp_ds_table.system == 8 & comp_ds_table.subsystem_id == 7 & comp_ds_table.impairs_system_operation; 
+
+% HVAC: Exhaust
+fnc_filters.hvac.tenant.hvac_exhaust.exhaust_fan = comp_ds_table.system == 8 & comp_ds_table.subsystem_id == 18 & comp_ds_table.impairs_system_operation;
 
 %% Flip orientation of fnc_filters to match orientation of damage data [reals x ds]
 names = fieldnames(fnc_filters);

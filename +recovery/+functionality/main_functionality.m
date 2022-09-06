@@ -44,7 +44,7 @@ import recovery.functionality.fn_calculate_functionality
     building_model, subsystems, functionality_options, tenant_units, impeding_temp_repairs );
 
 [recovery.functional] =  fn_calculate_functionality( damage, damage_consequences, utilities,  ...
-    building_model, subsystems, recovery.reoccupancy, functionality_options, tenant_units );
+    building_model, subsystems, recovery.reoccupancy, tenant_units );
 
 end
 

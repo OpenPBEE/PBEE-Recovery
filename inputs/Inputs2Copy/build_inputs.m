@@ -154,7 +154,10 @@ for tu = 1:height(tenant_unit_list)
     tenant_units.is_electrical_required(tu) = tenant_function_requirements.is_electrical_required(fnc_requirements_filt);
     tenant_units.is_water_potable_required(tu) = tenant_function_requirements.is_water_potable_required(fnc_requirements_filt);
     tenant_units.is_water_sanitary_required(tu) = tenant_function_requirements.is_water_sanitary_required(fnc_requirements_filt);
-    tenant_units.is_hvac_required(tu) = tenant_function_requirements.is_hvac_required(fnc_requirements_filt);
+    tenant_units.is_hvac_ventilation_required(tu) = tenant_function_requirements.is_hvac_ventilation_required(fnc_requirements_filt);
+    tenant_units.is_hvac_heating_required(tu) = tenant_function_requirements.is_hvac_heating_required(fnc_requirements_filt);
+    tenant_units.is_hvac_cooling_required(tu) = tenant_function_requirements.is_hvac_cooling_required(fnc_requirements_filt);
+    tenant_units.is_hvac_exhaust_required(tu) = tenant_function_requirements.is_hvac_exhaust_required(fnc_requirements_filt);
 end
 
 
@@ -246,12 +249,14 @@ for c = 1:height(comp_ds_list)
         % No subsytem
         comp_ds_info.n1_redundancy(c,1) = 0;
         comp_ds_info.parallel_operation(c,1) = 0;
+        comp_ds_info.redundancy_threshold(c,1) = 0;
     elseif sum(subsystem_filt) ~= 1
         error('Could not find damage state attrubutes')
     else
         % Set Damage State Attributes
         comp_ds_info.n1_redundancy(c,1) = subsystems.n1_redundancy(subsystem_filt);
         comp_ds_info.parallel_operation(c,1) = subsystems.parallel_operation(subsystem_filt);
+        comp_ds_info.redundancy_threshold(c,1) = subsystems.redundancy_threshold(subsystem_filt);
     end
 
 end

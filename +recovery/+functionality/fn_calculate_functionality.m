@@ -1,5 +1,5 @@
 function [functional] = fn_calculate_functionality(damage, damage_consequences, utilities, ...
-    building_model, subsystems, reoccupancy, functionality_options, tenant_units )
+    building_model, subsystems, reoccupancy, tenant_units )
 % Calcualte the loss and recovery of building functionality based on global building
 % damage, local component damage, and extenernal factors
 %
@@ -40,11 +40,11 @@ import recovery.functionality.fn_combine_comp_breakdown
 
 %% Define the day each system becomes functionl - Building level
 [ system_operation_day ] = fn_building_level_system_operation( damage, damage_consequences, ...
-    building_model, utilities, functionality_options );
+    building_model, utilities );
 
 %% Define the day each system becomes functionl - Tenant level
-[ recovery_day.tenant_function, comp_breakdowns.tenant_function ] = fn_tenant_function( damage, ...
-    building_model, system_operation_day, utilities, subsystems, tenant_units, functionality_options );
+[ recovery_day.tenant_function, comp_breakdowns.tenant_function ] = fn_tenant_function( ...
+    damage, building_model, system_operation_day, utilities, subsystems, tenant_units );
 
 %% Combine Checks to determine per unit functionality
 % Each tenant unit is functional only if it is occupiable

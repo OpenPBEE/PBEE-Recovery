@@ -424,7 +424,19 @@
 					"type": "logical"
 					"description": "is an operational sanitary waste plumbing system required for tenant function"
 				},
-				"is_hvac_required": {
+				"is_hvac_ventilation_required": {
+					"type": "logical"
+					"description": "is an operational hvac system required for tenant function"
+				},
+				"is_hvac_heating_required": {
+					"type": "logical"
+					"description": "is an operational hvac system required for tenant function"
+				},
+				"is_hvac_cooling_required": {
+					"type": "logical"
+					"description": "is an operational hvac system required for tenant function"
+				},
+				"is_hvac_exhaust_required": {
 					"type": "logical"
 					"description": "is an operational hvac system required for tenant function"
 				}

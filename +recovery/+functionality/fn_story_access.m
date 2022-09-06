@@ -105,7 +105,8 @@ for tu = 1:num_stories
                                                                                             % components in multuple PGs
 
             % Determine if the fire sprinkler system is operation at this story
-            sufficient_fs_drop = ratio_fs_drop_failed <= subsystems.redundancy_threshold(strcmp(subsystems.handle,'fs_drops'));
+            redundancy_threshold = max(damage.comp_ds_table.redundancy_threshold(damage.fnc_filters.fire_drops)); % should all be the same within a subsystem
+            sufficient_fs_drop = ratio_fs_drop_failed <= redundancy_threshold;
             building_fs_operational = isnan(max(repair_complete_day(:,damage.fnc_filters.fire_building),[],2)); % has all damage been repaired 
             fs_operational = sufficient_fs_drop & building_fs_operational;
         end
