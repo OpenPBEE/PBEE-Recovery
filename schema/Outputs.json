@@ -346,6 +346,10 @@
 									"description": "simulated financing time",
 									"$ref": "#/definitions/summaryImpedingFactors"
 								},
+								"contractor_mob": {
+									"description": "simulated contractor mobilization time",
+									"$ref": "#/definitions/summaryImpedingFactors"
+								},
 								"eng_mob": {
 									"description": "simulated engineering mobilization time for each system",
 									"$ref": "#/definitions/summaryImpedingFactorsSystem"
@@ -356,10 +360,6 @@
 								},
 								"permitting": {
 									"description": "simulated permitting time for each system",
-									"$ref": "#/definitions/summaryImpedingFactorsSystem"
-								},
-								"contractor_mob": {
-									"description": "simulated contractor mobilization time for each system",
 									"$ref": "#/definitions/summaryImpedingFactorsSystem"
 								}
 							}

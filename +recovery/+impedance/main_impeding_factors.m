@@ -264,6 +264,8 @@ impeding_factors.breakdowns.inspection.start_day = max(start_day.inspection,[],2
 impeding_factors.breakdowns.inspection.complete_day = max(complete_day.inspection,[],2);
 impeding_factors.breakdowns.financing.start_day = max(start_day.financing,[],2);
 impeding_factors.breakdowns.financing.complete_day = max(complete_day.financing,[],2);
+impeding_factors.breakdowns.contractor_mob.start_day = max(start_day.contractor_mob,[],2);
+impeding_factors.breakdowns.contractor_mob.complete_day = max(complete_day.contractor_mob,[],2);
 
 select_sys = [1, 2, 4]; % only for structure, exterior, and stairs
 for ss = select_sys
@@ -276,8 +278,6 @@ end
 for s = 1:height(systems)
     impeding_factors.breakdowns.permitting.(systems.name{s}).start_day = start_day.permitting(:,s);
     impeding_factors.breakdowns.permitting.(systems.name{s}).complete_day = complete_day.permitting(:,s);
-    impeding_factors.breakdowns.contractor_mob.(systems.name{s}).start_day = start_day.contractor_mob(:,s);
-    impeding_factors.breakdowns.contractor_mob.(systems.name{s}).complete_day = complete_day.contractor_mob(:,s);
     impeding_factors.breakdowns.long_lead.(systems.name{s}).start_day = start_day.long_lead(:,s);
     impeding_factors.breakdowns.long_lead.(systems.name{s}).complete_day = complete_day.long_lead(:,s);
 end
