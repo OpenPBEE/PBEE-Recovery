@@ -360,8 +360,8 @@ for tu = 1:num_units
     comp_breakdowns_hvac_control = system_operation_day.comp.hvac_control;
 
     % HVAC: Ventilation
-    dependancy.recovery_day = max(recovery_day_hvac_control,system_operation_day.building.hvac_ventilation);
-    dependancy.comp_breakdown = max(comp_breakdowns_hvac_control,system_operation_day.comp.hvac_ventilation);
+    dependancy.recovery_day = recovery_day_hvac_control;
+    dependancy.comp_breakdown = comp_breakdowns_hvac_control;
     [recovery_day.hvac_ventilation(:,tu), comp_breakdowns.hvac_ventilation(:,:,tu)] = ...
         subsystem_recovery('hvac_ventilation', damage, repair_complete_day, ...
                      total_num_comps, damaged_comps, initial_damaged, dependancy);

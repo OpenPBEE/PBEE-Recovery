@@ -113,7 +113,7 @@ fnc_filters.hvac.building.hvac_control.mcs = comp_ds_table.system == 8 & comp_ds
 fnc_filters.hvac.building.hvac_control.control_panel = comp_ds_table.system == 8 & comp_ds_table.subsystem_id == 20 & comp_ds_table.impairs_system_operation ;
 
 % HVAC: Ventilation
-fnc_filters.hvac.building.hvac_ventilation.duct_mains = comp_ds_table.system == 8 & comp_ds_table.subsystem_id == 24 & strcmp(string(comp_ds_table.service_location),'building') & comp_ds_table.impairs_system_operation;
+fnc_filters.hvac.tenant.hvac_ventilation.duct_mains = comp_ds_table.system == 8 & comp_ds_table.subsystem_id == 24 & strcmp(string(comp_ds_table.service_location),'unit') & comp_ds_table.impairs_system_operation;
 fnc_filters.hvac.tenant.hvac_ventilation.duct_braches = comp_ds_table.system == 8 & comp_ds_table.subsystem_id == 4 & strcmp(string(comp_ds_table.service_location),'unit') & comp_ds_table.impairs_system_operation;
 fnc_filters.hvac.tenant.hvac_ventilation.in_line_fan = comp_ds_table.system == 8 & comp_ds_table.subsystem_id == 5 & strcmp(string(comp_ds_table.service_location),'unit') & comp_ds_table.impairs_system_operation; 
 fnc_filters.hvac.tenant.hvac_ventilation.duct_drops = comp_ds_table.system == 8 & comp_ds_table.subsystem_id == 6 & strcmp(string(comp_ds_table.service_location),'unit') & comp_ds_table.impairs_system_operation;
