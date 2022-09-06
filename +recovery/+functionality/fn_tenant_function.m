@@ -308,10 +308,6 @@ for tu = 1:num_units
     tenant_sys_recovery_day = max(repair_complete_day .* damage.fnc_filters.water_unit,[],2); 
     recovery_day.water_potable(:,tu) = max(system_operation_day.building.water_potable_main,tenant_sys_recovery_day);
 
-    % Consider effect of external water network
-    utility_repair_day = utilities.water;
-    recovery_day.water_potable = max(recovery_day.water_potable,utility_repair_day);
-
     % distribute effect to the components
     comp_breakdowns.water_potable(:,:,tu) = max(system_operation_day.comp.water_potable_main, repair_complete_day .* damage.fnc_filters.water_unit);
     
@@ -328,10 +324,6 @@ for tu = 1:num_units
     % operation of the potable water system at this tenant unit
     recovery_day.water_sanitary(:,tu) = max(recovery_day.water_sanitary(:,tu),recovery_day.water_potable(:,tu));
     comp_breakdowns.water_sanitary(:,:,tu) = max(comp_breakdowns.water_sanitary(:,:,tu), comp_breakdowns.water_potable(:,:,tu));
-
-    % Consider effect of external water network
-    utility_repair_day = utilities.water;
-    recovery_day.water_sanitary(:,tu) = max(recovery_day.water_sanitary(:,tu),utility_repair_day);
     
     %% Electrical Power System
     % Does not consider effect of backup systems

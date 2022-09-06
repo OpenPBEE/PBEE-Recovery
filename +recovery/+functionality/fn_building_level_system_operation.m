@@ -1,5 +1,5 @@
 function [ system_operation_day ] = fn_building_level_system_operation( damage, ...
-    damage_consequences, building_model, utilities )
+    damage_consequences, building_model, utilities, functionality_options )
 % Calculate the day certain systems recovery building-level opertaions
 %
 % Parameters
@@ -14,6 +14,8 @@ function [ system_operation_day ] = fn_building_level_system_operation( damage, 
 %   general attributes of the building model
 % utilities: struct
 %   data structure containing simulated utility downtimes
+% functionality_options: struct
+%   recovery time optional inputs such as various damage thresholds
 %
 % Returns
 % -------
@@ -102,8 +104,12 @@ system_operation_day.building.water_potable_main = max(system_operation_day.comp
 system_operation_day.building.water_sanitary_main = max(system_operation_day.comp.water_sanitary_main,[],2);  % any major damage to the main pipes fails the system for the entire building
 system_operation_day.building.elevator_mcs = max(system_operation_day.comp.elevator_mcs,[],2); % any major damage fails the system for the whole building so take the max
 
+%% Account for Extermal Utilities impact on system Operation
+% Potable water
+system_operation_day.building.water_potable_main = max(system_operation_day.building.water_potable_main,utilities.water);
+
 % Assume hvac control runs on electricity and heating system runs on gas
 system_operation_day.building.hvac_control = max(system_operation_day.building.hvac_control,utilities.electrical);
-system_operation_day.building.hvac_heating = max(system_operation_day.building.hvac_heating,utilities.gas);
+system_operation_day.building.hvac_heating = max(system_operation_day.building.hvac_heating,utilities.(functionality_options.heat_utility));
 end
 

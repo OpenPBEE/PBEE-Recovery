@@ -40,6 +40,7 @@ functionality_options.min_egress_paths = 2;
 functionality_options.exterior_safety_threshold = 0.1;
 functionality_options.interior_safety_threshold = 0.25;
 functionality_options.door_access_width_ft = 9;
+functionality_options.heat_utility = 'gas';
 
 % Regional Impact
 regional_impact.surge_factor = 1;

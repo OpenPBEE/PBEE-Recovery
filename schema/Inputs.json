@@ -195,6 +195,10 @@
 				"door_access_width_ft": {
 					"type": "number",
 					"description": "width of door access zone, centerlined on the doorway, required for safe access. A safe door access zone must be free of falling hazards"
+				},
+				"heat_utility": {
+					"type": "string",
+					"description": "string identifier of the type of utility that is used to heat the building; string should match on of the fields in functionality.utilities"
 				}
 			}
 		},
