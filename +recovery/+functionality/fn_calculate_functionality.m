@@ -70,9 +70,5 @@ functional.breakdowns.component_combined = fn_combine_comp_breakdown( ...
     functional.breakdowns.component_breakdowns_all_reals ...
 );
 
-% delete all the extra per-realization data
-reoccupancy.breakdowns = rmfield(reoccupancy.breakdowns, 'component_breakdowns_all_reals');
-functional.breakdowns = rmfield(functional.breakdowns, 'component_breakdowns_all_reals');
-
 end
 

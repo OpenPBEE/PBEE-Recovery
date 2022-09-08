@@ -46,5 +46,9 @@ import recovery.functionality.fn_calculate_functionality
 [recovery.functional] =  fn_calculate_functionality( damage, damage_consequences, utilities,  ...
     building_model, subsystems, recovery.reoccupancy, functionality_options, tenant_units );
 
+% delete all the extra per-realization data
+recovery.reoccupancy.breakdowns = rmfield(recovery.reoccupancy.breakdowns, 'component_breakdowns_all_reals');
+recovery.functional.breakdowns = rmfield(recovery.functional.breakdowns, 'component_breakdowns_all_reals');
+
 end
 

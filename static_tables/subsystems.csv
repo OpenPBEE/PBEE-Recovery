@@ -1,4 +1,5 @@
 id,name,parallel_operation,redundancy_threshold,n1_redundancy
+0,null,0,0,0
 1,general building equipment,0,0,0
 2,motor control center,0,0,0
 3,utility backup equipment,0,0,0
