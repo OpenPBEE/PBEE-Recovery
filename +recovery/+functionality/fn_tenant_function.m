@@ -32,9 +32,6 @@ function [ recovery_day, comp_breakdowns ] = fn_tenant_function( damage, ...
 %   simulation of each components contributions to each of the fault tree events 
 
 %% Initial Setup
-% import packages
-import recovery.functionality.fn_redunant_component
-
 % Initialize Variables
 num_units = length(damage.tenant_units);
 [num_reals, num_comps] = size(damage.tenant_units{1}.qnt_damaged);
