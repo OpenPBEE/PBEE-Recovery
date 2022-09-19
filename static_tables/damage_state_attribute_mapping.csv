@@ -435,3 +435,7 @@ E2022\.01[0-3],Fragile content on shelves and desks,Object falls off shelf or sh
 E2022\.02[0-3],Electronic Equipment,"Falls, does not function.",1,NA,0,1,1,0,0,0,0,0,0,0,0,0,1,0,10,component,3,rapid,0,0,0,0,1,0.0625,0.0625,10
 E2022\.10[2-6][ab],Bookcase,Book case falls over and contents are scattered.  Likely damage to bookcase.,1,NA,0,1,1,0,0,0,0,1,0,0,0,0,1,0,50,component,3,rapid,0,0,0,0,1,0.125,0.125,10
 E2022\.1[12][245][ab],Filing Cabinent,Filing cabinet falls over and contents are scattered.  Likely damage to file cabinet.,1,NA,0,1,1,0,0,0,0,0,0,0,0,0,1,0,10,component,3,rapid,0,0,0,0,1,0.125,0.125,10
+C1011\.001a\.2,Partition Wall and Wall Finishes (metal studs),"Screw pop-out, cracking of wall board, warping or cracking of tape, slight crushing of wall panel at corners.",1,NA,0,1,10,0,0,0,0,0,0,0,0,0,0,0,0,NA,2,rapid,0,0,0,0,0,0,0,0
+C1011\.001a\.2,Partition Wall and Wall Finishes (metal studs),"Moderate cracking or crushing of gypsum wall boards (typically in corners).  Moderate corner gap openings, bending of boundary studs.",2,NA,0,1,10,0,0,0,0,0,0,0,0,0,0,0,0,NA,5,rapid,0,0,0,0,0,0,0,0
+C1011\.001a\.2,Partition Wall and Wall Finishes (metal studs),"Buckling of studs and tearing of tracks.  Tearing or bending of top track, tearing at corners with transverse walls, large gap openings, walls displaced.",3,NA,0,1,10,1,0,0,0,0,0,0,0,0,1,0,1,component,11,rapid,0,0,0,0,1,0.0625,0.0625,10
+C3011\.001a\.2,"Wall Partition, Type: Gypsum + Wallpaper",Wall paper warped and torn.,1,NA,0,1,3,0,0,0,0,0,0,0,0,0,0,0,0,NA,3,rapid,0,0,0,0,0,0,0,0
