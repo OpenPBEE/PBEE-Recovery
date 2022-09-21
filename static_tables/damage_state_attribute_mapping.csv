@@ -271,44 +271,44 @@ D1014\.02\w+,Hydraulic Elevators,"Damaged vane and hoist-way switches, and or be
 D1014\.02\w+,Hydraulic Elevators,"Damaged entrance and car door, and or flooring damage.",1,3,1,5,10,1,0,0,0,0,0,0,0,0,0,1,0,NA,2,rapid,0,1,0,0,0,0,0,0
 D1014\.02\w+,Hydraulic Elevators,"Oil leak in hydraulic line, and or hydraulic tank failure.",1,4,1,5,10,1,0,0,0,0,0,0,0,0,0,1,0,NA,2,rapid,0,0,0,0,0,0,0,0
 D2021\.01[12]b,"Cold Domestic Piping - Small diameter (brace only), SDC A-C",Lateral Brace Failure - 1 failure per 1000 feet of pipe.,1,NA,0,1,4,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,rapid,0,0,0,0,0,0,0,0
-D2021\.01[12]b,"Cold Domestic Piping - Small diameter (brace only), SDC A-C",Vertical Brace Failure - 1 failure per 1000 feet of pipe,2,NA,0,1,4,0,0,0,0,1,0,0,0,0,1,1,1,component,3,rapid,0,0,0,0,0,0,0,0
+D2021\.01[12]b,"Cold Domestic Piping - Small diameter (brace only), SDC A-C",Vertical Brace Failure - 1 failure per 1000 feet of pipe,2,NA,0,1,4,0,0,0,0,1,0,0,0,0,1,1,0.01,component,3,rapid,0,0,0,0,2,0.5,0.5,2
 D2021\.01[1234]a,Cold Domestic Piping - Small diameter (branches),Minor leakage at flange connections - 1 leak per 1000 feet of pipe.,1,NA,0,varies,varies,0,0,0,0,0,0,0,0,0,0,0,0,NA,3,rapid,0,0,0,0,0,0,0,0
-D2021\.01[1234]a,Cold Domestic Piping - Small diameter (branches),Pipe Break - 1 break per 1000 feet of pipe.,2,NA,0,varies,varies,1,0,0,0,1,0,0,0,0,1,1,1,component,5,rapid,0,0,0,0,0,0,0,0
+D2021\.01[1234]a,Cold Domestic Piping - Small diameter (branches),Pipe Break - 1 break per 1000 feet of pipe.,2,NA,0,varies,varies,1,0,0,0,1,0,0,0,0,1,1,0.01,component,5,rapid,0,0,0,0,2,0.5,0.5,2
 D2021\.01[34]b,"Cold Domestic Piping - Small diameter (brace only), SDC D+",Lateral Brace Failure - 1 failure per 1000 feet of pipe.,1,NA,0,3,10,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,rapid,0,0,0,0,0,0,0,0
 D2021\.02[1234]a,Cold Domestic Piping - Large diameter (mains),Minor leakage at flange connections - 1 leak per 1000 feet of pipe.,1,NA,0,5,10,0,0,0,0,0,0,0,0,0,0,0,0,NA,3,rapid,0,0,0,0,0,0,0,0
-D2021\.02[1234]a,Cold Domestic Piping - Large diameter (mains),Pipe Break - 1 break per 1000 feet of pipe.,2,NA,0,5,10,1,0,0,0,1,0,0,0,0,1,1,1,component,5,rapid,0,0,0,0,0,0,0,0
+D2021\.02[1234]a,Cold Domestic Piping - Large diameter (mains),Pipe Break - 1 break per 1000 feet of pipe.,2,NA,0,5,10,1,0,0,0,1,0,0,0,0,1,1,0.01,component,5,rapid,0,0,0,0,2,0.5,0.5,2
 D2021\.02[34]b,"Cold Domestic Piping - Large diameter (brace only), SDC D+",Lateral Brace Failure - 1 failure per 1000 feet of pipe.,1,NA,0,5,10,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,rapid,0,0,0,0,0,0,0,0
-D2021\.02[34]b,"Cold Domestic Piping - Large diameter (brace only), SDC D+",Vertical Brace Failure - 1 failure per 1000 feet of pipe,2,NA,0,5,10,0,0,0,0,1,0,0,0,0,1,1,1,component,3,rapid,0,0,0,0,0,0,0,0
+D2021\.02[34]b,"Cold Domestic Piping - Large diameter (brace only), SDC D+",Vertical Brace Failure - 1 failure per 1000 feet of pipe,2,NA,0,5,10,0,0,0,0,1,0,0,0,0,1,1,0.01,component,3,rapid,0,0,0,0,2,0.5,0.5,2
 D2022\.01[12]b,"Hot Domestic Piping - Small diameter (bracing), SDC A-C",Isolated support failure w/o leakage - 0.5 support failures per 1000 feet of pipe (assuming supports every 20 feet).,1,NA,0,1,4,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,rapid,0,0,0,0,0,0,0,0
-D2022\.01[12]b,"Hot Domestic Piping - Small diameter (bracing), SDC A-C",Multiple supports failure and 60 feet of pipe fail per 1000 feet of pipe (assuming supports every 20 feet).,2,NA,0,1,4,0,0,0,0,1,0,0,0,0,1,1,1,component,3,rapid,0,0,0,0,0,0,0,0
+D2022\.01[12]b,"Hot Domestic Piping - Small diameter (bracing), SDC A-C",Multiple supports failure and 60 feet of pipe fail per 1000 feet of pipe (assuming supports every 20 feet).,2,NA,0,1,4,0,0,0,0,1,0,0,0,0,1,1,0.03,component,3,rapid,0,0,0,0,2,0.5,0.5,3
 D2022\.01[1234]a,Hot Domestic Piping - Small diameter (branches),Small Leakage at joints - 1 leak per 1000 feet of pipe.,1,NA,0,varies,varies,0,0,0,0,0,0,0,0,0,0,0,0,NA,3,rapid,0,0,0,0,0,0,0,0
-D2022\.01[1234]a,Hot Domestic Piping - Small diameter (branches),Large Leakage w/ major repair - 1 leak per 1000 feet of pipe.,2,NA,0,varies,varies,1,0,0,0,1,0,0,0,0,1,1,1,component,5,rapid,0,0,0,0,0,0,0,0
+D2022\.01[1234]a,Hot Domestic Piping - Small diameter (branches),Large Leakage w/ major repair - 1 leak per 1000 feet of pipe.,2,NA,0,varies,varies,1,0,0,0,1,0,0,0,0,1,1,0.01,component,5,rapid,0,0,0,0,2,0.5,0.5,2
 D2022\.01[34]b,"Hot Domestic Piping - Small diameter (bracing), SDC D+",Isolated support failure w/o leakage - 0.5 support failures per 1000 feet of pipe (assuming supports every 20 feet).,1,NA,0,3,10,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,rapid,0,0,0,0,0,0,0,0
 D2022\.02[1234]a,Hot Domestic Piping - Large diameter (mains),Minor leakage at flange connections - 1 leak per 1000 feet of pipe.,1,NA,0,5,10,0,0,0,0,0,0,0,0,0,0,0,0,NA,3,rapid,0,0,0,0,0,0,0,0
-D2022\.02[1234]a,Hot Domestic Piping - Large diameter (mains),Pipe Break - 1 break per 1000 feet of pipe.,2,NA,0,5,10,1,0,0,0,1,0,0,0,0,1,1,1,component,5,rapid,0,0,0,0,0,0,0,0
+D2022\.02[1234]a,Hot Domestic Piping - Large diameter (mains),Pipe Break - 1 break per 1000 feet of pipe.,2,NA,0,5,10,1,0,0,0,1,0,0,0,0,1,1,0.01,component,5,rapid,0,0,0,0,2,0.5,0.5,2
 D2022\.02[1234]b,Hot Domestic Piping - Large diameter (bracing),Lateral Brace Failure - 1 failure per 1000 foot of pipe.,1,NA,0,5,10,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,rapid,0,0,0,0,0,0,0,0
-D2022\.02[1234]b,Hot Domestic Piping - Large diameter (bracing),Vertical Brace Failure - 1 failure per 1000 feet of pipe.,2,NA,0,5,10,0,0,0,0,1,0,0,0,0,1,1,1,component,3,rapid,0,0,0,0,0,0,0,0
+D2022\.02[1234]b,Hot Domestic Piping - Large diameter (bracing),Vertical Brace Failure - 1 failure per 1000 feet of pipe.,2,NA,0,5,10,0,0,0,0,1,0,0,0,0,1,1,0.01,component,3,rapid,0,0,0,0,2,0.5,0.5,2
 D2031.0[12][34]b,Sanitary Waste Bracing SDC D+,Isolated support failure w/o leakage - 0.5 support failures per 1000 feet of pipe (assuming supports every 20 feet).,1,NA,0,5,10,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,rapid,0,0,0,0,0,0,0,0
 D2031\.0[12][12]b,Sanitary Waste Bracing SDC A-C,Isolated support failure w/o leakage - 0.5 support failures per 1000 feet of pipe (assuming supports every 20 feet).,1,NA,0,5,10,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,rapid,0,0,0,0,0,0,0,0
-D2031\.0[12][12]b,Sanitary Waste Bracing SDC A-C,Multiple supports failure and    60 feet of pipe fail per 1000 feet of pipe (assuming supports every 20 feet).,2,NA,0,5,10,1,0,0,0,0,0,0,0,0,0,1,0,NA,5,rapid,0,0,0,0,0,0,0,0
-D2031\.02[1234]a,Sanitary Waste Piping,Joints break - 1 break per 1000 feet of pipe.,1,NA,0,5,10,1,0,0,0,0,0,0,0,0,0,1,0,NA,5,rapid,0,0,0,0,0,0,0,0
+D2031\.0[12][12]b,Sanitary Waste Bracing SDC A-C,Multiple supports failure and    60 feet of pipe fail per 1000 feet of pipe (assuming supports every 20 feet).,2,NA,0,5,10,1,0,0,0,1,0,0,0,0,1,1,0.03,component,5,rapid,0,0,0,0,2,0.5,0.5,3
+D2031\.02[1234]a,Sanitary Waste Piping,Joints break - 1 break per 1000 feet of pipe.,1,NA,0,5,10,1,0,0,0,1,0,0,0,0,1,1,0.01,component,5,rapid,0,0,0,0,2,0.5,0.5,2
 D2051\.0[12][1234]a,Chilled Piping,Small/minor leakage,1,NA,0,5,10,0,0,0,0,0,0,0,0,0,0,0,0,NA,3,rapid,0,0,0,0,0,0,0,0
-D2051\.0[12][1234]a,Chilled Piping,Large leak/pipe break,2,NA,0,5,10,1,0,0,0,1,0,0,0,0,1,1,1,component,5,rapid,0,0,0,0,0,0,0,0
+D2051\.0[12][1234]a,Chilled Piping,Large leak/pipe break,2,NA,0,5,10,1,0,0,0,1,0,0,0,0,1,1,0.01,component,5,rapid,0,0,0,0,2,0.5,0.5,2
 D2051\.01[12]b,"Chilled Water Piping, Small Diameter (Bracing) SDC A-C",Isolated support failure w/o leakage - 0.5 support failures per 1000 feet of pipe (assuming supports every 20 feet).,1,NA,0,5,10,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,rapid,0,0,0,0,0,0,0,0
-D2051\.01[12]b,"Chilled Water Piping, Small Diameter (Bracing) SDC A-C",Multiple supports failure and 60 feet of pipe fail per 1000 feet of pipe (assuming supports every 20 feet).,2,NA,0,5,10,0,0,0,0,1,0,0,0,0,1,1,1,component,3,rapid,0,0,0,0,0,0,0,0
+D2051\.01[12]b,"Chilled Water Piping, Small Diameter (Bracing) SDC A-C",Multiple supports failure and 60 feet of pipe fail per 1000 feet of pipe (assuming supports every 20 feet).,2,NA,0,5,10,0,0,0,0,1,0,0,0,0,1,1,0.03,component,3,rapid,0,0,0,0,2,0.5,0.5,3
 D2051\.01[34]b,"Chilled Water Piping, Small Diameter (Bracing) SDC D+",Isolated support failure w/o leakage - 0.5 support failures per 1000 feet of pipe (assuming supports every 20 feet).,1,NA,0,5,10,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,rapid,0,0,0,0,0,0,0,0
-D2051\.02[12]b,"Chilled Water Piping, Large Diameter (Bracing) SDC A-C",Vertical Brace Failure - 1 failure per 1000 feet of pipe.,1,NA,0,5,10,0,0,0,0,1,0,0,0,0,1,1,1,component,3,rapid,0,0,0,0,0,0,0,0
+D2051\.02[12]b,"Chilled Water Piping, Large Diameter (Bracing) SDC A-C",Vertical Brace Failure - 1 failure per 1000 feet of pipe.,1,NA,0,5,10,0,0,0,0,1,0,0,0,0,1,1,0.01,component,3,rapid,0,0,0,0,2,0.5,0.5,2
 D2051\.02[34]b,"Chilled Water Piping, Large Diameter (Bracing) SDC D+",Lateral brace failure,1,NA,0,5,10,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,rapid,0,0,0,0,0,0,0,0
-D2051\.02[34]b,"Chilled Water Piping, Large Diameter (Bracing) SDC D+",Vertical Brace Failure - 1 failure per 1000 feet of pipe.,2,NA,0,5,10,0,0,0,0,1,0,0,0,0,1,1,1,component,3,rapid,0,0,0,0,0,0,0,0
+D2051\.02[34]b,"Chilled Water Piping, Large Diameter (Bracing) SDC D+",Vertical Brace Failure - 1 failure per 1000 feet of pipe.,2,NA,0,5,10,0,0,0,0,1,0,0,0,0,1,1,0.01,component,3,rapid,0,0,0,0,2,0.5,0.5,2
 D2061\.01[12]b,Steam Piping - Small diameter (Bracing) SDC A-C,Isolated support failure w/o leakage - 0.5 support failures per 1000 feet of pipe (assuming supports every 20 feet).,1,NA,0,5,10,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,rapid,0,0,0,0,0,0,0,0
-D2061\.01[12]b,Steam Piping - Small diameter (Bracing) SDC A-C,Multiple supports failure and 60 feet of pipe fail per 1000 feet of pipe (assuming supports every 20 feet).,2,NA,0,5,10,0,0,0,0,1,0,0,0,0,1,1,1,component,3,rapid,0,0,0,0,0,0,0,0
+D2061\.01[12]b,Steam Piping - Small diameter (Bracing) SDC A-C,Multiple supports failure and 60 feet of pipe fail per 1000 feet of pipe (assuming supports every 20 feet).,2,NA,0,5,10,0,0,0,0,1,0,0,0,0,1,1,0.03,component,3,rapid,0,0,0,0,2,0.5,0.5,3
 D2061\.01[1234]a,Steam Piping - Small diameter (branches),Small Leakage at joints - 1 leak per 1000 feet of pipe.,1,NA,0,5,10,0,0,0,0,0,0,0,0,0,0,0,0,NA,3,rapid,0,0,0,0,0,0,0,0
-D2061\.01[1234]a,Steam Piping - Small diameter (branches),Large Leakage w/ major repair - 1 leak per 1000 feet of pipe.,2,NA,0,5,10,1,0,0,0,1,0,0,0,0,1,1,1,component,5,rapid,0,0,0,0,0,0,0,0
+D2061\.01[1234]a,Steam Piping - Small diameter (branches),Large Leakage w/ major repair - 1 leak per 1000 feet of pipe.,2,NA,0,5,10,1,0,0,0,1,0,0,0,0,1,1,0.01,component,5,rapid,0,0,0,0,2,0.5,0.5,2
 D2061\.01[34]b,Steam Piping - Small diameter (Bracing) SDC D+,Isolated support failure w/o leakage - 0.5 support failures per 1000 feet of pipe (assuming supports every 20 feet).,1,NA,0,5,10,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,rapid,0,0,0,0,0,0,0,0
 D2061\.02[1234]a,Steam Piping - Large diameter (mains),Minor leakage at flange connections - 1 leak per 1000 feet of pipe.,1,NA,0,5,10,0,0,0,0,0,0,0,0,0,0,0,0,NA,3,rapid,0,0,0,0,0,0,0,0
-D2061\.02[1234]a,Steam Piping - Large diameter (mains),Pipe Break - 1 break per 1000 feet of pipe.,2,NA,0,5,10,1,0,0,0,1,0,0,0,0,1,1,1,component,5,rapid,0,0,0,0,0,0,0,0
+D2061\.02[1234]a,Steam Piping - Large diameter (mains),Pipe Break - 1 break per 1000 feet of pipe.,2,NA,0,5,10,1,0,0,0,1,0,0,0,0,1,1,0.01,component,5,rapid,0,0,0,0,2,0.5,0.5,2
 D2061\.02[34]b,Steam Piping - Large diameter (bracing) SDC D+,Lateral Brace Failure - 1 failure per 1000 feet of pipe.,1,NA,0,5,10,0,0,0,0,0,0,0,0,0,0,1,0,NA,3,rapid,0,0,0,0,0,0,0,0
-D2061\.02[34]b,Steam Piping - Large diameter (bracing) SDC D+,Vertical Brace Failure - 1 failure per 1000 feet of pipe,2,NA,0,5,10,0,0,0,0,1,0,0,0,0,1,1,1,component,3,rapid,0,0,0,0,0,0,0,0
+D2061\.02[34]b,Steam Piping - Large diameter (bracing) SDC D+,Vertical Brace Failure - 1 failure per 1000 feet of pipe,2,NA,0,5,10,0,0,0,0,1,0,0,0,0,1,1,0.01,component,3,rapid,0,0,0,0,2,0.5,0.5,2
 D3031\.014[abcd],Chiller Equipment,"Damaged, inoperative, repairable.",1,1,0,1,5,1,0,0,0,0,0,0,0,0,0,1,0,NA,3,rapid,0,0,0,0,0,0,0,0
 D3031\.014[abcd],Chiller Equipment,Damaged to the extent requiring offsite repair.,1,2,0,1,5,1,0,0,0,0,0,0,0,0,0,1,0,NA,3,rapid,0,1,0,0,0,0,0,0
 D3031\.01(1[abcd]|[23][behk]),Chiller Equipment,Inoperative equipment,1,NA,0,1,5,1,0,0,0,0,0,0,0,0,0,1,0,NA,3,rapid,0,1,0,0,0,0,0,0
@@ -333,9 +333,9 @@ D3032\.01[23][cfil],Compressor Equip and Anchorage Combo,Anchorage failure.,1,1,
 D3032\.01[23][cfil],Compressor Equip and Anchorage Combo,Anchorage failure & Equipment damaged beyond repair.,1,2,0,1,5,1,0,0,0,0,0,0,0,0,0,1,0,NA,3,rapid,0,1,0,0,0,0,0,0
 D3032\.01[23][cfil],Compressor Equip and Anchorage Combo,Motor damaged but anchorage is OK.,1,3,0,1,5,1,0,0,0,0,0,0,0,0,0,1,0,NA,3,rapid,0,0,0,0,0,0,0,0
 D3032\.01[23][cfil],Compressor Equip and Anchorage Combo,Equipment damaged beyond repair but anchorage is OK.,1,4,0,1,5,1,0,0,0,0,0,0,0,0,0,1,0,NA,3,rapid,0,1,0,0,0,0,0,0
-D3041\.0[12]1[abcd],Air distribution systems: Ducting less than 6 sq ft (branches),Individual supports fail and duct sags - 1 failed support per 1000 feet of ducting.,1,NA,0,1,5,0,0,0,0,0,0,0,0,0,0,0,0,NA,3,rapid,0,0,0,0,3,0.5,0.5,2
+D3041\.0[12]1[abcd],Air distribution systems: Ducting less than 6 sq ft (branches),Individual supports fail and duct sags - 1 failed support per 1000 feet of ducting.,1,NA,0,1,5,0,0,0,0,0,0,0,0,0,0,0,0,NA,3,rapid,0,0,0,0,0,0,0,0
 D3041\.0[12]1[abcd],Air distribution systems: Ducting less than 6 sq ft (branches),Several adjacent supports fail and sections of ducting fall - 60 feet of ducting fail and fall per 1000 foot of ducting.,2,NA,0,1,5,1,0,0,0,1,0,0,0,0,1,1,0.1,component,5,rapid,0,0,0,0,3,1,1,2
-D3041\.0[12]2[abcd],Air distribution systems: Ducting greater than 6 sq ft (mains),Individual supports fail and duct sags - 1 failed support per 1000 feet of ducting.,1,NA,0,1,5,0,0,0,0,0,0,0,0,0,0,0,0,NA,3,rapid,0,0,0,0,3,0.5,0.5,2
+D3041\.0[12]2[abcd],Air distribution systems: Ducting greater than 6 sq ft (mains),Individual supports fail and duct sags - 1 failed support per 1000 feet of ducting.,1,NA,0,1,5,0,0,0,0,0,0,0,0,0,0,0,0,NA,3,rapid,0,0,0,0,0,0,0,0
 D3041\.0[12]2[abcd],Air distribution systems: Ducting greater than 6 sq ft (mains),Several adjacent supports fail and sections of ducting fall - 60 feet of ducting fail and fall per 1000 foot of ducting.,2,NA,0,1,5,1,0,0,0,1,0,0,0,0,1,1,0.1,component,5,rapid,0,0,0,0,3,1,1,2
 D3041\.001[abcd],Air distribution systems: HVAC Fan with vibration isolator,Bellows fails at fans.,1,NA,0,1,5,1,0,0,0,0,0,0,0,0,0,1,0,NA,3,rapid,0,0,0,0,0,0,0,0
 D3041\.001[abcd],Air distribution systems: HVAC Fan with vibration isolator,Fan dislodges from isolators and drops.,2,NA,0,1,5,1,0,0,0,0,0,0,0,0,0,1,0,NA,5,rapid,0,0,0,0,0,0,0,0
@@ -366,7 +366,7 @@ D3067\.012c,HVAC Control Panel Equipment Anchorage Combined,"Damaged, Inoperativ
 D4011\.0(3[12]a|[4567]\w+),Fire Sprinkler Water Supply: Fire sprinkler drop 2 DS,Spraying & Dripping Leakage at drop joints - 0.01 leaks per drop.,1,NA,0,2,5,0,0,0,0,0,0,0,0,0,0,0,0,NA,3,rapid,0,0,0,0,0,0,0,0
 D4011\.0(3[12]a|[4567]\w+),Fire Sprinkler Water Supply: Fire sprinkler drop 2 DS,Drop Joints Break - Major Leakage - 0.01 breaks per drop.,2,NA,0,2,5,1,0,0,0,0,0,0,0,0,0,1,0,NA,5,rapid,0,0,0,0,0,0,0,0
 D4011\.02\w+,Fire Sprinkler Water Supply: Piping and Pipe Bracing,Spraying & Dripping Leakage at joints - 0.02 leaks per 20 ft section of pipe.,1,NA,0,3,10,0,0,0,0,0,0,0,0,0,0,0,0,NA,3,rapid,0,0,0,0,0,0,0,0
-D4011\.02\w+,Fire Sprinkler Water Supply: Piping and Pipe Bracing,Joints Break - Major Leakage - 0.02 breaks per 20 ft section of pipe.,2,NA,0,3,10,1,0,0,0,1,0,0,0,0,1,1,1,component,5,rapid,0,0,0,0,0,0,0,0
+D4011\.02\w+,Fire Sprinkler Water Supply: Piping and Pipe Bracing,Joints Break - Major Leakage - 0.02 breaks per 20 ft section of pipe.,2,NA,0,3,10,1,0,0,0,1,0,0,0,0,1,1,0.01,component,5,rapid,0,0,0,0,2,0.5,0.5,2
 D4011\.03[34]a,Fire Sprinkler Drop,Spraying & Dripping Leakage at drop joints - 0.01 leaks per drop.,1,NA,0,2,5,0,0,0,0,0,0,0,0,0,0,0,0,NA,5,rapid,0,0,0,0,0,0,0,0
 D5011\.01(1[abcd]|3[behk]),Transformer Equipment,"Damaged - Service and repair existing transformer. Transformer tower removed, repaired offsite, and reinstalled.",1,NA,0,1,5,1,0,0,0,0,0,0,0,0,0,1,0,NA,3,rapid,0,0,0,0,0,0,0,0
 D5011\.013[adgj],Transformer Anchorage,Anchorage failure.,1,1,0,1,5,1,0,0,0,0,0,0,0,0,0,0,0,NA,3,rapid,0,0,0,0,0,0,0,0
