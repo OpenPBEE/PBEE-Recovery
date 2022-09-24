@@ -165,8 +165,7 @@ for c = 1:height(comp_ds_table) % for each comp ds
         tmp_worker_days_per_unit(:,c) = ...
             interp1([comp.tmp_repair_time_lower_qnty, comp.tmp_repair_time_upper_qnty],...
                     [comp.tmp_repair_time_lower,comp.tmp_repair_time_upper],...
-                    min(max(total_damaged_all_ds,comp.tmp_repair_time_lower_qnty),comp.tmp_repair_time_upper_qnty));
-            
+                    min(max(total_damaged_all_ds,comp.tmp_repair_time_lower_qnty),comp.tmp_repair_time_upper_qnty)); 
     else
         tmp_worker_days_per_unit(:,c) = NaN(size(total_damaged(:,1)));
     end

@@ -16,10 +16,10 @@ clc
 rehash
 
 %% Define User Inputs
-model_name = 'ICSB'; % Name of the model;
+model_name = '16-story_RCSW_475yr_Example'; % Name of the model;
                      % inputs are expected to be in a directory with this name
                      % outputs will save to a directory with this name
-model_dir = ['inputs' filesep 'example_inputs']; % Directory where the simulated inputs are located
+model_dir = ['inputs']; % Directory where the simulated inputs are located
 outputs_dir = ['outputs' filesep model_name]; % Directory where the assessment outputs are saved
 
 %% Load FEMA P-58 performance model data and simulated damage and loss

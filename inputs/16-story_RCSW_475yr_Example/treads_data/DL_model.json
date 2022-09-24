@@ -1,0 +1,450 @@
+{
+	"GeneralInformation": {
+        "depth": 455,
+        "height": 160,
+        "location": {
+            "latitude": 47.6,
+            "longitude": -123.3
+        },
+        "name": "",
+        "planArea": 206800,
+        "NumberofStories": 16,
+        "units": {
+            "force": "N",
+            "length": "ft",
+            "temperature": "C",
+            "time": "sec"
+        },
+        "width": 455
+    },
+	"DamageAndLoss": {
+        "CollapseModes": [
+            {
+                "affected_area": "1.0",
+                "injuries": "0.5, 0.5",
+                "name": "complete",
+                "weight": "1.0"
+            }
+        ],
+        "ComponentDataFolder": "Fragility Groups",
+        "Components": {
+            "B1044.101": [
+                {
+                    "cov": "",
+                    "direction": "1",
+                    "distribution": "N/A",
+                    "location": "101-104 , 1-6",
+                    "median_quantity": "299.5",
+                    "unit": "ft2"
+                }
+            ],
+            "B1044.101b": [
+                {
+                    "cov": "",
+                    "direction": "1",
+                    "distribution": "N/A",
+                    "location": "7-12",
+                    "median_quantity": "279.4",
+                    "unit": "ft2"
+                }
+            ],
+            "B1044.101.2": [
+                {
+                    "cov": "",
+                    "direction": "2",
+                    "distribution": "N/A",
+                    "location": "101-104 ,1-6",
+                    "median_quantity": "299.5",
+                    "unit": "ft2"
+                }
+            ],
+            "B1044.101.2b": [
+                {
+                    "cov": "",
+                    "direction": "2",
+                    "distribution": "N/A",
+                    "location": "7-12",
+                    "median_quantity": "279.4",
+                    "unit": "ft2"
+                }
+            ],
+            "B1049.012": [
+                {
+                    "cov": "",
+                    "direction": "1",
+                    "distribution": "N/A",
+                    "location": "1-12, 101-104",
+                    "median_quantity": "1,1,1,1,1,1,1,1,1,1,1,1",
+                    "unit": "ea"
+                }
+            ],
+            "D1014.011": [
+                {
+                    "cov": "",
+                    "direction": "1",
+                    "distribution": "N/A",
+                    "location": "104",
+                    "median_quantity": "1,1",
+                    "unit": "ea"
+                }
+            ],
+            "C1011.001a": [
+                {
+                    "cov": "",
+                    "direction": "1",
+                    "distribution": "N/A",
+                    "location": "1-12",
+                    "median_quantity": "100, 100, 100, 100, 100, 100",
+                    "unit": "ft"
+                }
+            ],
+            "C1011.001a.2": [
+                {
+                    "cov": "",
+                    "direction": "2",
+                    "distribution": "N/A",
+                    "location": "1-12",
+                    "median_quantity": "100, 100, 100, 100, 100, 100",
+                    "unit": "ft"
+                }
+            ],
+            "C3011.001a": [
+                {
+                    "cov": "",
+                    "direction": "1",
+                    "distribution": "N/A",
+                    "location": "1-12",
+                    "median_quantity": "31.83, 31.83, 31.83, 31.83, 31.83, 31.83",
+                    "unit": "ft"
+                }
+            ],          
+            "C3011.001a.2": [
+                {
+                    "cov": "",
+                    "direction": "2",
+                    "distribution": "N/A",
+                    "location": "1-12",
+                    "median_quantity": "31.83, 31.83, 31.83, 31.83, 31.83, 31.83",
+                    "unit": "ft"
+                }
+            ],          
+            "D3041.001c": [
+                {
+                    "cov": "",
+                    "direction": "1",
+                    "distribution": "N/A",
+                    "location": "1-12",
+                    "median_quantity": "1,1,1,1",
+                    "unit": "ea"
+                }
+            ],          
+            "D5012.023b": [
+                {
+                    "cov": "",
+                    "direction": "1",
+                    "distribution": "N/A",
+                    "location": "1-12",
+                    "median_quantity": "1",
+                    "unit": "ea"
+                }
+            ],            
+            "D2022.023a": [
+                {
+                    "cov": "",
+                    "direction": "1",
+                    "distribution": "N/A",
+                    "location": "1-12",
+                    "median_quantity": "56",
+                    "unit": "ft"
+                }
+            ],           
+            "D2022.023b": [
+                {
+                    "cov": "",
+                    "direction": "1",
+                    "distribution": "N/A",
+                    "location": "1-12",
+                    "median_quantity": "56",
+                    "unit": "ft"
+                }
+            ], 
+            "D2021.023a": [
+                {
+                    "cov": "",
+                    "direction": "1",
+                    "distribution": "N/A",
+                    "location": "1-12",
+                    "median_quantity": "75",
+                    "unit": "ft"
+                }
+            ],           
+            "D2021.023b": [
+                {
+                    "cov": "",
+                    "direction": "1",
+                    "distribution": "N/A",
+                    "location": "1-12",
+                    "median_quantity": "75",
+                    "unit": "ft"
+                }
+            ],
+            "C3032.003a": [
+                {
+                    "cov": "",
+                    "direction": "1",
+                    "distribution": "N/A",
+                    "location": "1",
+                    "median_quantity": "1000",
+                    "unit": "ft2"
+                }
+            ], 
+            "D3041.041b": [
+                {
+                    "cov": "",
+                    "direction": "1",
+                    "distribution": "N/A",
+                    "location": "1-12",
+                    "median_quantity": "1,1,1,1",
+                    "unit": "ea"
+                }
+            ],            
+            "D2022.013a": [
+                {
+                    "cov": "",
+                    "direction": "1",
+                    "distribution": "N/A",
+                    "location": "1-12",
+                    "median_quantity": "1550",
+                    "unit": "ft"
+                }
+            ],            
+            "D2022.013b": [
+                {
+                    "cov": "",
+                    "direction": "1",
+                    "distribution": "N/A",
+                    "location": "1-12",
+                    "median_quantity": "1550",
+                    "unit": "ft"
+                }
+            ],            
+            "D2031.023a": [
+                {
+                    "cov": "",
+                    "direction": "1",
+                    "distribution": "N/A",
+                    "location": "1-12",
+                    "median_quantity": "1340",
+                    "unit": "ft"
+                }
+            ],             
+            "D2031.023b": [
+                {
+                    "cov": "",
+                    "direction": "1",
+                    "distribution": "N/A",
+                    "location": "1-12",
+                    "median_quantity": "1340",
+                    "unit": "ft"
+                }
+            ],            
+            "D3041.011c": [
+                {
+                    "cov": "",
+                    "direction": "1",
+                    "distribution": "N/A",
+                    "location": "1-12",
+                    "median_quantity": "500",
+                    "unit": "ft"
+                }
+            ], 
+            "D3041.032c": [
+                {
+                    "cov": "",
+                    "direction": "1",
+                    "distribution": "N/A",
+                    "location": "1-12",
+                    "median_quantity": "10,10,10,10,10,10,10,10",
+                    "unit": "ea"
+                }
+            ],             
+            "D4011.023a": [
+                {
+                    "cov": "",
+                    "direction": "1",
+                    "distribution": "N/A",
+                    "location": "1-12",
+                    "median_quantity": "2200",
+                    "unit": "ft"
+                }
+            ],             
+            "D4011.023ab": [
+                {
+                    "cov": "",
+                    "direction": "1",
+                    "distribution": "N/A",
+                    "location": "101-104",
+                    "median_quantity": "5630",
+                    "unit": "ft"
+                }
+            ],                        
+            "D4011.053a": [
+                {
+                    "cov": "",
+                    "direction": "1",
+                    "distribution": "N/A",
+                    "location": "1-12",
+                    "median_quantity": "1200",
+                    "unit": "ft"
+                }
+            ],     
+            "D4011.053ab": [
+                {
+                    "cov": "",
+                    "direction": "1",
+                    "distribution": "N/A",
+                    "location": "101-104",
+                    "median_quantity": "3070",
+                    "unit": "ft"
+                }
+            ],     
+            "C2011.001a": [
+                {
+                    "cov": "",
+                    "direction": "1",
+                    "distribution": "N/A",
+                    "location": "101-104, 1-12",
+                    "median_quantity": "1,1",
+                    "unit": "ea"
+                }
+            ],      
+            "C2011.001a.2": [
+                {
+                    "cov": "",
+                    "direction": "2",
+                    "distribution": "N/A",
+                    "location": "101-104, 1-12",
+                    "median_quantity": "1,1",
+                    "unit": "ea"
+                }
+            ],   
+            "D3031.023i": [
+                {
+                    "cov": "",
+                    "direction": "1",
+                    "distribution": "N/A",
+                    "location": "12",
+                    "median_quantity": "1",
+                    "unit": "ea"
+                }
+            ],    
+            "D3052.013i": [
+                {
+                    "cov": "",
+                    "direction": "1",
+                    "distribution": "N/A",
+                    "location": "12",
+                    "median_quantity": "1",
+                    "unit": "ea"
+                }
+            ],     
+            "D3031.013f": [
+                {
+                    "cov": "",
+                    "direction": "1",
+                    "distribution": "N/A",
+                    "location": "12",
+                    "median_quantity": "1",
+                    "unit": "ea"
+                }
+            ],          
+            "B2022.201_ud": [
+                {
+                    "cov": "",
+                    "direction": "1",
+                    "distribution": "N/A",
+                    "location": "1-12",
+                    "median_quantity": "335,335,335,335,335,335",
+                    "unit": "ft2"
+                }
+            ],            
+            "B2022.201_ud.2": [
+                {
+                    "cov": "",
+                    "direction": "2",
+                    "distribution": "N/A",
+                    "location": "1-12",
+                    "median_quantity": "335,335,335,335,335,335",
+                    "unit": "ft2"
+                }
+            ],
+            "D1014.011_ridr": [
+                {
+                    "cov": "",
+                    "direction": "1",
+                    "distribution": "N/A",
+                    "location": "104",
+                    "median_quantity": "1,1",
+                    "unit": "ea"
+                }
+            ]                                            
+        },
+        "DamageModel": {
+            "CollapseLimits": {
+                "PFA": "",
+                "PID": "",
+                "RID": ""
+            },
+            "CollapseProbability": {
+                "Value": "0.0"
+            },
+            "IrreparableResidualDrift": {
+                "Beta": "0.3",
+                "Median": "0.01",
+                "YieldDriftRatio": "0.005"
+            }
+        },
+        "Dependencies": {
+            "CostAndTime": false,
+            "Fragilities": "per ATC recommendation",
+            "Injuries": "Independent",
+            "InjurySeverities": false,
+            "Quantities": "Independent",
+            "ReconstructionCosts": "Independent",
+            "ReconstructionTimes": "Independent",
+            "RedTagProbabilities": "Independent"
+        },
+        "LossModel": {
+            "DecisionVariables": {
+                "Injuries": false,
+                "ReconstructionCost": true,
+                "ReconstructionTime": true,
+                "RedTag": false
+            },
+            "Inhabitants": {
+                "OccupancyType": "Multi-Unit Residential",
+                "PeakPopulation": ""
+            },
+            "ReplacementCost": "47564000",
+            "ReplacementTime": "2240"
+        },
+        "ResponseModel": {
+            "AdditionalUncertainty": {
+                "GroundMotion": "",
+                "Modeling": "0.35"
+            },
+            "DetectionLimits": {
+                "PFA": "",
+                "PID": ""
+            },
+            "ResponseDescription": {
+                "BasisOfEDP_Distribution": "all results",
+                "CoupledAssessment": false,
+                "EDPDataFile": "EDP_475.csv",
+                "EDP_Distribution": "lognormal",
+                "Realizations": "1000"
+            }
+        },
+        "_method": "FEMA P58"
+    }
+}

@@ -77,8 +77,8 @@ for tu = 1:num_stories
     % damage, although its assigned to specific components. It would be
     % better to add utilities to the damage matrix
     if fs_exists % only do this if the building has a fire suppression system
-        repair_complete_day(:,damage.fnc_filters.fire_building) = system_operation_day.building.fire;
-        damaged_comps(:,damage.fnc_filters.fire_building) = system_operation_day.building.fire > 0;
+        repair_complete_day(:,damage.fnc_filters.fire_building) = system_operation_day.building.fire .* ones(1,sum(damage.fnc_filters.fire_building));
+        damaged_comps(:,damage.fnc_filters.fire_building) = (system_operation_day.building.fire > 0) .* ones(1,sum(damage.fnc_filters.fire_building));
         fire_access_day = zeros(num_reals,1); % day story becomes accessible from repair of fire suppression system
     end
 

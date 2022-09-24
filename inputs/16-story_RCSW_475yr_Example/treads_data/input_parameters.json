@@ -1,0 +1,63 @@
+{
+    "elevator_quantity": 2,
+    "facade_quantity_eq": 804.0,
+    "financing_coeff": [
+        0.16,
+        0.72,
+        0.12
+    ],
+    "floor_area": [
+        10000,
+        10000,
+        10000,
+        10000,
+        10000,
+        10000,
+        10000,
+        10000,
+        10000,
+        10000,
+        10000,
+        10000,
+        10000,
+        10000,
+        10000,
+        10000
+    ],
+    "max_number_workers": [
+        15,
+        15,
+        15,
+        9,
+        9,
+        6,
+        6
+    ],
+    "repair_phases": [
+        3,
+        3,
+        3,
+        3,
+        4
+    ],
+    "stabilization": {
+        "limit_facade": [
+            20,
+            100
+        ],
+        "limit_structural": [
+            3,
+            7
+        ],
+        "time_facade": [
+            0.1429,
+            0.076
+        ],
+        "time_structural": [
+            6,
+            4
+        ]
+    },
+    "time_story_reconstruction": 14,
+    "total_cost": 47564000
+}
