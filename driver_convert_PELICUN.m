@@ -26,7 +26,13 @@ close all
 clc
 rehash
 
-%% Set additional Assumptions not provided by TREADS or PELICUN
+%% Define Inputs
+model_name = '16-story_RCSW_475yr_Example'; % Name of the model;
+                     % inputs are expected to be in a directory with this name
+                     % outputs will save to a directory with this name
+model_dir = ['inputs' filesep model_name]; % Directory where the simulated inputs are located
+
+% Set additional Assumptions not provided by TREADS or PELICUN
 ht_per_story_ft = 10*ones(16,1);
 edge_lengths = 100*ones(16,2);
 struct_bay_area_per_story = 33*33*ones(16,1);
@@ -36,12 +42,7 @@ num_ag_levels = 12;
 num_entry_doors = 2; % int, number of entry/exit doors for the building
 
 %% Load Data
-model_name = '16-story_RCSW_475yr_Example'; % Name of the model;
-                     % inputs are expected to be in a directory with this name
-                     % outputs will save to a directory with this name
-model_dir = ['inputs' filesep model_name]; % Directory where the simulated inputs are located
-
-% Treads and Pelicun data
+% Treads data
 fileID = fopen([model_dir filesep 'treads_data' filesep 'input_parameters.json'],'r');
 input_parameters = jsondecode(fscanf(fileID,'%s'));
 fclose(fileID);
@@ -53,6 +54,7 @@ comps = DL_model.DamageAndLoss.Components;
 
 IF_delays = readtable([model_dir filesep 'treads_data' filesep 'IF_delays.csv']);
 
+% Pelicun Outputs
 DV_rec_cost_agg = readtable([model_dir filesep 'pelicun_results' filesep 'DV_rec_cost_agg.csv']);
 sim_repair_cost = sum(str2double(DV_rec_cost_agg{2:end,2:end}),2);
 
