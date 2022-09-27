@@ -19,7 +19,8 @@ if ~exist(plot_dir,'dir')
     mkdir(plot_dir)
 end
 
-perform_targ_labs = {'Immediately', '>3 Days', '>7 Days', '>2 Weeks', '>1 Month', '>6 Months', '>1 Year'};
+perform_targ_labs = {'Immediately', '>3 Days', '>7 Days', '>2 Weeks', '>1 Month', '>2 Months', '>3 Months', '>4 Months', '>6 Months', '>9 Months', '>1 Year'};
+
 var = {'component_breakdowns', 'system_breakdowns'};
 labs = {'comp_names', 'system_names'};
 plt_ht = [550, 350];

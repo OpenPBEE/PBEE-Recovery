@@ -155,7 +155,10 @@ for s = 1:length(story_str_converter)
             qty = str2double(strsplit(comps.(frag_id).median_quantity,','));
             % comps.(frag_id).location  % Number of elements doesnt line up
             % with location field, therefor I am not using
-            simulated_damage(s).num_comps(c) = qty(1); % just take the first field (assumes they are all the same)
+            if length(qty) > 1
+                test = 5;
+            end
+            simulated_damage(s).num_comps(c) = sum(qty); % total number per level is the sum of the array
             
         elseif sum(DMG_filt) > 1
             error('couldnt find comp ds')
