@@ -40,36 +40,39 @@ peak_occ_rate = 3.1/1000; % residential peak occupancy rates (occupants per sqft
 num_basement_levels = 4;
 num_ag_levels = 12;
 num_entry_doors = 2; % int, number of entry/exit doors for the building
+total_cost = 47564000;
+elevator_quantity = 2;
+floor_area = 10000*ones(16,1);
 
-%% Load Data
-% Treads data
-fileID = fopen([model_dir filesep 'treads_data' filesep 'input_parameters.json'],'r');
-input_parameters = jsondecode(fscanf(fileID,'%s'));
-fclose(fileID);
+%% Load ATC 138 model input data
+comp_ds_list = readtable([model_dir filesep 'comp_ds_list.csv']);
+tenant_unit_list = readtable([model_dir filesep 'tenant_unit_list.csv']);
 
-fileID = fopen([model_dir filesep 'treads_data' filesep 'DL_model.json'],'r');
+%% Load Pelicun Outputs
+pelicun_dir = [model_dir filesep 'pelicun_data'];
+
+% Pull components from DL_model.json
+fileID = fopen([pelicun_dir filesep 'DL_model.json'],'r');
 DL_model = jsondecode(fscanf(fileID,'%s'));
 fclose(fileID);
 comps = DL_model.DamageAndLoss.Components;
 
-IF_delays = readtable([model_dir filesep 'treads_data' filesep 'IF_delays.csv']);
-
-% Pelicun Outputs
-DV_rec_cost_agg = readtable([model_dir filesep 'pelicun_results' filesep 'DV_rec_cost_agg.csv']);
+% Pull repair cost realizations
+DV_rec_cost_agg = readtable([pelicun_dir filesep 'DV_rec_cost_agg.csv']);
 sim_repair_cost = sum(str2double(DV_rec_cost_agg{2:end,2:end}),2);
 
-DMG = readtable([model_dir filesep 'pelicun_results' filesep 'DMG.csv']);
+% Pull realizations of damaged components
+DMG = readtable([pelicun_dir filesep 'DMG.csv']);
 DMG_FG = DMG{1,2:end};
 DMG_PG = DMG{2,2:end};
 DMG_DS = DMG{3,2:end};
 DMG_data = str2double(DMG{5:end,2:end});
 
-DV_rec_time = readtable([model_dir filesep 'pelicun_results' filesep 'DV_rec_time.csv']);
+% Pull realization of repair time
+DV_rec_time = readtable([pelicun_dir filesep 'DV_rec_time.csv']);
 DV_rec_time_data = str2double(DV_rec_time{5:end,2:end});
 
-% ATC 138 data
-comp_ds_list = readtable([model_dir filesep 'comp_ds_list.csv']);
-tenant_unit_list = readtable([model_dir filesep 'tenant_unit_list.csv']);
+
 
 %% Develop building_model.json from treads inputs
 comp_ids = fieldnames(comps);
@@ -84,15 +87,15 @@ for c = 1:length(stair_ids)
 end
 
 % Set Variables
-building_model.building_value = input_parameters.total_cost; % num
-building_model.num_stories = length(input_parameters.floor_area); % int
-building_model.total_area_sf = sum(input_parameters.floor_area); % number
-building_model.area_per_story_sf = input_parameters.floor_area; % num_stories x 1 array
+building_model.building_value = total_cost; % num
+building_model.num_stories = length(floor_area); % int
+building_model.total_area_sf = sum(floor_area); % number
+building_model.area_per_story_sf = floor_area; % num_stories x 1 array
 building_model.ht_per_story_ft = ht_per_story_ft; % num_stories x 1 array
 building_model.edge_lengths = edge_lengths; % num_stories x 2 array
 building_model.struct_bay_area_per_story = struct_bay_area_per_story; % num_stories x 1 array
 building_model.num_entry_doors = num_entry_doors; % int
-building_model.num_elevators = input_parameters.elevator_quantity; % int
+building_model.num_elevators = elevator_quantity; % int
 building_model.stairs_per_story = stairs_per_story*ones(building_model.num_stories,1); % num_stories x 1 array
 building_model.occupants_per_story = peak_occ_rate*building_model.area_per_story_sf; % num_stories x 1 array
 
@@ -103,12 +106,17 @@ fclose(fileID);
 
 %% Develop damage_consequences.json
 % Set Variables
-damage_consequences.red_tag = IF_delays.IF_stab > 10; % array, num real x 1
+
 damage_consequences.racked_stair_doors_per_story = zeros(length(damage_consequences.red_tag),building_model.num_stories); % array, num real x num stories
 damage_consequences.racked_entry_doors_side_1  = zeros(size(damage_consequences.red_tag)); % array, num real x 1
 damage_consequences.racked_entry_doors_side_2  = zeros(size(damage_consequences.red_tag)); % array, num real x 1
-damage_consequences.inpsection_trigger = IF_delays.IF_inspection > 0;  % array, num real x 1
 damage_consequences.repair_cost_ratio = sim_repair_cost / building_model.building_value;  % array, num real x 1
+
+% note: calculate these directly by incorporating red tag assessment into
+% PBEE recovery
+damage_consequences.red_tag = 0; % array, num real x 1
+damage_consequences.inpsection_trigger = 0;  % array, num real x 1
+
 
 % Write file
 fileID = fopen([model_dir filesep 'damage_consequences.json'],'w');
