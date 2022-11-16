@@ -196,11 +196,7 @@
 				},
 				"egress_threshold": {
 					"type": "number",
-					"description": "ratio of building egress paths required for building safety and access, assuming an operational fire suppression system"
-				},
-				"egress_threshold_wo_fs": {
-					"type": "number",
-					"description": "ratio of building egress paths required for building safety and access, assuming an non-operational fire suppression system"
+					"description": "ratio of building egress paths required for building safety and access"
 				},
 				"fire_watch": {
 					"type": "logical",
