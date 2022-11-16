@@ -36,12 +36,12 @@ def build_inputs(input_dir, build_file_dir):
         if file_exists:
             os.remove(input_dir + '/' + d + '/simulated_inputs.mat')
 
-        # Excecute Matlab build script
+        # Execute Matlab build script
         bld_path = os.path.abspath(input_dir + '/' + d + '/build_inputs.m')
         exc_str = "run('" + bld_path + "'); exit;"
         p = subprocess.run(["matlab", "-nosplash", "-nodesktop", "-r", exc_str])
 
-        time.sleep(15)  # low tech way of getting python to wait until matlab is finished
+        time.sleep(60)  # low tech way of getting python to wait until matlab is finished
 
         # Check if the input file has been successfully created
         file_exists = os.path.exists(input_dir + '/' + d + '/simulated_inputs.mat')

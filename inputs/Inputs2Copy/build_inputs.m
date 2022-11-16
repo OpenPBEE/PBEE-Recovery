@@ -134,9 +134,22 @@ damage_state_attribute_mapping = readtable([static_data_dir filesep 'damage_stat
 subsystems = readtable([static_data_dir filesep 'subsystems.csv']);
 tenant_function_requirements = readtable([static_data_dir filesep 'tenant_function_requirements.csv']);
 
+% Preallocate tenant unit table
+tenant_units = tenant_unit_list;
+tenant_units.exterior = zeros(height(tenant_units),1);
+tenant_units.interior = zeros(height(tenant_units),1);
+tenant_units.occ_per_elev = zeros(height(tenant_units),1);
+tenant_units.is_elevator_required = zeros(height(tenant_units),1);
+tenant_units.is_electrical_required = zeros(height(tenant_units),1);
+tenant_units.is_water_potable_required = zeros(height(tenant_units),1);
+tenant_units.is_water_sanitary_required = zeros(height(tenant_units),1);
+tenant_units.is_hvac_ventilation_required = zeros(height(tenant_units),1);
+tenant_units.is_hvac_heating_required = zeros(height(tenant_units),1);
+tenant_units.is_hvac_cooling_required = zeros(height(tenant_units),1);
+tenant_units.is_hvac_exhaust_required = zeros(height(tenant_units),1);
+
 % Pull default tenant unit attributes for each tenant unit listed in the
 % tenant_unit_list
-tenant_units = tenant_unit_list;
 for tu = 1:height(tenant_unit_list)
     fnc_requirements_filt = tenant_function_requirements.occupancy_id == tenant_units.occupancy_id(tu);
     if sum(fnc_requirements_filt) ~= 1

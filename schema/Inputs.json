@@ -70,6 +70,14 @@
 						}
 					}
 				},
+				"eng_design_min_days":{
+					"type": "number",
+					"description": "Minumum number of days for the median engineering design time"
+				},
+				"eng_design_max_days":{
+					"type": "number",
+					"description": "Maximum number of days for the median engineering design time"
+				},
 				"mitigation": {
 					"type": "object",
 					"description": "general impedance assessment inputs such as mitigation factors",
@@ -347,7 +355,7 @@
 					"$ref": "#/definitions/arrayOfNumbers"
 				},
 				"repair_cost_ratio": {
-					"description": "simulated building repair cost normalized by the replacement value", 
+					"description": "simulated building repair cost of structural and nonstructural repairs (does not include tenant contents) normalized by the replacement value", 
 					"$ref": "#/definitions/arrayOfNumbers"
 				}
 			}

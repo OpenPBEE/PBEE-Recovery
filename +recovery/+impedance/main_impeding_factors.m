@@ -55,18 +55,14 @@ import recovery.impedance.fn_permitting
 num_reals = length(inpsection_trigger);
 num_sys = height(systems);
 
-% Preallocatd each impance time
+% Pre-allocate each type of impedance
 duration.inspection = zeros(num_reals, num_sys);
 duration.financing = zeros(num_reals, num_sys);
-duration.permitting = zeros(num_reals, num_sys);
+duration.permit = zeros(num_reals, num_sys);
 duration.contractor_mob = zeros(num_reals, num_sys);
 duration.eng_mob = zeros(num_reals, num_sys);
 duration.design = zeros(num_reals, num_sys);
 duration.long_lead = zeros(num_reals, num_sys);
-
-% System repair trigger
-% are there any repairs needed for this system
-% sys_repair_trigger = system_repair_time > 0;
 
 % Create basic trucated standard normal distribution for later simulation
 pd = makedist('normal','mu',0,'sigma',1);
@@ -74,7 +70,7 @@ th_low = -impedance_options.impedance_truncation;
 th_high = impedance_options.impedance_truncation;
 trunc_pd = truncate(pd,th_low,th_high);
 beta = impedance_options.impedance_beta;
-
+    
 %% Parse through damage to determine which systems require repair
 rapid_permit_filt = strcmp(damage.comp_ds_table.permit_type', 'rapid');
 full_permiting_filt = strcmp(damage.comp_ds_table.permit_type', 'full');
@@ -133,9 +129,8 @@ if impedance_options.include_impedance.financing
 end
 
 if impedance_options.include_impedance.permitting
-    duration.permitting = fn_permitting( num_reals, ...
-        surge_factor, sys_repair_trigger, trunc_pd, ...
-        beta, impeding_factor_medians );
+    [duration.permit_rapid, duration.permit_full ]= fn_permitting( ...
+        num_reals, sys_repair_trigger, trunc_pd, beta, impeding_factor_medians );
 end
 
 if impedance_options.include_impedance.contractor
@@ -149,7 +144,8 @@ if impedance_options.include_impedance.engineering
         sys_repair_trigger.redesign, ...
         impedance_options.mitigation.is_engineer_on_retainer, ...
         impedance_options.system_design_time, ...
-        systems.imped_design_min_days', systems.imped_design_max_days', ...
+        impedance_options.eng_design_min_days', ...
+        impedance_options.eng_design_max_days', ...
         trunc_pd, beta, impeding_factor_medians);
 end
 
@@ -192,8 +188,11 @@ complete_day.eng_mob = start_day.eng_mob + duration.eng_mob;
 start_day.design = complete_day.eng_mob;
 complete_day.design = start_day.design + duration.design;
 
-start_day.permitting = complete_day.design;
-complete_day.permitting = start_day.permitting + duration.permitting;
+start_day.permit_rapid = complete_day.design;
+complete_day.permit_rapid = start_day.permit_rapid + duration.permit_rapid;
+
+start_day.permit_full = complete_day.design;
+complete_day.permit_full = start_day.permit_full + duration.permit_full;
 
 start_day.contractor_mob = max(complete_day.inspection,start_day.financing);
 complete_day.contractor_mob = start_day.contractor_mob + duration.contractor_mob;
@@ -266,18 +265,17 @@ impeding_factors.breakdowns.financing.start_day = max(start_day.financing,[],2);
 impeding_factors.breakdowns.financing.complete_day = max(complete_day.financing,[],2);
 impeding_factors.breakdowns.contractor_mob.start_day = max(start_day.contractor_mob,[],2);
 impeding_factors.breakdowns.contractor_mob.complete_day = max(complete_day.contractor_mob,[],2);
+impeding_factors.breakdowns.eng_mob.start_day = max(start_day.eng_mob,[],2);
+impeding_factors.breakdowns.eng_mob.complete_day = max(complete_day.eng_mob,[],2);
+impeding_factors.breakdowns.design.start_day = max(start_day.design,[],2);
+impeding_factors.breakdowns.design.complete_day = max(complete_day.design,[],2);
+impeding_factors.breakdowns.permit_rapid.start_day = max(start_day.permit_rapid,[],2);
+impeding_factors.breakdowns.permit_rapid.complete_day = max(complete_day.permit_rapid,[],2);
+impeding_factors.breakdowns.permit_full.start_day = max(start_day.permit_full,[],2);
+impeding_factors.breakdowns.permit_full.complete_day = max(complete_day.permit_full,[],2);
 
-select_sys = [1, 2, 4]; % only for structure, exterior, and stairs
-for ss = select_sys
-    impeding_factors.breakdowns.eng_mob.(systems.name{ss}).start_day = start_day.eng_mob(:,ss);
-    impeding_factors.breakdowns.eng_mob.(systems.name{ss}).complete_day = complete_day.eng_mob(:,ss);
-    impeding_factors.breakdowns.design.(systems.name{ss}).start_day = start_day.design(:,ss);
-    impeding_factors.breakdowns.design.(systems.name{ss}).complete_day = complete_day.design(:,ss);
-end
-
+% Represent long lead times per system
 for s = 1:height(systems)
-    impeding_factors.breakdowns.permitting.(systems.name{s}).start_day = start_day.permitting(:,s);
-    impeding_factors.breakdowns.permitting.(systems.name{s}).complete_day = complete_day.permitting(:,s);
     impeding_factors.breakdowns.long_lead.(systems.name{s}).start_day = start_day.long_lead(:,s);
     impeding_factors.breakdowns.long_lead.(systems.name{s}).complete_day = complete_day.long_lead(:,s);
 end
