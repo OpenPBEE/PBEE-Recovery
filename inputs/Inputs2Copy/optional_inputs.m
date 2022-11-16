@@ -17,10 +17,13 @@ impedance_options.mitigation.is_engineer_on_retainer = false;
 impedance_options.mitigation.contractor_relationship = 'good';
 impedance_options.mitigation.contractor_retainer_time = 3;
 impedance_options.mitigation.funding_source = 'private';
-impedance_options.mitigation.capital_available_ratio = 0.1;
+impedance_options.mitigation.capital_available_ratio = 0.02;
 impedance_options.impedance_beta = 0.6;
 impedance_options.impedance_truncation = 2;
 impedance_options.default_lead_time = 182;
+impedance_options.demand_surge.include_surge = 1;
+impedance_options.demand_surge.is_dense_urban_area = 1;
+impedance_options.demand_surge.site_pga = 1;
 impedance_options.scaffolding_lead_time = 5;
 impedance_options.scaffolding_erect_time = 2;
 
@@ -43,6 +46,3 @@ functionality_options.exterior_safety_threshold = 0.1;
 functionality_options.interior_safety_threshold = 0.25;
 functionality_options.door_access_width_ft = 9;
 functionality_options.heat_utility = 'gas';
-
-% Regional Impact
-regional_impact.surge_factor = 1;

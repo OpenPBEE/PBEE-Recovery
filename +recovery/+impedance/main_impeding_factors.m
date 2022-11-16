@@ -1,6 +1,6 @@
 function [impeding_factors] = main_impeding_factors(damage, ...
     impedance_options, repair_cost_ratio, inpsection_trigger, systems, ...
-    tmp_repair_class, building_value, impeding_factor_medians, surge_factor)
+    tmp_repair_class, building_value, impeding_factor_medians)
 % Calculate ATC-138 impeding times for each system given simulation of damage
 %
 % Parameters
@@ -22,9 +22,6 @@ function [impeding_factors] = main_impeding_factors(damage, ...
 %   The replacement value of the building, in USD
 % impeding_factor_medians: table
 %   median delays for various impeding factors
-% surge_factor: number
-%   amplification factor for imepding times due to materials and labor
-%   impacts due to regional damage
 %
 % Returns
 % -------
@@ -50,6 +47,7 @@ import recovery.impedance.fn_engineering
 import recovery.impedance.fn_financing
 import recovery.impedance.fn_inspection
 import recovery.impedance.fn_permitting
+import recovery.impedance.fn_default_surge_factor
 
 % Initialize parameters
 num_reals = length(inpsection_trigger);
@@ -70,6 +68,15 @@ th_low = -impedance_options.impedance_truncation;
 th_high = impedance_options.impedance_truncation;
 trunc_pd = truncate(pd,th_low,th_high);
 beta = impedance_options.impedance_beta;
+
+%% Calculate Demand Surge (if applicble)
+if impedance_options.demand_surge.include_surge
+    surge_factor = fn_default_surge_factor( ...
+        impedance_options.demand_surge.is_dense_urban_area, ...
+        impedance_options.demand_surge.site_pga );
+else
+    surge_factor = 1;
+end
     
 %% Parse through damage to determine which systems require repair
 rapid_permit_filt = strcmp(damage.comp_ds_table.permit_type', 'rapid');

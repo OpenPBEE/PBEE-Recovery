@@ -108,13 +108,13 @@
 						},
 						"capital_available_ratio": {
 							"type": "number",
-							"description": "ratio of the building value that the onwer has immediately available for repairs. Default to 0.10"
+							"description": "ratio of the building value that the onwer has immediately available for repairs"
 						}
 					}
 				},
 				"impedance_beta": {
 					"type": "number",
-					"description": "lognormal uncetainty of impedance times. Default to 0.6",
+					"description": "lognormal uncetainty of impedance times",
 				},
 				"impedance_truncation": {
 					"type": "number",
@@ -123,6 +123,32 @@
 				"default_lead_time": {
 					"type": "number",
 					"description": "Lead time, in days, to replace select components (equipment or other less readily available components). This default lead time will be applied to all components with the long_lead flag in the inputs builder. To add custom lead times per component, update the long_lead_time attribute in the damage.comp_ds_table field.",
+				},
+				"demand_surge": {
+					"type": "object",
+					"description": "general user input options for defining the demand surge",
+					"properties": {
+						"include_surge": {
+							"type": "logical",
+							"description": "include demand surge when simulating impedance times"
+						},
+						"is_dense_urban_area": {
+							"type": "logical",
+							"description": "is within a dense urban area, typically defined by a site within a metropolitan statistical area (MSA) with a population of over 1 million"
+						},
+						"site_pga": {
+							"type": "number",
+							"description": "peak ground acceleration (PGA) in g at the building site for the ground shaking intensity of interest"
+						}
+					}
+				},
+				"scaffolding_lead_time": {
+					"type": "number",
+					"description": "The number of days it takes to get workers to the site to erect scaffolding",
+				},
+				"scaffolding_erect_time": {
+					"type": "number",
+					"description": "The number of days it takes for workers to errect scaffolding to protect doorways and walkways from falling hazards",
 				}
 			}
 		},
@@ -207,16 +233,6 @@
 				"heat_utility": {
 					"type": "string",
 					"description": "string identifier of the type of utility that is used to heat the building; string should match on of the fields in functionality.utilities"
-				}
-			}
-		},
-		"regional_impact": {
-			"type": "object",
-			"description": "general inputs that quantify regional impact on individual building performance",
-			"properties": {
-				"surge_factor": {
-					"type": "number",
-					"description": "impedance and temporary repair time amplification factor based on a post-earthquake surge in demand for skilled trade and materials",
 				}
 			}
 		},
