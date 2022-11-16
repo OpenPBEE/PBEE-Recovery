@@ -30,7 +30,7 @@ systems = readtable(['static_tables' filesep 'systems.csv']);
 subsystems = readtable(['static_tables' filesep 'subsystems.csv']);
 impeding_factor_medians = readtable(['static_tables' filesep 'impeding_factors.csv']);
 tmp_repair_class = readtable(['static_tables' filesep 'temp_repair_class.csv']);
-        
+
 %% Run Recovery Method
 [functionality] = main_PBEErecovery(damage, damage_consequences, ...
     building_model, tenant_units, systems, subsystems, tmp_repair_class, ...

@@ -1,6 +1,5 @@
 function [ recovery_day, comp_breakdowns ] = fn_story_access(...
-    damage, building_model, damage_consequences, system_operation_day, ...
-    subsystems, functionality_options )
+    damage, building_model, damage_consequences, functionality_options )
 % Check each story for damage that would cause that story to be shut down due to
 % issues of access
 %
@@ -14,10 +13,6 @@ function [ recovery_day, comp_breakdowns ] = fn_story_access(...
 % damage_consequences: struct
 %   data structure containing simulated building consequences, such as red
 %   tags and repair costs ratios
-% system_operation_day: struct
-%   simulation of recovery of operation for various systems in the building
-% subsystems: table
-%   data table containing information about each subsystem's attributes
 % functionality_options: struct
 %   recovery time optional inputs such as various damage thresholds
 %

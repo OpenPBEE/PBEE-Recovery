@@ -38,14 +38,14 @@ import recovery.functionality.fn_tenant_safety
 import recovery.functionality.fn_extract_recovery_metrics
     
 %% Stage 1: Quantify the effect that component damage has on the building safety
-[ recovery_day.building_safety, comp_breakdowns.building_safety, system_operation_day ] = ...
+[ recovery_day.building_safety, comp_breakdowns.building_safety ] = ...
     fn_building_safety( damage, building_model, damage_consequences, ...,
     utilities, functionality_options, impeding_temp_repairs );
 
 %% Stage 2: Quantify the accessibility of each story in the building
 [ recovery_day.story_access, comp_breakdowns.story_access ] = ...
     fn_story_access( damage, building_model, damage_consequences, ...
-    system_operation_day, subsystems, functionality_options );
+    functionality_options );
 
 %% Stage 3: Quantify the effect that component damage has on the safety of each tenant unit
 [ recovery_day.tenant_safety, comp_breakdowns.tenant_safety ] = ...

@@ -40,6 +40,7 @@ functionality_options.red_tag_clear_beta = 0.6;
 functionality_options.door_racking_repair_day = 3;
 functionality_options.egress_threshold = 0.5;
 functionality_options.fire_watch = true;
+functionality_options.local_fire_damamge_threshold = 0.25;
 functionality_options.min_egress_paths = 2;
 functionality_options.exterior_safety_threshold = 0.1;
 functionality_options.interior_safety_threshold = 0.25;

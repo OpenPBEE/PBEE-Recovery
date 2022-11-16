@@ -202,6 +202,10 @@
 					"type": "logical",
 					"description": "will a fire watch be set if fire sprinkler systems are damaged"
 				},
+				"local_fire_damamge_threshold": {
+					"type": "number",
+					"description": "ratio of building fire sprinkler branches or drops that can be damaged with a given story without significantly disrupting the operation of the active fire supression system"
+				},
 				"min_egress_paths": {
 					"type": "number",
 					"description": "minimum number of egress pathways that must be maintained at each story to maintain occupancy"

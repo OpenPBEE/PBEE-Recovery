@@ -1,4 +1,4 @@
-function [ recovery_day, comp_breakdowns, system_operation_day ] = fn_building_safety( ...
+function [ recovery_day, comp_breakdowns ] = fn_building_safety( ...
     damage, building_model, damage_consequences, utilities, ...
     functionality_options, impeding_temp_repairs )
 % Check damage that would cause the whole building to be shut down due to
@@ -26,26 +26,22 @@ function [ recovery_day, comp_breakdowns, system_operation_day ] = fn_building_s
 %   safety
 % comp_breakdowns: struct
 %   simulation of each components contributions to each of the fault tree events 
-% system_operation_day: struct
-%   simulation of recovery of operation for various systems in the building
 
 %% Initial Setup
 num_reals = length(damage_consequences.red_tag);
 num_units = length(damage.tenant_units);
 num_comps = height(damage.comp_ds_table);
 
-%% Calculate effect of red tags and fire suppression system
 % Initialize parameters
 recovery_day.red_tag = zeros(num_reals, 1);
 recovery_day.shoring = zeros(num_reals, 1);
 recovery_day.hazardous_material = zeros(num_reals, 1);
 recovery_day.fire_suppression = zeros(num_reals, 1);
-system_operation_day.building.fire = zeros(num_reals, 1);
 
 % check if building has fire supprsion system
 fs_exists = any(damage.fnc_filters.fire_building);
 
-% Check damage throughout the building
+%% Check damage throughout the building that can affect the entire building
 for tu = 1:num_units
     % Grab tenant and damage info for this tenant unit
     repair_complete_day = damage.tenant_units{tu}.recovery.repair_complete_day;
@@ -86,15 +82,15 @@ for tu = 1:num_units
     comp_breakdowns.shoring(:,:,tu) = shoring_filt .* repair_complete_day_w_tmp .* is_damaged;
     
     %% Day the fire suppression system is operating again (for the whole building)
-    if fs_exists
+    if ~functionality_options.fire_watch && fs_exists
         % any major damage fails the system for the whole building so take the max
-        system_operation_day.building.fire = max(system_operation_day.building.fire,max(repair_complete_day(:,damage.fnc_filters.fire_building),[],2));
+        recovery_day.fire_suppression = max(recovery_day.fire_suppression,max(repair_complete_day(:,damage.fnc_filters.fire_building),[],2));
     
         % Consider utilities (assume no backup water supply)
-        system_operation_day.building.fire = max(system_operation_day.building.fire,utilities.water); 
+        recovery_day.fire_suppression = max(recovery_day.fire_suppression,utilities.water); 
 
         % Componet Breakdowns
-        system_operation_day.comp.fire(:,:,tu) = damage.fnc_filters.fire_building .* repair_complete_day;
+        comp_breakdowns.fire_suppression(:,:,tu) = damage.fnc_filters.fire_building .* repair_complete_day;
     end
 
     %% Hazardous Materials
@@ -173,8 +169,7 @@ for i = 1:num_repair_time_increments
         break % everything has been fixed
     end
     
-    % Go through each door to determine which is affected by falling
-    % hazards
+    % Go through each door to determine which is affected by falling hazards
     for d = 1:building_model.num_entry_doors
         % Combine affected areas of all stories above the first using SRSS
         % HARDCODED ASSUMPTIONS: DOORS ONLY ON TWO SIDES
@@ -222,20 +217,12 @@ door_access_day = max(day_repair_racked,day_repair_fall_haz);
 % falling hazards or door racking
 cum_days = 0;
 entry_door_access_day = zeros(num_reals,1);
-fire_safety_day = zeros(num_reals,1);
 door_access_day_nan = door_access_day;
 door_access_day_nan(door_access_day_nan == 0) = NaN;
 num_repair_time_increments = building_model.num_entry_doors; % possible unique number of loop increments
 for i = 1:num_repair_time_increments
     num_accessible_doors = sum(door_access_day <= cum_days,2);
-    sufficent_door_access_with_fs  = num_accessible_doors >= max(functionality_options.min_egress_paths,functionality_options.egress_threshold*building_model.num_entry_doors);   % must have at least 1 functioning entry door or 50% of design egress
-    sufficent_door_access_wo_fs = num_accessible_doors >= max(functionality_options.min_egress_paths,functionality_options.egress_threshold_wo_fs*building_model.num_entry_doors);  % must have at least 1 functioning entry door or 75% of design egress when fire suppression system is down
-    fire_system_failure = system_operation_day.building.fire > cum_days;
-    entry_door_accessible = sufficent_door_access_with_fs .* ~fire_system_failure + sufficent_door_access_wo_fs .* fire_system_failure;
-    
-    if i == 1 % just save on the initial loop
-        fs_operation_matters_for_entry_doors = sufficent_door_access_with_fs - sufficent_door_access_wo_fs;
-    end
+    entry_door_accessible = num_accessible_doors >= max(functionality_options.min_egress_paths,functionality_options.egress_threshold*building_model.num_entry_doors); 
             
     % Bean counting for this iteration
     delta_day = min(door_access_day_nan,[],2);
@@ -245,14 +232,6 @@ for i = 1:num_repair_time_increments
     
     % Save recovery time increments
     entry_door_access_day = entry_door_access_day + delta_day .* ~entry_door_accessible;
-    if functionality_options.fire_watch
-        % if there is a fire watch, fire damage only affects door egress
-        % requirements
-        fire_safety_day = fire_safety_day + delta_day .* fs_operation_matters_for_entry_doors .* fire_system_failure;
-    else
-        % If no fire watch, failure of fire system causes loss of occupancy
-        fire_safety_day = fire_safety_day + delta_day .* fire_system_failure;
-    end
 end
 
 % Save recovery day values
@@ -265,17 +244,57 @@ recovery_day.entry_door_racking = min(recovery_day.entry_door_access,max(day_rep
 % Component Breakdown
 comp_breakdowns.falling_hazard = min(recovery_day.entry_door_access, max(fall_haz_comps_day_rep,[],4));
 
-%% Determine when fire suppresion affects recovery
-if fs_exists % only save this when fire system exists
-    recovery_day.fire_suppression = fire_safety_day;
-    if functionality_options.fire_watch
-        % If fire watch is in place, only account for the damage that
-        % affects egress requirements
-        comp_breakdowns.fire_suppression = system_operation_day.comp.fire .* fs_operation_matters_for_entry_doors .* fire_system_failure;
-    else
-        % If no fire watch, take any damage that fails the system
-        comp_breakdowns.fire_suppression = system_operation_day.comp.fire;
+%% Fire Safety
+if ~functionality_options.fire_watch && fs_exists
+    comp_breakdowns_local_fire = zeros(num_reals,num_comps,num_units);
+    fire_safety_day = zeros(num_reals,num_units); % Day the local fire sprinkler system becomes operational
+    filt_fs_drop = damage.fnc_filters.fire_drops;
+    filt_fs_branch = damage.fnc_filters.fire_unit;
+    for tu = 1:num_units
+        repair_complete_day = damage.tenant_units{tu}.recovery.repair_complete_day;
+        repair_complete_day(repair_complete_day == 0) = NaN; % Make sure zero repair days are NaN
+        damaged_comps = damage.tenant_units{tu}.qnt_damaged;
+        num_drops = max(damage.tenant_units{tu}.num_comps .* filt_fs_drop,[],2); % Assumes drops are all in one performance group
+        num_branches = max(damage.tenant_units{tu}.num_comps .* filt_fs_branch,[],2); % Assumes branches are all in one performance group
+        if sum([num_drops,num_branches]) > 0 % If there are any of these components on in this tenant unit
+            % Loop through component repair times to determine the day it stops affecting re-occupanc
+            num_repair_time_increments = sum(filt_fs_drop | filt_fs_branch); % possible unique number of loop increments
+            for i = 1:num_repair_time_increments 
+                % Calculate the ratio of damaged drops and branches on this story
+                ratio_damaged_drop = sum(damaged_comps .* filt_fs_drop,2) ./ num_drops; % assumes comps are not simeltaneous
+                ratio_damaged_branch = sum(damaged_comps .* filt_fs_branch,2) ./ num_drops; % assumes comps are not simeltaneous
+
+                % Determine if fire drops and branches are adequately operating
+                fire_drop_operational = functionality_options.local_fire_damamge_threshold >= ratio_damaged_drop;
+                fire_branch_operational = functionality_options.local_fire_damamge_threshold >= ratio_damaged_branch;
+                local_fire_operational = fire_drop_operational & fire_drop_operational;
+                
+                % Add days in this increment to the tally
+                delta_day = min(repair_complete_day(:,filt_fs_drop),[],2);
+                delta_day(isnan(delta_day)) = 0;
+                fire_safety_day(:,tu) = fire_safety_day(:,tu) + ~local_fire_operational .* delta_day;
+
+                % Add days to components that are affecting occupancy
+                contributing_drops = ((damaged_comps .* filt_fs_drop) > 0)  .* ~fire_drop_operational; % count all components that contributed to non operational fire drops
+                contributing_branches = ((damaged_comps .* filt_fs_drop) > 0)  .* ~fire_branch_operational; % count all components that contributed to non operational fire drops
+                contributing_comps = max(contributing_drops,contributing_branches);
+                comp_breakdowns_local_fire(:,:,tu) = comp_breakdowns_local_fire(:,:,tu) + contributing_comps .* delta_day;
+
+                % Change the comps for the next increment
+                repair_complete_day = repair_complete_day - delta_day;
+                repair_complete_day(repair_complete_day <= 0) = NaN;
+                fixed_comps_filt = isnan(repair_complete_day);
+                damaged_comps(fixed_comps_filt) = 0;
+            end
+        end
     end
+
+    % Inoperable fire drips on any story shuts down entire building
+    fire_safety_day_building = max(fire_safety_day,[],2);
+    
+    % Combine parts of fire suppression system
+    recovery_day.fire_suppression = max(recovery_day.fire_suppression,fire_safety_day_building);
+    comp_breakdowns.fire_suppression = max(comp_breakdowns.fire_suppression,comp_breakdowns_local_fire);
 end
 
 %% Delay Red Tag recovery by the time it takes to clear the tag
