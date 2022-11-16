@@ -16,14 +16,21 @@ clc
 rehash
 
 %% Define User Inputs
-model_name = 'ICSB'; % Name of the model;
+model_name = 'Negar_test'; % Name of the model;
                      % inputs are expected to be in a directory with this name
                      % outputs will save to a directory with this name
-model_dir = ['inputs' filesep 'example_inputs']; % Directory where the simulated inputs are located
+                     
+%% Define I/O Directories
+model_dir = ['inputs' filesep model_name]; % Directory where the simulated inputs are located
 outputs_dir = ['outputs' filesep model_name]; % Directory where the assessment outputs are saved
 
 %% Load FEMA P-58 performance model data and simulated damage and loss
-load([model_dir filesep model_name filesep 'simulated_inputs.mat'])
+load([model_dir filesep 'simulated_inputs.mat'])
+
+%% Some additional translation of SP3 inputs
+repair_time_options = repair_time_options_atc_138.repair_time_options;
+functionality_options = repair_time_options_atc_138.functionality_options;
+tenant_units = repair_time_options_atc_138.tenant_units;
 
 %% Load required static data
 systems = readtable(['static_tables' filesep 'systems.csv']);
