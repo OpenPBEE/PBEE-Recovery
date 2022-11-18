@@ -35,6 +35,7 @@ repair_time_options.max_workers_building_min = 20;
 repair_time_options.max_workers_building_max = 260;
 
 % Functionality Assessment Options
+functionality_options.calculate_red_tag = 1;
 functionality_options.red_tag_clear_time = 7;
 functionality_options.red_tag_clear_beta = 0.6;
 functionality_options.door_racking_repair_day = 3;

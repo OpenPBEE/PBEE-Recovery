@@ -75,6 +75,10 @@ Each file listed below contains data specific to the building performance model 
      - comp_id: [string] unique FEMA P-58 component identifier
      - ds_seq_id: [int] interger index of the sequential parent damage state (i.e., damage state 1, 2, 3, 4);
      - ds_sub_id: [int] interger index for the mutually exlusive of simeltaneous sub damage state; use 1 to indicate a sequential damage state with no sub damage state.
+  - **comp_ds_list.csv**: Table that lists the quantity and location of each component in the building performance model. This table requires the following attributes:
+     - story: [int] story location of the component
+     - dir: [int] direciton of the component (1, 2, or 3 for nondirectional);
+     - <1 attribute per comp>: [str] each component should be listed at its own column with string representation of the component id as the column header.
  - **damage_consequences.json**: Building-level and story-level simulated properties of building damage. Contains all variables within the _damage_consequences_ structure defined in the inputs schema.
  - **simulated_damage.json**: Component-level simulated damage properties. Contains all variables within the _damage.tenant_units_ structure defined in the inputs schema. Each variable containing realization of component damage should be defined uniquely for each tenant unit (shown as "tu" below). Each tenant_unit cell should contain the following variables:
      - tenant_unit{tu}.qnt_damaged: [array: simulations × damage states] The number of damaged components in each component damage state for each realization of the simulation.

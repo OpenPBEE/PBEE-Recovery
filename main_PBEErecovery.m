@@ -51,9 +51,13 @@ import recovery.functionality.main_functionality
 %% Combine compoment attributes into recovery filters to expidite recovery assessment
 [damage] = fn_preprocessing(damage.comp_ds_table, damage);
 
+%% Calculate Red Tags
+[ damage_consequences.red_tag, damage.red_tag_impact, damage_consequences.inspection_trigger ] ...
+    = fn_red_tag( functionality_options.calculate_red_tag, damage, building_model.comps );
+
 %% Simulate ATC 138 Impeding Factors
 [functionality.impeding_factors] = main_impeding_factors(damage, impedance_options, ...
-    damage_consequences.repair_cost_ratio, damage_consequences.inpsection_trigger, ...
+    damage_consequences.repair_cost_ratio, damage_consequences.inspection_trigger, ...
     systems, tmp_repair_class, building_model.building_value, impeding_factor_medians); 
 
 %% Construct the Building Repair Schedule

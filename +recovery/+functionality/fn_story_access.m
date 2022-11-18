@@ -48,7 +48,6 @@ damage.fnc_filters.stair_doors = logical([zeros(1,num_comps), 1]);
 % if stairs don't exist on a story, this will assume they are rugged (along with the stair doors)
 for tu = 1:num_stories
     % Augment damage matrix with door data
-    damage.tenant_units{tu}.num_comps = [damage.tenant_units{tu}.num_comps, building_model.stairs_per_story(tu)];
     racked_stair_doors = min(damage_consequences.racked_stair_doors_per_story(:,tu),building_model.stairs_per_story(tu));
     damage.tenant_units{tu}.qnt_damaged = [damage.tenant_units{tu}.qnt_damaged, racked_stair_doors];
     door_repair_day = (racked_stair_doors > 0) * functionality_options.door_racking_repair_day;

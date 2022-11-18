@@ -71,7 +71,7 @@ for sys = 1:num_sys
     story_complete_day = start_day + system_schedule.per_system{sys}.repair_complete_day;
     
     % Do not perform temporary repairs when building is red tagged
-    if strcmp(repair_type,'temp')
+    if strcmp(repair_type,'temp') && any(simulated_red_tags)
         story_start_day(simulated_red_tags,:) = NaN;
         story_complete_day(simulated_red_tags,:) = Inf;
     end

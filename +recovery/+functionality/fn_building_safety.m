@@ -49,14 +49,6 @@ for tu = 1:num_units
     
     is_damaged = (damage.tenant_units{tu}.qnt_damaged > 0);
     
-    if isfield(damage, 'red_tag_impact')
-        % assume the same for all tenant units (works out in the end)
-        affectes_red_tag = damage.red_tag_impact;
-    else
-        % no better information, just assume that if the component is damaged it affects red tag
-        affectes_red_tag = is_damaged;
-    end
-    
     %% Red Tags
     % The day the red tag is resolved is the day when all damage (anywhere in building) that has
     % the potentail to cause a red tag is fixed (ie max day)
@@ -66,7 +58,7 @@ for tu = 1:num_units
     end
     
     % Componet Breakdowns
-    comp_breakdowns.red_tag(:,:,tu) = damage.fnc_filters.red_tag .* recovery_day.red_tag .* affectes_red_tag;
+    comp_breakdowns.red_tag(:,:,tu) = damage.fnc_filters.red_tag .* recovery_day.red_tag .* damage.red_tag_impact;
     
     %% Local Shoring
     % Any unresolved damage (temporary or otherwise) that requires shoring,
@@ -158,7 +150,11 @@ for i = 1:num_repair_time_increments
             comp_affected_ft_this_story = comp_affected_area(:,:,tu) ./ building_model.ht_per_story_ft(tu);
             affected_ft_this_story = sum(comp_affected_ft_this_story,2); % Assumes cladding components do not occupy the same perimeter space
 
+            try
             affected_ratio.(['side_' num2str(side)])(:,tu) = min((affected_ft_this_story) ./ edge_lengths(side,tu),1);
+            catch
+                tmp = 6;
+            end
         end
     end
 

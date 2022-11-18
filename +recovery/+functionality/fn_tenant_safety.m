@@ -90,7 +90,7 @@ for tu = 1:num_units
     area_affected_all_linear_comps = damage.comp_ds_table.fraction_area_affected' .* damage.comp_ds_table.unit_qty' .* building_model.ht_per_story_ft(tu) .* damage.tenant_units{tu}.qnt_damaged;
     area_affected_all_area_comps   = damage.comp_ds_table.fraction_area_affected' .* damage.comp_ds_table.unit_qty' .* damage.tenant_units{tu}.qnt_damaged;
     area_affected_all_bay_comps    = damage.comp_ds_table.fraction_area_affected' .* building_model.struct_bay_area_per_story(tu) .* damage.tenant_units{tu}.qnt_damaged;
-    area_affected_all_build_comps  = damage.comp_ds_table.fraction_area_affected' .* building_model.total_area_sf .* damage.tenant_units{tu}.qnt_damaged;
+    area_affected_all_build_comps  = damage.comp_ds_table.fraction_area_affected' .* sum(building_model.area_per_story_sf) .* damage.tenant_units{tu}.qnt_damaged;
     
     % Checking damage that affects components in story below
     repair_complete_day_w_tmp_w_instabilities = repair_complete_day_w_tmp;
