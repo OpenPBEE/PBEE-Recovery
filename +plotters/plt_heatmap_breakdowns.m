@@ -19,7 +19,6 @@ if ~exist(plot_dir,'dir')
     mkdir(plot_dir)
 end
 
-perform_targ_labs = {'Immediately', '>3 Days', '>7 Days', '>2 Weeks', '>1 Month', '>6 Months', '>1 Year'};
 var = {'component_breakdowns', 'system_breakdowns'};
 labs = {'comp_names', 'system_names'};
 plt_ht = [550, 350];
@@ -30,12 +29,12 @@ for fs = 1:length(fnc_states)
     for v = 1:length(var)
         y_labs = recovery.(fnc_states{fs}).breakdowns.(labs{v});
         data = recovery.(fnc_states{fs}).breakdowns.(var{v});
-
+        perform_targ_labs = recovery.(fnc_states{fs}).breakdowns.perform_targ_days;
         h = heatmap(perform_targ_labs, strrep(y_labs,'_',' '), round(data,2));
         h.MissingDataColor = 1-h.MissingDataColor;
         fnc_lab = [upper(fnc_states{fs}(1)) fnc_states{fs}(2:end) ' Recovery'];
         title(['Fraction of Realizations Affecting Building ' fnc_lab])
-        xlabel('Recovery Time After Earthquake')
+        xlabel('Recovery Time After Earthquake (days)')
         set(gca,'fontname','times')
         set(gcf,'position',[10,10,650,plt_ht(v)])
         saveas(gcf,[plot_dir filesep var{v} '_' fnc_states{fs}],'png')

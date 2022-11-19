@@ -58,7 +58,7 @@ for tu = 1:num_units
     end
     
     % Componet Breakdowns
-    comp_breakdowns.red_tag(:,:,tu) = damage.fnc_filters.red_tag .* recovery_day.red_tag .* damage.red_tag_impact;
+    comp_breakdowns.red_tag(:,:,tu) = recovery_day.red_tag .* damage.red_tag_impact;
     
     %% Local Shoring
     if any(damage.fnc_filters.requires_shoring) && functionality_options.include_local_stability_impact

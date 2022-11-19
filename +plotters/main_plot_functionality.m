@@ -43,7 +43,7 @@ plt_recovery_trajectory( recovery, full_repair_time, plot_dir)
 %% Plot Gantt Charts
 plot_dir = [save_dir filesep 'gantt_charts'];
 fr_time = functionality.recovery.functional.building_level.recovery_day;
-p_idx = find(fr_time == prctile(fr_time,p_gantt),1); % Find the index of the first realization that matches the selected percentile
+p_idx = find(abs(fr_time - prctile(fr_time,p_gantt)) == min(abs(fr_time - prctile(fr_time,p_gantt))),1); % Find the index of the first realization that most closely matches the selected percentile
 plot_name = ['prt_' num2str(p_gantt)];
 plt_gantt_chart( p_idx, recovery, full_repair_time, workers, schedule, impede, plot_dir, plot_name )
 
