@@ -175,6 +175,10 @@
 				"max_workers_building_max": {
 					"type": "number",
 					"description": "Upper limit on the maximum number of workers for the entire building (i.e., max number of workers is never more than this). Default to 260 from REDi",
+				},
+				"allow_shoring": {
+					"type": "logical",
+					"description": "Flag to allow shoring to be used as a temporary repair for mitigating local structural stability issues",
 				}
 			}
 		},
@@ -193,6 +197,10 @@
 				"red_tag_clear_beta": {
 					"type": "number",
 					"description": "lognormal dispersion defining the uncertaitny in the red tag clear time"
+				},
+				"include_local_stability_impact": {
+					"type": "logical",
+					"description": "flag to consider the effect of local structural stability issues (that would require shoring) on building occupancy"
 				},
 				"door_racking_repair_day": {
 					"type": "number",

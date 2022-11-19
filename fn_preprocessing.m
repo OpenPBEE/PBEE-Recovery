@@ -1,4 +1,5 @@
-function [damage] = fn_preprocessing(comp_ds_table, damage)
+function [damage, temp_repair_class] = ...
+    fn_preprocessing(comp_ds_table, damage, allow_shoring, temp_repair_class)
 % Calculate ATC-138 impeding times for each system given simulation of damage
 %
 % Parameters
@@ -10,17 +11,21 @@ function [damage] = fn_preprocessing(comp_ds_table, damage)
 %   databases in the static_tables directory.  Each row of the table 
 %   corresponds to each column of the simulated component damage arrays 
 %   within damage.tenant_units.
+% damage: struct
+%   contains simulated damage info and damage state attributes
+% temp_repair_class: table
+%   attributes of each temporary repair class to consider
+% allow_shoring: logical
+%   flag indicating whether or not shoring should be considered as a
+%   temporary repair for local stability issues for structural components
 %
 % Returns
 % -------
-% fnc_filters: struct
-%   logical filters controlling the function and reoccupancy 
-%   consequences of various component damage states. Primarily used to
-%   expidite the assessment in the functionality module. Each field is a 
-%   [1xn] array where n represents the damage state of each component 
-%   populated in the builing and corresponding to the columns of the 
-%   simulated component damage arrays within damage.tenant_units.
-
+% damage: struct
+%   contains simulated damage info and damage state attributes
+% temp_repair_class: table
+%   attributes of each temporary repair class to consider
+%
 
 %% Combine compoment attributes into recovery filters to expidite recovery assessment
 % combine all damage state filters that have the potential to affect
@@ -41,6 +46,9 @@ fnc_filters.affects_function = fnc_filters.affects_reoccupancy | ...
 % Define when building has resolved its red tag (when all repairs are complete that may affect red tags)
 % get any components that have the potential to cause red tag
 fnc_filters.red_tag = comp_ds_table.safety_class > 0; 
+
+fnc_filters.requires_shoring = logical(comp_ds_table.requires_shoring);
+
 
 % fire suppresion system damage that affects entire building
 fnc_filters.fire_building = comp_ds_table.system == 9 & strcmp(string(comp_ds_table.service_location),'building') & comp_ds_table.impairs_system_operation;
@@ -184,6 +192,12 @@ sim_tmp_worker_days_per_unit = lognrnd(log(tmp_worker_days_per_unit),0.4,size(tm
 for tu = 1:length(damage.tenant_units)
     damage.tenant_units{tu}.tmp_worker_day = ...
         damage.tenant_units{tu}.qnt_damaged .* sim_tmp_worker_days_per_unit;
+end
+
+
+%% Set up temp_repair_class based on user inputs
+if ~allow_shoring
+    temp_repair_class(temp_repair_class.id == 5,:) = []; % Remove shoring from table
 end
 
 end

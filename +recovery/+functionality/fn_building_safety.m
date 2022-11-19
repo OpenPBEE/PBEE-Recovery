@@ -61,17 +61,16 @@ for tu = 1:num_units
     comp_breakdowns.red_tag(:,:,tu) = damage.fnc_filters.red_tag .* recovery_day.red_tag .* damage.red_tag_impact;
     
     %% Local Shoring
-    % Any unresolved damage (temporary or otherwise) that requires shoring,
-    % blocks occupancy to the whole building
-    shoring_filt = logical(damage.comp_ds_table.requires_shoring');
-    if any(shoring_filt)
+    if any(damage.fnc_filters.requires_shoring) && functionality_options.include_local_stability_impact
+        % Any unresolved damage (temporary or otherwise) that requires shoring,
+        % blocks occupancy to the whole building
         recovery_day.shoring = max(recovery_day.shoring, ...
-            max(repair_complete_day_w_tmp(:,shoring_filt),[],2)); 
-    end
+            max(repair_complete_day_w_tmp(:,damage.fnc_filters.requires_shoring),[],2)); 
     
-    % Componet Breakdowns (the time it takes to shore or fully repair each
-    % component is the time it blocks occupancy for)
-    comp_breakdowns.shoring(:,:,tu) = shoring_filt .* repair_complete_day_w_tmp .* is_damaged;
+        % Componet Breakdowns (the time it takes to shore or fully repair each
+        % component is the time it blocks occupancy for)
+        comp_breakdowns.shoring(:,:,tu) = damage.fnc_filters.requires_shoring .* repair_complete_day_w_tmp .* is_damaged;
+    end
     
     %% Day the fire suppression system is operating again (for the whole building)
     if ~functionality_options.fire_watch && fs_exists

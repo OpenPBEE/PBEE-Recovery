@@ -33,11 +33,13 @@ repair_time_options.max_workers_per_sqft_story_temp_repair = 0.005;
 repair_time_options.max_workers_per_sqft_building = 0.00025;
 repair_time_options.max_workers_building_min = 20;
 repair_time_options.max_workers_building_max = 260;
+repair_time_options.allow_shoring = 1;
 
 % Functionality Assessment Options
 functionality_options.calculate_red_tag = 1;
 functionality_options.red_tag_clear_time = 7;
 functionality_options.red_tag_clear_beta = 0.6;
+functionality_options.include_local_stability_impact = 1;
 functionality_options.door_racking_repair_day = 3;
 functionality_options.egress_threshold = 0.5;
 functionality_options.fire_watch = true;

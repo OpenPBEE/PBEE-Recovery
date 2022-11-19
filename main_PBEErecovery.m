@@ -49,7 +49,8 @@ import recovery.repair_schedule.main_repair_schedule
 import recovery.functionality.main_functionality
 
 %% Combine compoment attributes into recovery filters to expidite recovery assessment
-[damage] = fn_preprocessing(damage.comp_ds_table, damage);
+[damage, tmp_repair_class] = fn_preprocessing(damage.comp_ds_table, damage, ...
+    repair_time_options.allow_shoring, tmp_repair_class);
 
 %% Calculate Red Tags
 [ damage_consequences.red_tag, damage.red_tag_impact, damage_consequences.inspection_trigger ] ...
