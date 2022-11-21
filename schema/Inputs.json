@@ -41,7 +41,7 @@
 						"contractor": {
 							"type": "logical",
 							"description": "flag to include contractor mobilization delays"
-						}
+						},
 						"long_lead": {
 							"type": "logical",
 							"description": "flag to include long lead delays"
@@ -183,7 +183,7 @@
 			}
 		},
 		"functionality_options": {
-			"type": "object"
+			"type": "object",
 			"description": "general functionality module inputs",
 			"properties": {
 				"calculate_red_tag": {
@@ -303,21 +303,21 @@
 								"type": "object",
 								"properties": {
 									"qty_dir_1": {								
-										"description": "total number of component units for each component stack in direction 1 of this story"
-										"$ref": "#/definitions/arrayOfNumbers"
+										"description": "total number of component units for each component stack in direction 1 of this story",
+										"$ref": "#/definitions/arrayOfNumbers",
 									"qty_dir_2": {
-										"description": "total number of component units for each component stack in direction 2 of this story"
+										"description": "total number of component units for each component stack in direction 2 of this story",
 										"$ref": "#/definitions/arrayOfNumbers"
 									},
 									"qty_dir_3": {
-										"description": "total number of component units for each component stack in direction 3 (nondirectional) of this story"
+										"description": "total number of component units for each component stack in direction 3 (nondirectional) of this story",
 										"$ref": "#/definitions/arrayOfNumbers"
 									}
 								}
 							}
 						},
-						"comp_list":, {
-							"description": "fragility ID for each component stack"
+						"comp_list": {
+							"description": "fragility ID for each component stack",
 							"$ref": "#/definitions/arrayOfStrings"
 						},
 						"comp_table": {
@@ -343,35 +343,35 @@
 						"type": "object",
 						"properties": {
 							"qnt_damaged": {
-								"description": "simulation of the quantity of damaged components in each component damage state"
+								"description": "simulation of the quantity of damaged components in each component damage state",
 								"$ref": "#/definitions/arrayOfArraysOfNumbers"
 							},
 							"cost": {
-								"description": "simulated repair cost of each component's damage state"
+								"description": "simulated repair cost of each component's damage state",
 								"$ref": "#/definitions/arrayOfArraysOfNumbers"
 							},
 							"worker_days": {
-								"description": "simulated worker days required to repair each component's damage state"
+								"description": "simulated worker days required to repair each component's damage state",
 								"$ref": "#/definitions/arrayOfArraysOfNumbers"
 							},
 							"qnt_damaged_side_1": {
-								"description": "simulated number of damaged component damage states associated with side 1"
+								"description": "simulated number of damaged component damage states associated with side 1",
 								"$ref": "#/definitions/arrayOfArraysOfNumbers"
 							},
 							"qnt_damaged_side_2": {
-								"description": "simulated number of damaged component damage states associated with side 2"
+								"description": "simulated number of damaged component damage states associated with side 2",
 								"$ref": "#/definitions/arrayOfArraysOfNumbers"
 							},
 							"qnt_damaged_side_3": {
-								"description": "simulated number of damaged component damage states associated with side 3"
+								"description": "simulated number of damaged component damage states associated with side 3",
 								"$ref": "#/definitions/arrayOfArraysOfNumbers"
 							},
 							"qnt_damaged_side_4": {
-								"description": "simulated number of damaged component damage states associated with side 4"
+								"description": "simulated number of damaged component damage states associated with side 4",
 								"$ref": "#/definitions/arrayOfArraysOfNumbers"
 							},
 							"num_comps": {
-								"description": "total number of components populated within each tenant unit associated with each damage state"
+								"description": "total number of components populated within each tenant unit associated with each damage state",
 								"$ref": "#/definitions/arrayOfNumbers"
 							}
 						}
@@ -431,70 +431,70 @@
 		},
 		"tenant_units": {
 			"type": "table",
-			"description": "attributes and functional requirements of each tenant unit in the building"
+			"description": "attributes and functional requirements of each tenant unit in the building",
 			"properties": {
 				"id": {
-					"type": "number"
+					"type": "number",
 					"description": "tenant unit unique id"
 				},
 				"story": {
-					"type": "number"
+					"type": "number",
 					"description": "story where each tenant unit is located"
 				},
 				"area": {
-					"type": "number"
+					"type": "number",
 					"description": "floor area, in square feet, of the tenant unit"
 				},
 				"perim_area": {
-					"type": "number"
+					"type": "number",
 					"description": "perimeter area, in square feet, of the tenant unit"
 				},
 				"occupancy_id": {
-					"type": "number"
+					"type": "number",
 					"description": "unique id key linking each tenant unit to its associated tenant function requirements"
 				},
 				"exterior": {
-					"type": "number"
+					"type": "number",
 					"description": "tolerance for damage to exterior systems required for tenant function (0 = any damage causes loss of function, 0.999 = everything must be damage for loss of tenant function). Ratio of the perimeter area of severely damaged exterior components within the tenant-unit to the total perimeter area of the tenant unit (i.e., what percent of the exterior walls must be sufficiently damaged to cause tenants to not be able to function in this space)."
 				},
 				"interior": {
-					"type": "number"
+					"type": "number",
 					"description":  "tolerance for damage to interior systems required for tenant function (0 = any damage causes loss of function, 0.999 = everything must be damage for loss of tenant function). Ratio of the interior plan area of severely damaged interior components within the tenant-unit to the total plan area of the tenant unit (i.e., what percent of the interior space must be hindered to cause tenants to not be able to function in this space)."
 				},
 				"occ_per_elev": {
-					"type": "number"
+					"type": "number",
 					"description": "max number of occupants per elevator allowed for function"
 				},
 				"is_elevator_required": {
-					"type": "logical"
+					"type": "logical",
 					"description": "is an operational elevator required for tenant function"
 				},
 				"is_electrical_required": {
-					"type": "logical"
+					"type": "logical",
 					"description": "is an operational electrical system required for tenant function"
 				},
 				"is_water_potable_required": {
-					"type": "logical"
+					"type": "logical",
 					"description": "is an operational potable water plumbing system required for tenant function"
 				},
 				"is_water_sanitary_required": {
-					"type": "logical"
+					"type": "logical",
 					"description": "is an operational sanitary waste plumbing system required for tenant function"
 				},
 				"is_hvac_ventilation_required": {
-					"type": "logical"
+					"type": "logical",
 					"description": "is an operational hvac system required for tenant function"
 				},
 				"is_hvac_heating_required": {
-					"type": "logical"
+					"type": "logical",
 					"description": "is an operational hvac system required for tenant function"
 				},
 				"is_hvac_cooling_required": {
-					"type": "logical"
+					"type": "logical",
 					"description": "is an operational hvac system required for tenant function"
 				},
 				"is_hvac_exhaust_required": {
-					"type": "logical"
+					"type": "logical",
 					"description": "is an operational hvac system required for tenant function"
 				}
 			}
