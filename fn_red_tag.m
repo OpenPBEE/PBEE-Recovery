@@ -1,4 +1,5 @@
-function [ red_tag, red_tag_impact, inspection_tag ] = fn_red_tag( calculate_red_tag, damage, comps )
+function [ red_tag, red_tag_impact, inspection_tag ] = ...
+    fn_red_tag( calculate_red_tag, damage, comps, simulated_replacement )
 % Perform the ATC-138 functional recovery time assessement given similation
 % of component damage for a single shaking intensity
 %
@@ -12,6 +13,8 @@ function [ red_tag, red_tag_impact, inspection_tag ] = fn_red_tag( calculate_red
 %   contains per damage state damage and loss data for each component in the building
 % comps: struct
 %   data structure component population info
+% simulated_replacement: array [num reals x 1]
+%   Time 
 %
 % Returns
 % -------
@@ -40,15 +43,21 @@ else
     inspection_tag = zeros(num_reals,1);
 end
 
+% Account for global red tag cases
+replace_case = ~isnan(simulated_replacement);
+red_tag(replace_case) = 1;
+
 end
 
 function [ red_tag, red_tag_impact ] = simulate_tagging( damage, comps, sc_ids, sc_thresholds )
 
 % Simulate uncertainty in inspector threhsold
-% num_reals = length(damage_consequences.simulated_replacement);
+% [num_reals,~] = size(damage.story{1}.qnt_damaged_dir_1);
 % sc_beta = [0.5 0.5 0.5 0.5];
+% sc_mins = [0.05 0.05 0.05 0];
+% sc_max = [0.75 0.75 0.75 0.75];
 % p_inpsector = rand(num_reals,1); % Simulate inspector "conservatism"
-% max(min(logninv(p_inpsector,log(sc_thresholds),sc_beta),0.75),0.05); % assumes beta of 0.5 and limits between 0.05 and 75%
+% sc_sim = max(min(logninv(p_inpsector,log(sc_thresholds),sc_beta),sc_max),sc_mins);
 
 red_tag_impact = zeros(size(damage.tenant_units{1}.qnt_damaged)); % num reals by num comp_ds
 
@@ -88,6 +97,7 @@ for sc = 1:length(sc_ids)
                 sys_qty = max(ser_qty,[],2);
                 sys_ratio = sys_dmg ./ sys_qty;
                 sys_tag(:,sys) = sys_ratio > sc_thresholds(sc);
+%                 sys_tag(:,sys) = sys_ratio > sc_sim(:,sc); % when using simulated safety class thresholds
                 
                 % Calculate the impact that each component has on red tag
                 % (boolean, 1 = affects red tag, 0 = does not affect)

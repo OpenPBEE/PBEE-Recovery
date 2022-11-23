@@ -54,7 +54,8 @@ import recovery.functionality.main_functionality
 
 %% Calculate Red Tags
 [ damage_consequences.red_tag, damage.red_tag_impact, damage_consequences.inspection_trigger ] ...
-    = fn_red_tag( functionality_options.calculate_red_tag, damage, building_model.comps );
+    = fn_red_tag( functionality_options.calculate_red_tag, damage, building_model.comps,...
+    damage_consequences.simulated_replacement);
 
 %% Simulate ATC 138 Impeding Factors
 [functionality.impeding_factors] = main_impeding_factors(damage, impedance_options, ...

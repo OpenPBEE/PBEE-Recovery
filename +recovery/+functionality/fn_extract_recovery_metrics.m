@@ -77,7 +77,9 @@ recovery.building_level.prob_of_target = mean(recovery.building_level.recovery_d
 
 % Save specific breakdowns for red tags
 if isfield(recovery_day, 'building_safety')
-    recovery.building_level.recovery_day_red_tag = recovery_day.building_safety.red_tag;
+    red_tag_day = recovery_day.building_safety.red_tag;
+    red_tag_day(replace_cases,:) = simulated_replacement(replace_cases);
+    recovery.building_level.recovery_day_red_tag = red_tag_day;
 end
 
 %% Recovery Trajectory -- calcualte from the tenant breakdowns
