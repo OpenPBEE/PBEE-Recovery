@@ -58,7 +58,7 @@ for tu = 1:num_units
     end
     
     % Componet Breakdowns
-    comp_breakdowns.red_tag(:,:,tu) = recovery_day.red_tag .* damage.red_tag_impact;
+    comp_breakdowns.red_tag(:,:,tu) = recovery_day.red_tag .* damage_consequences.red_tag_impact;
     
     %% Local Shoring
     if any(damage.fnc_filters.requires_shoring) && functionality_options.include_local_stability_impact
@@ -149,11 +149,7 @@ for i = 1:num_repair_time_increments
             comp_affected_ft_this_story = comp_affected_area(:,:,tu) ./ building_model.ht_per_story_ft(tu);
             affected_ft_this_story = sum(comp_affected_ft_this_story,2); % Assumes cladding components do not occupy the same perimeter space
 
-            try
             affected_ratio.(['side_' num2str(side)])(:,tu) = min((affected_ft_this_story) ./ edge_lengths(side,tu),1);
-            catch
-                tmp = 6;
-            end
         end
     end
 

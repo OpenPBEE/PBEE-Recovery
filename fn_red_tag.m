@@ -26,6 +26,14 @@ function [ red_tag, red_tag_impact, inspection_tag ] = ...
 % inspection_tag: logical array [num_reals x 1]
 %   indicates the realizations that require inspection
 
+%% Initial Setup
+% Check to see if any components need the red tag check
+% if none of the components are assinged to structuctural systems, then
+% skip the red tag calc
+if ~any(comps.comp_table.structural_system)
+    calculate_red_tag = false;
+end
+
 %% Method
 if calculate_red_tag
     % Simulate Red Tags
@@ -38,9 +46,9 @@ if calculate_red_tag
 else
     % Do not calculate red tags based on component damage
     [num_reals,num_comp_ds] = size(damage.tenant_units{1}.qnt_damaged);
-    red_tag = zeros(num_reals,1);
+    red_tag = false(num_reals,1);
     red_tag_impact = zeros(num_reals,num_comp_ds);
-    inspection_tag = zeros(num_reals,1);
+    inspection_tag = false(num_reals,1);
 end
 
 % Account for global red tag cases
