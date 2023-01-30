@@ -139,6 +139,10 @@
 						"site_pga": {
 							"type": "number",
 							"description": "peak ground acceleration (PGA) in g at the building site for the ground shaking intensity of interest"
+						},
+						"pga_de": {
+							"type": "number",
+							"description": "peak ground acceleration (PGA) in g associated with the design eartquake (DE)"
 						}
 					}
 				},
@@ -399,8 +403,12 @@
 					"description": "simulated number of racked entry doors on one side of the building", 
 					"$ref": "#/definitions/arrayOfNumbers"
 				},
-				"repair_cost_ratio": {
-					"description": "simulated building repair cost of structural and nonstructural repairs (does not include tenant contents) normalized by the replacement value", 
+				"repair_cost_ratio_total": {
+					"description": "simulated building repair cost of structural and nonstructural repairs (does not include tenant contents); normalized by the replacement value", 
+					"$ref": "#/definitions/arrayOfNumbers"
+				},
+				"repair_cost_ratio_engineering": {
+					"description": "simulated building repair cost of repairs that require engineering redesign; normalized by the replacement value", 
 					"$ref": "#/definitions/arrayOfNumbers"
 				}
 			}

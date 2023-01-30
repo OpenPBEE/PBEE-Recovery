@@ -141,7 +141,7 @@ if exist('utility_downtime.json','file')
     functionality = jsondecode(fileread('utility_downtime.json'));
 else
     % If no data exist, assume there is no consequence of network downtime
-    num_reals = length(damage_consequences.repair_cost_ratio);
+    num_reals = length(damage_consequences.repair_cost_ratio_total);
     functionality.utilities.electrical = zeros(num_reals,1);
     functionality.utilities.water = zeros(num_reals,1);
     functionality.utilities.gas = zeros(num_reals,1);

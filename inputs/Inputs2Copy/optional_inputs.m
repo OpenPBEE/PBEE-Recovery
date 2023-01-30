@@ -24,6 +24,7 @@ impedance_options.default_lead_time = 182;
 impedance_options.demand_surge.include_surge = 1;
 impedance_options.demand_surge.is_dense_urban_area = 1;
 impedance_options.demand_surge.site_pga = 1;
+impedance_options.demand_surge.pga_de = 1;
 impedance_options.scaffolding_lead_time = 5;
 impedance_options.scaffolding_erect_time = 2;
 
