@@ -142,7 +142,7 @@
 						},
 						"pga_de": {
 							"type": "number",
-							"description": "peak ground acceleration (PGA) in g associated with the design eartquake (DE)"
+							"description": "peak ground acceleration (PGA) in g associated with the design eartquake (DE). Method of combining ground motion pairs (e.g., max direction vs geomean) should match the field site_pga"
 						}
 					}
 				},

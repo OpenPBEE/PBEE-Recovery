@@ -112,7 +112,8 @@ end
 % Format Start and Stop Time Data for Gantt Chart plots 
 % This is also the main data structure used for calculating full repair time
 % outputs
-[ building_repair_schedule ] = fn_format_gantt_chart_data( damage, systems, simulated_replacement );
+[ building_repair_schedule.full ] = fn_format_gantt_chart_data( damage, systems, simulated_replacement );
+[ building_repair_schedule.temp ] = fn_format_gantt_chart_data( tmp_damage, systems, simulated_replacement );
 
 end
 
