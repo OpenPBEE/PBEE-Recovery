@@ -180,9 +180,13 @@
 					"type": "number",
 					"description": "Upper limit on the maximum number of workers for the entire building (i.e., max number of workers is never more than this). Default to 260 from REDi",
 				},
+				"allow_tmp_repairs": {
+					"type": "logical",
+					"description": "Flag to allow temporay repair measures to be used to restore building reoccupancy and basic function",
+				},
 				"allow_shoring": {
 					"type": "logical",
-					"description": "Flag to allow shoring to be used as a temporary repair for mitigating local structural stability issues",
+					"description": "Flag to allow shoring to be used as a temporary repair for mitigating local structural stability issues. Setting allow_tmp_repairs to zero overwrites this flag",
 				}
 			}
 		},

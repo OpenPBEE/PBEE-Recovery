@@ -1,5 +1,5 @@
 function [damage, temp_repair_class] = ...
-    fn_preprocessing(comp_ds_table, damage, allow_shoring, temp_repair_class)
+    fn_preprocessing(comp_ds_table, damage, repair_time_options, temp_repair_class)
 % Calculate ATC-138 impeding times for each system given simulation of damage
 %
 % Parameters
@@ -15,7 +15,7 @@ function [damage, temp_repair_class] = ...
 %   contains simulated damage info and damage state attributes
 % temp_repair_class: table
 %   attributes of each temporary repair class to consider
-% allow_shoring: logical
+% repair_time_options.allow_shoring: logical
 %   flag indicating whether or not shoring should be considered as a
 %   temporary repair for local stability issues for structural components
 %
@@ -166,7 +166,7 @@ end
 tmp_worker_days_per_unit = [];
 for c = 1:height(comp_ds_table) % for each comp ds
     comp = comp_ds_table(c,:);
-    if comp.tmp_repair_class > 0 % For damage that has temporary repair
+    if comp.tmp_repair_class > 0 && repair_time_options.allow_tmp_repairs % For damage that has temporary repair
         filt = strcmp(comp_ds_table.comp_id,comp.comp_id)';
         total_damaged_all_ds = sum(total_damaged(:,filt),2);
 
@@ -195,7 +195,7 @@ end
 
 
 %% Set up temp_repair_class based on user inputs
-if ~allow_shoring
+if ~repair_time_options.allow_shoring
     temp_repair_class(temp_repair_class.id == 5,:) = []; % Remove shoring from table
 end
 

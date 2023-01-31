@@ -34,6 +34,7 @@ repair_time_options.max_workers_per_sqft_story_temp_repair = 0.005;
 repair_time_options.max_workers_per_sqft_building = 0.00025;
 repair_time_options.max_workers_building_min = 20;
 repair_time_options.max_workers_building_max = 260;
+repair_time_options.allow_tmp_repairs = 1;
 repair_time_options.allow_shoring = 1;
 
 % Functionality Assessment Options
