@@ -155,6 +155,12 @@ damage.fnc_filters = tmp_fnc_filt; % assign to damage data structure
 % provide more inputs than they are already and compromise the backward
 % compatability of the code
 
+% Turn of temp repairs if specificied by the user
+if ~repair_time_options.allow_tmp_repairs
+    comp_ds_table.tmp_repair_class = zeros(size(damage.comp_ds_table.tmp_repair_class));
+    damage.comp_ds_table = comp_ds_table; % Save changes to pass through to outputs
+end
+
 % Find total number of damamged components
 total_damaged = damage.tenant_units{1}.qnt_damaged;
 for tu = 2:length(damage.tenant_units)
@@ -166,7 +172,7 @@ end
 tmp_worker_days_per_unit = [];
 for c = 1:height(comp_ds_table) % for each comp ds
     comp = comp_ds_table(c,:);
-    if comp.tmp_repair_class > 0 && repair_time_options.allow_tmp_repairs % For damage that has temporary repair
+    if comp.tmp_repair_class > 0 % For damage that has temporary repair
         filt = strcmp(comp_ds_table.comp_id,comp.comp_id)';
         total_damaged_all_ds = sum(total_damaged(:,filt),2);
 
@@ -192,7 +198,6 @@ for tu = 1:length(damage.tenant_units)
     damage.tenant_units{tu}.tmp_worker_day = ...
         damage.tenant_units{tu}.qnt_damaged .* sim_tmp_worker_days_per_unit;
 end
-
 
 %% Set up temp_repair_class based on user inputs
 if ~repair_time_options.allow_shoring

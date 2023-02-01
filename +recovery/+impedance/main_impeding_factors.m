@@ -58,7 +58,8 @@ num_sys = height(systems);
 % Pre-allocate each type of impedance
 duration.inspection = zeros(num_reals, num_sys);
 duration.financing = zeros(num_reals, num_sys);
-duration.permit = zeros(num_reals, num_sys);
+duration.permit_rapid = zeros(num_reals, num_sys);
+duration.permit_full = zeros(num_reals, num_sys);
 duration.contractor_mob = zeros(num_reals, num_sys);
 duration.eng_mob = zeros(num_reals, num_sys);
 duration.design = zeros(num_reals, num_sys);
