@@ -103,25 +103,25 @@ The csv tables listed below contain default componet, damage state, system, and 
  - **tenant_function_requirements.csv**: Default tenant requirements for function for various occupancy classes.
 
 ## Converting Inputs from PELICUN Outputs
-Convert outputs from SimCenter's PELICUN tool into PBEE-Recovery inputs. Specifically; build the three json files: _damage_consequences.json_, _building_model.json_, and _simulated_damage.json_ from PELICUN outputs
+Convert outputs from SimCenter's PELICUN v3 tool into PBEE-Recovery inputs. Specifically; build the four input files: _comp_ds_list.csv_, _damage_consequences.json_, _building_model.json_, and _simulated_damage.json_ from PELICUN I/O
 
 ### Instructions
  - **Step 1**: Create a model input directory in the _inputs_ directory
- - **Step 2**: Copy the PELICUN output files into a directory titled _pelicun_results_ within the model input directory.
- - **Step 3**: Copy any additional input files into a titled _treads_data_ within the model input directory.
- - **Step 4**: Create the files _tenant_unit_list.csv_ and _comp_ds_list.csv_ and place them into the model input directory.
- - **Step 5**: Make sure the input variables at the begining of the file _driver_convert_PELICUN.m_ are all up to date.
- - **Step 6**: Run the file _driver_convert_PELICUN.m_
+ - **Step 2**: Copy the PELICUN I/O files into a directory titled _pelicun_data_ within the model input directory.
+ - **Step 3**: Create the files _tenant_unit_list.csv_ and _general_inputs.json_ and place them into the model input directory.
+ - **Step 4**: Make sure the input variables at the begining of the file _driver_convert_PELICUN.m_ are all up to date.
+ - **Step 5**: Run the file _driver_convert_PELICUN.m_
  - **Step 6**: Run the build script following the instructions above
 
 ### PELICUN Files
 Place each of the following files in the _pelicun_results_ directory within the model input directory.
- - **DMG.csv**: Realizations of damaged components for each damage state of each performance group.
- - **DV_rec_cost_agg.csv**: Realizations of repair cost for each fragility group.
- - **DV_rec_time.csv**: Realizations of repair time (worker days) for each damage state of each performance group.
+ - **DMG_sample.csv**: Realizations of damaged components for each damage state of each performance group.
+ - **DV_bldg_repair_sample.csv**: Realizations of repair time (worker days) for each damage state of each performance group.
+ - **DL_summary.csv**: Realizations of consequence data at the building level (including repair cost).
+ - **CMP_QNT.csv**: Component population data.
+ - **input.json**: Pelicun config file.
  
  ### Required Additoinal Inputs
  Place each of the following files in the _treads_data_ directory within the model input directory.
- - **DL_model.json**: Json containing model data (from PELICUN)
- - **IF_delays.csv**: Realizations of impeding factor delays
- - **input_parameters.json**: Json containing model data (from TREADS)
+ - **general_inputs.json**: Json containing other misc data needed for recovery assessment.
+ - **tenant_unit_list.csv**: Table that lists each tenant unit within the building; see description above.
