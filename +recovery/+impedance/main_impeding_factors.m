@@ -271,20 +271,21 @@ scaffold_repair_time = exp(x_vals_std_n * beta + log(impedance_options.scaffoldi
 impeding_factors.temp_repair.scaffold_day = ceil(scaffold_impede_time + scaffold_repair_time); % round up (dont resolve issue on the same day repairs are complete)
 
 %% Format Impedance times for Gantt Charts
-impeding_factors.breakdowns.inspection.start_day = max(start_day.inspection,[],2);
-impeding_factors.breakdowns.inspection.complete_day = max(complete_day.inspection,[],2);
-impeding_factors.breakdowns.financing.start_day = max(start_day.financing,[],2);
-impeding_factors.breakdowns.financing.complete_day = max(complete_day.financing,[],2);
-impeding_factors.breakdowns.contractor_mob.start_day = max(start_day.contractor_mob,[],2);
-impeding_factors.breakdowns.contractor_mob.complete_day = max(complete_day.contractor_mob,[],2);
-impeding_factors.breakdowns.eng_mob.start_day = max(start_day.eng_mob,[],2);
-impeding_factors.breakdowns.eng_mob.complete_day = max(complete_day.eng_mob,[],2);
-impeding_factors.breakdowns.design.start_day = max(start_day.design,[],2);
-impeding_factors.breakdowns.design.complete_day = max(complete_day.design,[],2);
-impeding_factors.breakdowns.permit_rapid.start_day = max(start_day.permit_rapid,[],2);
-impeding_factors.breakdowns.permit_rapid.complete_day = max(complete_day.permit_rapid,[],2);
-impeding_factors.breakdowns.permit_full.start_day = max(start_day.permit_full,[],2);
-impeding_factors.breakdowns.permit_full.complete_day = max(complete_day.permit_full,[],2);
+% Full repair
+impeding_factors.breakdowns.full.inspection.start_day = max(start_day.inspection,[],2);
+impeding_factors.breakdowns.full.inspection.complete_day = max(complete_day.inspection,[],2);
+impeding_factors.breakdowns.full.financing.start_day = max(start_day.financing,[],2);
+impeding_factors.breakdowns.full.financing.complete_day = max(complete_day.financing,[],2);
+impeding_factors.breakdowns.full.contractor_mob.start_day = max(start_day.contractor_mob,[],2);
+impeding_factors.breakdowns.full.contractor_mob.complete_day = max(complete_day.contractor_mob,[],2);
+impeding_factors.breakdowns.full.eng_mob.start_day = max(start_day.eng_mob,[],2);
+impeding_factors.breakdowns.full.eng_mob.complete_day = max(complete_day.eng_mob,[],2);
+impeding_factors.breakdowns.full.design.start_day = max(start_day.design,[],2);
+impeding_factors.breakdowns.full.design.complete_day = max(complete_day.design,[],2);
+impeding_factors.breakdowns.full.permit_rapid.start_day = max(start_day.permit_rapid,[],2);
+impeding_factors.breakdowns.full.permit_rapid.complete_day = max(complete_day.permit_rapid,[],2);
+impeding_factors.breakdowns.full.permit_full.start_day = max(start_day.permit_full,[],2);
+impeding_factors.breakdowns.full.permit_full.complete_day = max(complete_day.permit_full,[],2);
 
 % Represent long lead times per system
 for s = 1:height(systems)
@@ -292,5 +293,16 @@ for s = 1:height(systems)
     impeding_factors.breakdowns.long_lead.(systems.name{s}).complete_day = complete_day.long_lead(:,s);
 end
 
+% Temporary Repairs - hard coded fixed to 5 temp repair class
+impeding_factors.breakdowns.temp.janitorial.start_day = zeros(num_reals,1);
+impeding_factors.breakdowns.temp.janitorial.complete_day = impeding_factors.temp_repair.time_sys(:,1);
+impeding_factors.breakdowns.temp.basic_laborer.start_day = zeros(num_reals,1);
+impeding_factors.breakdowns.temp.basic_laborer.complete_day = impeding_factors.temp_repair.time_sys(:,2);
+impeding_factors.breakdowns.temp.skilled_laborer.start_day = zeros(num_reals,1);
+impeding_factors.breakdowns.temp.skilled_laborer.complete_day = impeding_factors.temp_repair.time_sys(:,3);
+impeding_factors.breakdowns.temp.specialized_laborer.start_day = zeros(num_reals,1);
+impeding_factors.breakdowns.temp.specialized_laborer.complete_day = impeding_factors.temp_repair.time_sys(:,4);
+impeding_factors.breakdowns.temp.shoring.start_day = zeros(num_reals,1);
+impeding_factors.breakdowns.temp.shoring.complete_day = impeding_factors.temp_repair.time_sys(:,5);
 
 end
