@@ -111,7 +111,7 @@ average_crew_size = zeros(num_reals,num_stories);
 for s = 1:num_stories
     % Define damage properties of this system at this story
     num_damaged_units(:,s) = sum(sequence_filt .* damage.tenant_units{s}.qnt_damaged,2);
-    is_damaged = damage.tenant_units{s}.qnt_damaged > 0;
+    is_damaged = damage.tenant_units{s}.qnt_damaged > 0 & damage.tenant_units{s}.worker_days > 0;
     is_damaged_building = is_damaged_building | is_damaged;
     
     for c = 1:length(comp_types)

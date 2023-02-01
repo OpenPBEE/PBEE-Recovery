@@ -95,7 +95,7 @@ sys_repair_trigger.redesign = zeros(num_reals, num_sys);
 for sys = 1:num_sys
     sys_filt = damage.comp_ds_table.system' == sys; 
     for tu = 1:length(damage.tenant_units)
-        is_damaged = damage.tenant_units{tu}.qnt_damaged > 0;
+        is_damaged = damage.tenant_units{tu}.qnt_damaged > 0 & damage.tenant_units{tu}.worker_days > 0; % There is damage that needs to be fixed
         % Track if any damage exists that requires repair (assumes all
         % damage requires repair)
         sys_repair_trigger.any(:,sys) = max( ...
@@ -172,7 +172,7 @@ if impedance_options.include_impedance.long_lead
         sim_long_lead = exp(x_vals_std_n * beta + log(damage.comp_ds_table.long_lead_time'));
         
         for tu = 1:length(damage.tenant_units)
-            is_damaged = damage.tenant_units{tu}.qnt_damaged > 0;
+            is_damaged = damage.tenant_units{tu}.qnt_damaged > 0 & damage.tenant_units{tu}.worker_days > 0;
             
             % Track if any damage exists that requires repair (assumes all
             % damage requires repair). The long lead time for the system is
@@ -239,7 +239,7 @@ tmp_repair_class_trigger = zeros(num_reals, height(tmp_repair_class));
 for sys = 1:height(tmp_repair_class) 
     sys_filt = damage.comp_ds_table.tmp_repair_class' == sys; 
     for tu = 1:length(damage.tenant_units)
-        is_damaged = damage.tenant_units{tu}.qnt_damaged > 0;
+        is_damaged = damage.tenant_units{tu}.qnt_damaged > 0 & damage.tenant_units{tu}.worker_days > 0;
         % Track if any damage exists that requires repair (assumes all
         % damage requires repair)
         tmp_repair_class_trigger(:,sys) = max( ...
@@ -294,15 +294,10 @@ for s = 1:height(systems)
 end
 
 % Temporary Repairs - hard coded fixed to 5 temp repair class
-impeding_factors.breakdowns.temp.janitorial.start_day = zeros(num_reals,1);
-impeding_factors.breakdowns.temp.janitorial.complete_day = impeding_factors.temp_repair.time_sys(:,1);
-impeding_factors.breakdowns.temp.basic_laborer.start_day = zeros(num_reals,1);
-impeding_factors.breakdowns.temp.basic_laborer.complete_day = impeding_factors.temp_repair.time_sys(:,2);
-impeding_factors.breakdowns.temp.skilled_laborer.start_day = zeros(num_reals,1);
-impeding_factors.breakdowns.temp.skilled_laborer.complete_day = impeding_factors.temp_repair.time_sys(:,3);
-impeding_factors.breakdowns.temp.specialized_laborer.start_day = zeros(num_reals,1);
-impeding_factors.breakdowns.temp.specialized_laborer.complete_day = impeding_factors.temp_repair.time_sys(:,4);
-impeding_factors.breakdowns.temp.shoring.start_day = zeros(num_reals,1);
-impeding_factors.breakdowns.temp.shoring.complete_day = impeding_factors.temp_repair.time_sys(:,5);
+for tmp = 1:height(tmp_repair_class)
+    impeding_factors.breakdowns.temp.(tmp_repair_class.name_short{tmp}).start_day = zeros(num_reals,1);
+    impeding_factors.breakdowns.temp.(tmp_repair_class.name_short{tmp}).complete_day = impeding_factors.temp_repair.time_sys(:,1);
+end
+
 
 end

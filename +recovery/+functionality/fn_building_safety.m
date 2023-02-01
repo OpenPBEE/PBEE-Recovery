@@ -47,7 +47,7 @@ for tu = 1:num_units
     repair_complete_day = damage.tenant_units{tu}.recovery.repair_complete_day;
     repair_complete_day_w_tmp = damage.tenant_units{tu}.recovery.repair_complete_day_w_tmp;
     
-    is_damaged = (damage.tenant_units{tu}.qnt_damaged > 0);
+    is_damaged = damage.tenant_units{tu}.qnt_damaged > 0 & damage.tenant_units{tu}.worker_days > 0;
     
     %% Red Tags
     % The day the red tag is resolved is the day when all damage (anywhere in building) that has

@@ -58,7 +58,7 @@ for tu = 1:num_units
     damage.tenant_units{tu}.recovery.repair_complete_day = inf(size(damage.tenant_units{tu}.qnt_damaged));
     
     % if not damaged, set repair complete time to NaN
-    is_damaged = damage.tenant_units{tu}.qnt_damaged > 0;
+    is_damaged = damage.tenant_units{tu}.qnt_damaged > 0 & damage.tenant_units{tu}.worker_days > 0;
     damage.tenant_units{tu}.recovery.repair_complete_day(~is_damaged) = NaN; 
 end
 
