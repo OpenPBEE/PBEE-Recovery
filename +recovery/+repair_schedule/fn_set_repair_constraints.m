@@ -45,8 +45,10 @@ elseif strcmp(repair_type,'temp')
     % All temp repairs are blocked by shoring
     shoring_id = 5;
     shoring_filt = systems.id == shoring_id;
-    shoring_idx = find(shoring_filt);
-    sys_constraint_matrix(:,~shoring_filt') = shoring_idx; % all classes that are not shoring idx are blocked by the shoring idx
+    if any(shoring_filt) % If shoring is considred as a temp repair measure
+        shoring_idx = find(shoring_filt);
+        sys_constraint_matrix(:,~shoring_filt') = shoring_idx; % all classes that are not shoring idx are blocked by the shoring idx
+    end
 else
     error('Unexpected Repair Type')
 end

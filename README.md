@@ -28,8 +28,6 @@ A brief description of the various input and output variables are provided below
    data structure containing optional method inputs for the assessment of the repair schedule
  - **functionality_options**: [_struct_]
    data structure containing optional method inputs for the assessment of building function, such as functionality limit state thresholds
- - **regional_impact**: [_struct_] 
-   general inputs that quantify regional impact on individual building performance
  - **building_model**: [_struct_]
    data structure containing general information about the building such as the number of stories and the building area
  - **damage**: [_struct_]
@@ -77,6 +75,10 @@ Each file listed below contains data specific to the building performance model 
      - comp_id: [string] unique FEMA P-58 component identifier
      - ds_seq_id: [int] interger index of the sequential parent damage state (i.e., damage state 1, 2, 3, 4);
      - ds_sub_id: [int] interger index for the mutually exlusive of simeltaneous sub damage state; use 1 to indicate a sequential damage state with no sub damage state.
+  - **comp_ds_list.csv**: Table that lists the quantity and location of each component in the building performance model. This table requires the following attributes:
+     - story: [int] story location of the component
+     - dir: [int] direciton of the component (1, 2, or 3 for nondirectional);
+     - <1 attribute per comp>: [str] each component should be listed at its own column with string representation of the component id as the column header.
  - **damage_consequences.json**: Building-level and story-level simulated properties of building damage. Contains all variables within the _damage_consequences_ structure defined in the inputs schema.
  - **simulated_damage.json**: Component-level simulated damage properties. Contains all variables within the _damage.tenant_units_ structure defined in the inputs schema. Each variable containing realization of component damage should be defined uniquely for each tenant unit (shown as "tu" below). Each tenant_unit cell should contain the following variables:
      - tenant_unit{tu}.qnt_damaged: [array: simulations × damage states] The number of damaged components in each component damage state for each realization of the simulation.
@@ -93,7 +95,7 @@ The file(s) listed below contain data that is optional for the assessment. If th
 
 ### Default Optional Inputs
 The matlab file listed below defines additional assessment inputs based on set of default values. Copy the file from the _Inputs2Copy_ directory, place it in the root directory of the build script, and modify it as you see if (or build the script programmatically)
- - **optional_inputs.m**: Defines default variables for the impedance_options, repair_time_options, functionality_options, and regional_impact variables listed in the inputs schema.
+ - **optional_inputs.m**: Defines default variables for the impedance_options, repair_time_options, and functionality_options variables listed in the inputs schema.
 
 ### Static Data
 The csv tables listed below contain default componet, damage state, system, and tenant function attributes that can be used to populate the required assessment inputs according to the methodology. Either point the _static_data_dir_ variable in build_inputs.m to the location of these tables in the _static_tables_ directory, or copy and modify them as you see fit and place them in the root directory of the build script.

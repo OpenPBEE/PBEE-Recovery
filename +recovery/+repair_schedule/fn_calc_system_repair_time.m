@@ -5,6 +5,8 @@ function [schedule] = fn_calc_system_repair_time(damage, repair_type, systems, m
 % ----------
 % damage: struct
 %   contains per damage state damage and loss data for each component in the building
+% repair_type: string
+%   String identifier indicating whether the repair are temporary or full
 % systems: table
 %   data table containing information about each system's attributes
 % max_workers_per_building: int
@@ -52,7 +54,7 @@ for sys = 1:height(systems)
             repair_type, ...
             systems.id(sys), ...
             systems.num_du_per_crew(sys), ...
-            systems.max_crews_per_comp_type(sys), ...
+            systems.max_crews_per_comp_type(sys), ...   
             max_workers_per_story, ...
             max_workers_per_building ...
             );
@@ -109,7 +111,7 @@ average_crew_size = zeros(num_reals,num_stories);
 for s = 1:num_stories
     % Define damage properties of this system at this story
     num_damaged_units(:,s) = sum(sequence_filt .* damage.tenant_units{s}.qnt_damaged,2);
-    is_damaged = damage.tenant_units{s}.qnt_damaged > 0;
+    is_damaged = damage.tenant_units{s}.qnt_damaged > 0 & damage.tenant_units{s}.(repair_time_var) > 0;
     is_damaged_building = is_damaged_building | is_damaged;
     
     for c = 1:length(comp_types)

@@ -1,6 +1,6 @@
-id,name,priority,num_du_per_crew,max_crews_per_comp_type,impeding_time,impeding_time_no_contractor
-1,Janitorial / general,5,NaN,1,1,1
-2,Basic carpenter/laborers,4,10,3,2,28
-3,Skilled labor,3,10,3,5,28
-4,Specialized laborer and equipment,2,NaN,1,7,28
-5,Skilled labor (shoring),1,10,3,5,28
+id,name,name_short,priority,num_du_per_crew,max_crews_per_comp_type,impeding_time,impeding_time_no_contractor
+1,Janitorial / general,janitorial,5,NaN,1,1,1
+2,Basic carpenter/laborers,basic_laborer,4,10,3,2,28
+3,Skilled labor,skilled_laborer,3,10,3,5,28
+4,Specialized laborer and equipment,specialized_laborer,2,NaN,1,7,28
+5,Skilled labor (shoring),shoring,1,10,3,5,28

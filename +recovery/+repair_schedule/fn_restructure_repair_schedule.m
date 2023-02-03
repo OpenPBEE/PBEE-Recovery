@@ -42,8 +42,10 @@ num_units = length(damage.tenant_units);
 
 % Define Repair Type Variables (variable within the damage object)
 if strcmp(repair_type,'full')
+    repair_time_var = 'worker_days';
     system_var = 'system';
 elseif strcmp(repair_type,'temp')
+    repair_time_var = 'tmp_worker_day';
     system_var = 'tmp_repair_class';
 else
     error('Unexpected Repair Type')
@@ -58,7 +60,7 @@ for tu = 1:num_units
     damage.tenant_units{tu}.recovery.repair_complete_day = inf(size(damage.tenant_units{tu}.qnt_damaged));
     
     % if not damaged, set repair complete time to NaN
-    is_damaged = damage.tenant_units{tu}.qnt_damaged > 0;
+    is_damaged = damage.tenant_units{tu}.qnt_damaged > 0 & damage.tenant_units{tu}.(repair_time_var) > 0;
     damage.tenant_units{tu}.recovery.repair_complete_day(~is_damaged) = NaN; 
 end
 
@@ -71,7 +73,7 @@ for sys = 1:num_sys
     story_complete_day = start_day + system_schedule.per_system{sys}.repair_complete_day;
     
     % Do not perform temporary repairs when building is red tagged
-    if strcmp(repair_type,'temp')
+    if strcmp(repair_type,'temp') && any(simulated_red_tags)
         story_start_day(simulated_red_tags,:) = NaN;
         story_complete_day(simulated_red_tags,:) = Inf;
     end
@@ -79,7 +81,7 @@ for sys = 1:num_sys
     % Re-distribute to each tenant unit
     sys_filt = damage.comp_ds_table.(system_var)' == systems.id(sys); % identifies which ds idices are in this seqeunce  
     for tu = 1:num_units
-        is_damaged = damage.tenant_units{tu}.qnt_damaged(:,sys_filt) > 0;
+        is_damaged = damage.tenant_units{tu}.qnt_damaged(:,sys_filt) > 0 & damage.tenant_units{tu}.(repair_time_var)(:,sys_filt) > 0;
         is_damaged = is_damaged*1;
         is_damaged(is_damaged == 0) = NaN;
 

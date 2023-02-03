@@ -250,67 +250,80 @@
 					"type": "object",
 					"description": "simulated building repair schedule",
 					"properties": {
-						"repair_start_day": {
+						"full": {
 							"type": "object",
-							"description": "the day after the earthquake that each repair starts",
-							"properties":{
-								"per_component":{
-									"description": "repair start day of each component",
-									"$ref": "#/definitions/arrayOfArraysOfNumbersOrNaN"
+							"description": "full building repairs required to bring building back to pre-event conditions",
+							"properties": {
+								"repair_start_day": {
+									"type": "object",
+									"description": "the day after the earthquake that each repair starts",
+									"properties":{
+										"per_component":{
+											"description": "repair start day of each component",
+											"$ref": "#/definitions/arrayOfArraysOfNumbersOrNaN"
+										},
+										"per_story":{
+											"description": "repair start day of each story",
+											"$ref": "#/definitions/arrayOfArraysOfNumbersOrNaN"
+										},
+										"per_system":{
+											"description": "repair start day of each system",
+											"$ref": "#/definitions/arrayOfArraysOfNumbersOrNaN"
+										},
+										"per_system_story":{
+											"description": "repair start day of each story within each system",
+											"$ref": "#/definitions/arrayOfArraysOfNumbersOrNaN"
+										},
+										"per_story_system":{
+											"description": "repair start day of each system on each story",
+											"$ref": "#/definitions/arrayOfArraysOfNumbersOrNaN"
+										}
+									}
 								},
-								"per_story":{
-									"description": "repair start day of each story",
-									"$ref": "#/definitions/arrayOfArraysOfNumbersOrNaN"
+								"repair_complete_day": {
+									"type": "object",
+									"description": "the day after the earthquake that each repair is finished",
+									"properties":{
+										"per_component":{
+											"description": "repair complete day of each component",
+											"$ref": "#/definitions/arrayOfArraysOfNumbersOrNaN"
+										},
+										"per_story":{
+											"description": "repair complete day of each story",
+											"$ref": "#/definitions/arrayOfArraysOfNumbersOrNaN"
+										},
+										"per_system":{
+											"description": "repair complete day of each system",
+											"$ref": "#/definitions/arrayOfArraysOfNumbersOrNaN"
+										},
+										"per_system_story":{
+											"description": "repair complete day of each story within each system",
+											"$ref": "#/definitions/arrayOfArraysOfNumbersOrNaN"
+										},
+										"per_story_system":{
+											"description": "repair complete day of each system on each story",
+											"$ref": "#/definitions/arrayOfArraysOfNumbersOrNaN"
+										}
+									}
 								},
-								"per_system":{
-									"description": "repair start day of each system",
-									"$ref": "#/definitions/arrayOfArraysOfNumbersOrNaN"
+								"component_names": {
+									"description": "names of each of the components in the per_component breakdown field",
+									"$ref": "#/definitions/arrayOfStrings"
 								},
-								"per_system_story":{
-									"description": "repair start day of each story within each system",
-									"$ref": "#/definitions/arrayOfArraysOfNumbersOrNaN"
-								},
-								"per_story_system":{
-									"description": "repair start day of each system on each story",
-									"$ref": "#/definitions/arrayOfArraysOfNumbersOrNaN"
+								"system_names": {
+									"description": "names of each of the systems in the per_system breakdown field",
+									"$ref": "#/definitions/arrayOfStrings"
 								}
 							}
 						},
-						"repair_complete_day": {
-						    "type": "object",
-						    "description": "the day after the earthquake that each repair is finished",
-						    "properties":{
-								"per_component":{
-									"description": "repair complete day of each component",
-									"$ref": "#/definitions/arrayOfArraysOfNumbersOrNaN"
-								},
-								"per_story":{
-									"description": "repair complete day of each story",
-									"$ref": "#/definitions/arrayOfArraysOfNumbersOrNaN"
-								},
-								"per_system":{
-									"description": "repair complete day of each system",
-									"$ref": "#/definitions/arrayOfArraysOfNumbersOrNaN"
-								},
-								"per_system_story":{
-									"description": "repair complete day of each story within each system",
-									"$ref": "#/definitions/arrayOfArraysOfNumbersOrNaN"
-								},
-								"per_story_system":{
-									"description": "repair complete day of each system on each story",
-									"$ref": "#/definitions/arrayOfArraysOfNumbersOrNaN"
-								}
-						    }
-						},
-						"component_names": {
-							"description": "names of each of the components in the per_component breakdown field",
-							"$ref": "#/definitions/arrayOfStrings"
-						},
-						"system_names": {
-							"description": "names of each of the systems in the per_system breakdown field",
-							"$ref": "#/definitions/arrayOfStrings"
+						"temp": {
+							"type": "object",
+							"description": "temporary building repairs only required to restore basic function",
+							"properties": {
+								"shares properties with full repair object"
+							}
 						}
-				    }
+					}
 				},
 				"worker_data": {
 				    "type": "object",

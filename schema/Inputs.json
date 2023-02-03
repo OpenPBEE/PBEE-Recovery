@@ -41,7 +41,7 @@
 						"contractor": {
 							"type": "logical",
 							"description": "flag to include contractor mobilization delays"
-						}
+						},
 						"long_lead": {
 							"type": "logical",
 							"description": "flag to include long lead delays"
@@ -69,6 +69,14 @@
 							"description": "average workday: average number of hours per day spent on project: Default to 8 hours"
 						}
 					}
+				},
+				"eng_design_min_days":{
+					"type": "number",
+					"description": "Minumum number of days for the median engineering design time"
+				},
+				"eng_design_max_days":{
+					"type": "number",
+					"description": "Maximum number of days for the median engineering design time"
 				},
 				"mitigation": {
 					"type": "object",
@@ -100,13 +108,13 @@
 						},
 						"capital_available_ratio": {
 							"type": "number",
-							"description": "ratio of the building value that the onwer has immediately available for repairs. Default to 0.10"
+							"description": "ratio of the building value that the onwer has immediately available for repairs"
 						}
 					}
 				},
 				"impedance_beta": {
 					"type": "number",
-					"description": "lognormal uncetainty of impedance times. Default to 0.6",
+					"description": "lognormal uncetainty of impedance times",
 				},
 				"impedance_truncation": {
 					"type": "number",
@@ -115,6 +123,36 @@
 				"default_lead_time": {
 					"type": "number",
 					"description": "Lead time, in days, to replace select components (equipment or other less readily available components). This default lead time will be applied to all components with the long_lead flag in the inputs builder. To add custom lead times per component, update the long_lead_time attribute in the damage.comp_ds_table field.",
+				},
+				"demand_surge": {
+					"type": "object",
+					"description": "general user input options for defining the demand surge",
+					"properties": {
+						"include_surge": {
+							"type": "logical",
+							"description": "include demand surge when simulating impedance times"
+						},
+						"is_dense_urban_area": {
+							"type": "logical",
+							"description": "is within a dense urban area, typically defined by a site within a metropolitan statistical area (MSA) with a population of over 1 million"
+						},
+						"site_pga": {
+							"type": "number",
+							"description": "peak ground acceleration (PGA) in g at the building site for the ground shaking intensity of interest"
+						},
+						"pga_de": {
+							"type": "number",
+							"description": "peak ground acceleration (PGA) in g associated with the design eartquake (DE). Method of combining ground motion pairs (e.g., max direction vs geomean) should match the field site_pga"
+						}
+					}
+				},
+				"scaffolding_lead_time": {
+					"type": "number",
+					"description": "The number of days it takes to get workers to the site to erect scaffolding",
+				},
+				"scaffolding_erect_time": {
+					"type": "number",
+					"description": "The number of days it takes for workers to errect scaffolding to protect doorways and walkways from falling hazards",
 				}
 			}
 		},
@@ -141,13 +179,25 @@
 				"max_workers_building_max": {
 					"type": "number",
 					"description": "Upper limit on the maximum number of workers for the entire building (i.e., max number of workers is never more than this). Default to 260 from REDi",
+				},
+				"allow_tmp_repairs": {
+					"type": "logical",
+					"description": "Flag to allow temporay repair measures to be used to restore building reoccupancy and basic function",
+				},
+				"allow_shoring": {
+					"type": "logical",
+					"description": "Flag to allow shoring to be used as a temporary repair for mitigating local structural stability issues. Setting allow_tmp_repairs to zero overwrites this flag",
 				}
 			}
 		},
 		"functionality_options": {
-			"type": "object"
+			"type": "object",
 			"description": "general functionality module inputs",
 			"properties": {
+				"calculate_red_tag": {
+					"type": "logical",
+					"description": "flag to indicate whether or not to include the assessment of red tags based on component damage"	
+				}, 
 				"red_tag_clear_time": {
 					"type": "number",
 					"description": "days after all red tag repairs are done before occupancy can be regained (i.e. time for permitting office to clear the tag)"
@@ -156,21 +206,25 @@
 					"type": "number",
 					"description": "lognormal dispersion defining the uncertaitny in the red tag clear time"
 				},
+				"include_local_stability_impact": {
+					"type": "logical",
+					"description": "flag to consider the effect of local structural stability issues (that would require shoring) on building occupancy"
+				},
 				"door_racking_repair_day": {
 					"type": "number",
 					"description": "days after the earthquake required to repaired all racked doorways"
 				},
 				"egress_threshold": {
 					"type": "number",
-					"description": "ratio of building egress paths required for building safety and access, assuming an operational fire suppression system"
-				},
-				"egress_threshold_wo_fs": {
-					"type": "number",
-					"description": "ratio of building egress paths required for building safety and access, assuming an non-operational fire suppression system"
+					"description": "ratio of building egress paths required for building safety and access"
 				},
 				"fire_watch": {
 					"type": "logical",
 					"description": "will a fire watch be set if fire sprinkler systems are damaged"
+				},
+				"local_fire_damamge_threshold": {
+					"type": "number",
+					"description": "ratio of building fire sprinkler branches or drops that can be damaged with a given story without significantly disrupting the operation of the active fire supression system"
 				},
 				"min_egress_paths": {
 					"type": "number",
@@ -202,16 +256,6 @@
 				}
 			}
 		},
-		"regional_impact": {
-			"type": "object",
-			"description": "general inputs that quantify regional impact on individual building performance",
-			"properties": {
-				"surge_factor": {
-					"type": "number",
-					"description": "impedance and temporary repair time amplification factor based on a post-earthquake surge in demand for skilled trade and materials",
-				}
-			}
-		},
 		"building_model": {
 			"type": "object",
 			"description": "general information about the building such as the number of stories and the building area",
@@ -223,10 +267,6 @@
 				"num_stories": {
 					"type": "number",
 					"description": "number of stories in the building, does not include basement levels"
-				},
-				"total_area_sf": {
-					"type": "number",
-					"description": "total interior area, in square feet, of the entire building"
 				},
 				"area_per_story_sf": {
 					"type": "#/definitions/arrayOfNumbers",
@@ -259,6 +299,40 @@
 				"occupants_per_story": {
 					"type": "#/definitions/arrayOfNumbers",
 					"description": "total number of occuapnts (persons) that occupy each story of this building, starting from the lowest level"
+				},
+				"comps": {
+					"type": "object",
+					"description": "component population information",
+					"properties": {
+						"story": {
+							"type": "array",
+							"description": "component quantities at each story",
+							"items": {
+								"type": "object",
+								"properties": {
+									"qty_dir_1": {								
+										"description": "total number of component units for each component stack in direction 1 of this story",
+										"$ref": "#/definitions/arrayOfNumbers",
+									"qty_dir_2": {
+										"description": "total number of component units for each component stack in direction 2 of this story",
+										"$ref": "#/definitions/arrayOfNumbers"
+									},
+									"qty_dir_3": {
+										"description": "total number of component units for each component stack in direction 3 (nondirectional) of this story",
+										"$ref": "#/definitions/arrayOfNumbers"
+									}
+								}
+							}
+						},
+						"comp_list": {
+							"description": "fragility ID for each component stack",
+							"$ref": "#/definitions/arrayOfStrings"
+						},
+						"comp_table": {
+							"type": "table",
+							"description": "various component attributes. Can be populated from the component_attribites.csv database in the static_tables directory"
+						}
+					}
 				}
 			}
 		},
@@ -277,55 +351,46 @@
 						"type": "object",
 						"properties": {
 							"qnt_damaged": {
-								"description": "simulation of the quantity of damaged components in each component damage state"
+								"description": "simulation of the quantity of damaged components in each component damage state",
 								"$ref": "#/definitions/arrayOfArraysOfNumbers"
 							},
 							"cost": {
-								"description": "simulated repair cost of each component's damage state"
+								"description": "simulated repair cost of each component's damage state",
 								"$ref": "#/definitions/arrayOfArraysOfNumbers"
 							},
 							"worker_days": {
-								"description": "simulated worker days required to repair each component's damage state"
+								"description": "simulated worker days required to repair each component's damage state",
 								"$ref": "#/definitions/arrayOfArraysOfNumbers"
 							},
 							"qnt_damaged_side_1": {
-								"description": "simulated number of damaged component damage states associated with side 1"
+								"description": "simulated number of damaged component damage states associated with side 1",
 								"$ref": "#/definitions/arrayOfArraysOfNumbers"
 							},
 							"qnt_damaged_side_2": {
-								"description": "simulated number of damaged component damage states associated with side 2"
+								"description": "simulated number of damaged component damage states associated with side 2",
 								"$ref": "#/definitions/arrayOfArraysOfNumbers"
 							},
 							"qnt_damaged_side_3": {
-								"description": "simulated number of damaged component damage states associated with side 3"
+								"description": "simulated number of damaged component damage states associated with side 3",
 								"$ref": "#/definitions/arrayOfArraysOfNumbers"
 							},
 							"qnt_damaged_side_4": {
-								"description": "simulated number of damaged component damage states associated with side 4"
+								"description": "simulated number of damaged component damage states associated with side 4",
 								"$ref": "#/definitions/arrayOfArraysOfNumbers"
 							},
 							"num_comps": {
-								"description": "total number of components populated within each tenant unit associated with each damage state"
+								"description": "total number of components populated within each tenant unit associated with each damage state",
 								"$ref": "#/definitions/arrayOfNumbers"
 							}
 						}
 					}
-				},
-				"red_tag_impact": {
-					"description": "OPTIONAL INPUT: logicals identifying the component damage state and realizations that caused the red tag"
-					"$ref": "#/definitions/arrayOfArraysOfNumbers"
 				}
-				
 			}
 		},
 		"damage_consequences": {
 			"type": "object",
 			"description": "general impedance assessment inputs such as mitigation factors",
 			"properties": {
-				"red_tag": {
-					"description": "simulated logical of red tags, TRUE = building is red tagged", 
-					"$ref": "#/definitions/arrayOfNumbers"
-				},
 				"simulated_replacement": {
 					"description": "simulated replacement time in days for all realizations where replacement is required, NaN = building does not need replaced and is scheduled for repairs. Note: to not consider building replacement, pass in an array of NaNs", 
 					"$ref": "#/definitions/arrayOfNumbers"
@@ -342,12 +407,12 @@
 					"description": "simulated number of racked entry doors on one side of the building", 
 					"$ref": "#/definitions/arrayOfNumbers"
 				},
-				"inpsection_trigger": {
-					"description": "simulated logical of inspection triggers, TRUE = building requires inspection", 
+				"repair_cost_ratio_total": {
+					"description": "simulated building repair cost of structural and nonstructural repairs (does not include tenant contents); normalized by the replacement value", 
 					"$ref": "#/definitions/arrayOfNumbers"
 				},
-				"repair_cost_ratio": {
-					"description": "simulated building repair cost normalized by the replacement value", 
+				"repair_cost_ratio_engineering": {
+					"description": "simulated building repair cost of repairs that require engineering redesign; normalized by the replacement value", 
 					"$ref": "#/definitions/arrayOfNumbers"
 				}
 			}
@@ -378,70 +443,70 @@
 		},
 		"tenant_units": {
 			"type": "table",
-			"description": "attributes and functional requirements of each tenant unit in the building"
+			"description": "attributes and functional requirements of each tenant unit in the building",
 			"properties": {
 				"id": {
-					"type": "number"
+					"type": "number",
 					"description": "tenant unit unique id"
 				},
 				"story": {
-					"type": "number"
+					"type": "number",
 					"description": "story where each tenant unit is located"
 				},
 				"area": {
-					"type": "number"
+					"type": "number",
 					"description": "floor area, in square feet, of the tenant unit"
 				},
 				"perim_area": {
-					"type": "number"
+					"type": "number",
 					"description": "perimeter area, in square feet, of the tenant unit"
 				},
 				"occupancy_id": {
-					"type": "number"
+					"type": "number",
 					"description": "unique id key linking each tenant unit to its associated tenant function requirements"
 				},
 				"exterior": {
-					"type": "number"
+					"type": "number",
 					"description": "tolerance for damage to exterior systems required for tenant function (0 = any damage causes loss of function, 0.999 = everything must be damage for loss of tenant function). Ratio of the perimeter area of severely damaged exterior components within the tenant-unit to the total perimeter area of the tenant unit (i.e., what percent of the exterior walls must be sufficiently damaged to cause tenants to not be able to function in this space)."
 				},
 				"interior": {
-					"type": "number"
+					"type": "number",
 					"description":  "tolerance for damage to interior systems required for tenant function (0 = any damage causes loss of function, 0.999 = everything must be damage for loss of tenant function). Ratio of the interior plan area of severely damaged interior components within the tenant-unit to the total plan area of the tenant unit (i.e., what percent of the interior space must be hindered to cause tenants to not be able to function in this space)."
 				},
 				"occ_per_elev": {
-					"type": "number"
+					"type": "number",
 					"description": "max number of occupants per elevator allowed for function"
 				},
 				"is_elevator_required": {
-					"type": "logical"
+					"type": "logical",
 					"description": "is an operational elevator required for tenant function"
 				},
 				"is_electrical_required": {
-					"type": "logical"
+					"type": "logical",
 					"description": "is an operational electrical system required for tenant function"
 				},
 				"is_water_potable_required": {
-					"type": "logical"
+					"type": "logical",
 					"description": "is an operational potable water plumbing system required for tenant function"
 				},
 				"is_water_sanitary_required": {
-					"type": "logical"
+					"type": "logical",
 					"description": "is an operational sanitary waste plumbing system required for tenant function"
 				},
 				"is_hvac_ventilation_required": {
-					"type": "logical"
+					"type": "logical",
 					"description": "is an operational hvac system required for tenant function"
 				},
 				"is_hvac_heating_required": {
-					"type": "logical"
+					"type": "logical",
 					"description": "is an operational hvac system required for tenant function"
 				},
 				"is_hvac_cooling_required": {
-					"type": "logical"
+					"type": "logical",
 					"description": "is an operational hvac system required for tenant function"
 				},
 				"is_hvac_exhaust_required": {
-					"type": "logical"
+					"type": "logical",
 					"description": "is an operational hvac system required for tenant function"
 				}
 			}

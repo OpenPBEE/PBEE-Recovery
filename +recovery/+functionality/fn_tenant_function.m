@@ -239,7 +239,7 @@ for tu = 1:num_units
     area_affected_lf_all_comps    = damage.comp_ds_table.fraction_area_affected' .* damage.comp_ds_table.unit_qty' .* building_model.ht_per_story_ft(tu) .* damage.tenant_units{tu}.qnt_damaged;
     area_affected_sf_all_comps    = damage.comp_ds_table.fraction_area_affected' .* damage.comp_ds_table.unit_qty' .* damage.tenant_units{tu}.qnt_damaged;
     area_affected_bay_all_comps   = damage.comp_ds_table.fraction_area_affected' .* building_model.struct_bay_area_per_story(tu) .* damage.tenant_units{tu}.qnt_damaged;
-    area_affected_build_all_comps = damage.comp_ds_table.fraction_area_affected' .* building_model.total_area_sf .* damage.tenant_units{tu}.qnt_damaged;
+    area_affected_build_all_comps = damage.comp_ds_table.fraction_area_affected' .* sum(building_model.area_per_story_sf) .* damage.tenant_units{tu}.qnt_damaged;
     
     repair_complete_day_w_tmp_w_instabilities = repair_complete_day_w_tmp;
     if tu > 1

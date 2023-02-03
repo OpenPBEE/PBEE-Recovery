@@ -75,6 +75,13 @@ recovery.building_level.initial_percent_affected = mean(tentant_unit_recovery_da
 recovery.building_level.perform_targ_days = perform_targ_days;
 recovery.building_level.prob_of_target = mean(recovery.building_level.recovery_day > perform_targ_days);
 
+% Save specific breakdowns for red tags
+if isfield(recovery_day, 'building_safety')
+    red_tag_day = recovery_day.building_safety.red_tag;
+    red_tag_day(replace_cases,:) = simulated_replacement(replace_cases);
+    recovery.building_level.recovery_day_red_tag = red_tag_day;
+end
+
 %% Recovery Trajectory -- calcualte from the tenant breakdowns
 recovery.recovery_trajectory.recovery_day = sort([tentant_unit_recovery_day, tentant_unit_recovery_day],2);
 recovery.recovery_trajectory.percent_recovered = sort([(0:(num_units-1)), (1:num_units)])/num_units;
@@ -157,18 +164,6 @@ recovery.breakdowns.component_breakdowns_all_reals = component_breakdowns;
 recovery.breakdowns.perform_targ_days = perform_targ_days;
 recovery.breakdowns.system_names = system_names;
 recovery.breakdowns.comp_names = comps';
-
-%% Save specific breakdowns for red tags
-% Note for future updates: Perhaps instead, all realizations of red tag time
-% should be output andthe statistics calculated here should be done as a post process
-if isfield(recovery_day, 'building_safety')
-    red_tag_time = recovery_day.building_safety.red_tag;
-    red_tag_time(replace_cases,:) = []; % Ignore replacement cases
-    recovery.red_tag.probability = mean(red_tag_time > 0);
-    recovery.red_tag.mean = mean(red_tag_time);
-    recovery.red_tag.median = median(red_tag_time);
-    recovery.red_tag.fractile_90 = prctile(red_tag_time, 90);
-end
 
 end
 
