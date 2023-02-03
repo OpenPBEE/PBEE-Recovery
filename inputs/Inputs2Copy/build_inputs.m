@@ -95,14 +95,14 @@ comp_ds_list = readtable('comp_ds_list.csv');
 % List of component and damage states in the performance model
 comp_population = readtable('comp_population.csv');
 comp_header = readtable('comp_population.csv','ReadVariableNames',false);
-comp_list = comp_header{1,3:end};
+comp_list = strrep(comp_header{1,3:end},'_','.');
 building_model.comps.comp_list = comp_list;
 
 % Go through each story and assign component populations
 drs = unique(comp_population.dir);
 for s = 1:building_model.num_stories
     for d = 1:length(drs)
-        filt = comp_population.story == 1 & comp_population.dir == drs(d);
+        filt = comp_population.story == s & comp_population.dir == drs(d);
         building_model.comps.story{s}.(['qty_dir_' num2str(drs(d))]) = comp_population{filt,3:end};
     end
 end
@@ -152,14 +152,14 @@ end
 sim_damage = jsondecode(fileread('simulated_damage.json'));
 
 % Transform structural array to cell array to work with later code
-for tu = 1:length(sim_damage.tenant_units)
-    damage.tenant_units{tu} = sim_damage.tenant_units(tu);
-    damage.tenant_units{tu}.num_comps = damage.tenant_units{tu}.num_comps'; 
-end
-
 for s = 1:length(sim_damage.story)
     damage.story{s} = sim_damage.story(s);
+    damage.story{s}.num_comps = damage.story{s}.num_comps'; 
 end
+
+% HARD CODED ASSUMPTION - Assume 1:1 relationship between tenant units and
+% stories
+damage.tenant_units = damage.story;
 
 %% LOAD DEFAULT OPTIONAL INPUTS
 % various assessment otpions. Set to default options in the
@@ -311,6 +311,19 @@ for c = 1:height(comp_ds_list)
     end
 end
 damage.comp_ds_table = struct2table(comp_ds_info);
+
+%% Check missing data
+% Engineering Repair Cost Ratio - Assume is the sum of all component repair
+% costs that require redesign
+if ~isfield(damage_consequences,'repair_cost_ratio_engineering')
+    eng_filt = logical(damage.comp_ds_table.redesign');
+    damage_consequences.repair_cost_ratio_engineering = zeros(size(damage_consequences.repair_cost_ratio_total));
+    for s = 1:length(sim_damage.story)
+        damage_consequences.repair_cost_ratio_engineering = ...
+            damage_consequences.repair_cost_ratio_engineering + ...
+            sum(sim_damage.story(s).repair_cost(:,eng_filt),2);
+    end
+end
 
 %% SAVE INPUTS AS MATLAB DATAFILE
 save('simulated_inputs.mat',...

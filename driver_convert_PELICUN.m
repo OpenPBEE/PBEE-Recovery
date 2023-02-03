@@ -30,7 +30,7 @@ rehash
 model_name = '001'; % Name of the model;
                      % inputs are expected to be in a directory with this name
                      % outputs will save to a directory with this name
-model_dir = ['inputs' filesep model_name]; % Directory where the simulated inputs are located
+model_dir = ['inputs' filesep 'example_pelicun_inputs' filesep model_name]; % Directory where the simulated inputs are located
 
 %% Load Pelicun Outputs
 pelicun_dir = [model_dir filesep 'pelicun_data'];
@@ -48,7 +48,6 @@ comps = readtable([pelicun_dir filesep 'CMP_QNT.csv']);
 
 % Pull repair cost realizations
 DV_rec_cost_agg = readtable([pelicun_dir filesep 'DL_summary.csv']);
-sim_repair_cost = DV_rec_cost_agg.repair_cost_;
 
 % Pull realizations of damaged components
 DMG = readtable([pelicun_dir filesep 'DMG_sample.csv']);
@@ -61,9 +60,11 @@ DMG = DMG(:,frag_col_filt); % Filt to only component level damage
 DMG_ids = DMG.Properties.VariableNames;
 
 % Pull realization of repair time per componentDS
-DV_rec_time = readtable([pelicun_dir filesep 'DV_bldg_repair_sample.csv']);
-frag_col_filt = ~cellfun(@isempty,regexp(DV_rec_time.Properties.VariableNames,'^TIME'));
-DV_rec_time = DV_rec_time(:,frag_col_filt); % Filt to only component level damage
+DV = readtable([pelicun_dir filesep 'DV_bldg_repair_sample.csv']);
+rec_time_filt = ~cellfun(@isempty,regexp(DV.Properties.VariableNames,'^TIME'));
+DV_time = DV(:,rec_time_filt); % Filt to only component level damage
+repair_cost_filt = ~cellfun(@isempty,regexp(DV.Properties.VariableNames,'^COST'));
+DV_cost = DV(:,repair_cost_filt); % Filt to only component level damage
 
 %% Load ATC 138 model input data
 tenant_unit_list = readtable([model_dir filesep 'tenant_unit_list.csv']);
@@ -74,7 +75,7 @@ fileID = fopen([model_dir filesep 'general_inputs.json'],'r');
 general_inputs = jsondecode(fscanf(fileID,'%s'));
 fclose(fileID);
 
-%% Develop building_model.json from treads inputs
+%% Develop building_model.json
 % Count the number of stairs in the building
 stair_filt = contains(comps.ID,'C.20.11'); 
 if any(stair_filt)
@@ -93,10 +94,9 @@ end
 % Set Variables
 building_model.building_value = total_cost; % num
 building_model.num_stories = num_stories; % int
-building_model.total_area_sf = plan_area; % number
 building_model.area_per_story_sf = plan_area*ones(num_stories,1); % num_stories x 1 array
 building_model.ht_per_story_ft = general_inputs.typ_story_ht_ft*ones(num_stories,1); % num_stories x 1 array
-building_model.edge_lengths = [general_inputs.length_side_1_ft, general_inputs.length_side_2_ft].*ones(num_stories,1); % num_stories x 2 array
+building_model.edge_lengths = [general_inputs.length_side_1_ft; general_inputs.length_side_2_ft].*ones(1, num_stories); % 2 x num_stories array (json flips the others)
 building_model.struct_bay_area_per_story = general_inputs.typ_struct_bay_area_ft*ones(num_stories,1); % num_stories x 1 array
 building_model.num_entry_doors = general_inputs.num_entry_doors; % int
 building_model.num_elevators = num_elev_bays; % int
@@ -109,21 +109,68 @@ fprintf(fileID,'%s',jsonencode(building_model));
 fclose(fileID);
 
 %% Develop damage_consequences.json
+% Pull data from Pelicun structure 
+sim_repair_cost = DV_rec_cost_agg.repair_cost_;
+sim_replacement = DV_rec_cost_agg.collapse | DV_rec_cost_agg.irreparable;
+
 % Set Variables
+damage_consequences.repair_cost_ratio_total = sim_repair_cost / building_model.building_value;  % array, num real x 1
+damage_consequences.simulated_replacement = sim_replacement;
+
+% HARD CODED VARIABLES -- assumed no racked doors
 damage_consequences.racked_stair_doors_per_story = zeros(length(sim_repair_cost),building_model.num_stories); % array, num real x num stories
 damage_consequences.racked_entry_doors_side_1  = zeros(size(sim_repair_cost)); % array, num real x 1
 damage_consequences.racked_entry_doors_side_2  = zeros(size(sim_repair_cost)); % array, num real x 1
-damage_consequences.repair_cost_ratio = sim_repair_cost / building_model.building_value;  % array, num real x 1
-
-% note: calculate these directly by incorporating red tag assessment into
-% PBEE recovery
-damage_consequences.red_tag = zeros(size(sim_repair_cost)); % array, num real x 1
-damage_consequences.inpsection_trigger = zeros(size(sim_repair_cost));  % array, num real x 1
 
 % Write file
 fileID = fopen([model_dir filesep 'damage_consequences.json'],'w');
 fprintf(fileID,'%s',jsonencode(damage_consequences));
 fclose(fileID);
+
+%% Build comp_population.csv
+comp_population.story = zeros(num_stories*3,1);
+comp_population.dir = zeros(num_stories*3,1);
+for c = 1:height(comps)
+    idx = 1;
+    comp = comps(c,:);            
+    frag_id = comp.ID{1};
+    frag_id([2,5]) = []; % Remove extra periods
+    frag_id = strrep(frag_id,'.','_');
+    comp_population.(frag_id) = zeros(num_stories*3,1);
+    loc = comp.Location{1};
+    dir = comp.Direction{1};
+    for s = 1:num_stories
+        if  strcmp(loc,'all')
+            is_story = true;
+        elseif  strcmp(loc,'roof')
+            is_story = s == num_stories;
+        elseif  contains(loc,'--')
+            is_story = s >= str2double(loc(1)) & s<= str2double(loc(end));
+        else
+            loc_vec = str2double(strsplit(loc));
+            is_story = ismember(s,loc_vec);
+        end
+        
+        for d = 1:3
+            comp_population.story(idx) = s;
+            comp_population.dir(idx) = d;
+            dir_str = strrep(dir,'0','3'); % replace nondirection identifier
+            dir_vec = str2double(strsplit(dir_str,','));
+            is_dir = ismember(d,dir_vec);
+
+            if is_story && is_dir
+                % Assign to component population table (add duplicates)
+                comp_population.(frag_id)(idx) = comp_population.(frag_id)(idx) + comp.Theta_0;
+            end
+
+            idx = idx + 1;
+        end
+    end
+end
+
+% Convert to table and save
+comp_population = struct2table(comp_population);
+writetable(comp_population, [model_dir filesep 'comp_population.csv']);
 
 %% Build comp_ds_list.csv
 idx = 0;
@@ -159,15 +206,19 @@ ratio_damage_per_side = ratio_damage_per_side ./ sum(ratio_damage_per_side,2); %
 
 % Set Variables
 count = 0;
-for s = 1:length(num_stories)
+for s = 1:num_stories
     % Initialize variables
-    simulated_damage(s).qnt_damaged = zeros(num_reals,height(comp_ds_list));
-    simulated_damage(s).worker_days = zeros(num_reals,height(comp_ds_list));
-    simulated_damage(s).qnt_damaged_side_1 = zeros(num_reals,height(comp_ds_list));
-    simulated_damage(s).qnt_damaged_side_2 = zeros(num_reals,height(comp_ds_list));
-    simulated_damage(s).qnt_damaged_side_3 = zeros(num_reals,height(comp_ds_list));
-    simulated_damage(s).qnt_damaged_side_4 = zeros(num_reals,height(comp_ds_list));
-    simulated_damage(s).num_comps = zeros(height(comp_ds_list),1);
+    simulated_damage.story(s).qnt_damaged = zeros(num_reals,height(comp_ds_list));
+    simulated_damage.story(s).worker_days = zeros(num_reals,height(comp_ds_list));
+    simulated_damage.story(s).repair_cost = zeros(num_reals,height(comp_ds_list));
+    simulated_damage.story(s).qnt_damaged_side_1 = zeros(num_reals,height(comp_ds_list));
+    simulated_damage.story(s).qnt_damaged_side_2 = zeros(num_reals,height(comp_ds_list));
+    simulated_damage.story(s).qnt_damaged_side_3 = zeros(num_reals,height(comp_ds_list));
+    simulated_damage.story(s).qnt_damaged_side_4 = zeros(num_reals,height(comp_ds_list));
+    simulated_damage.story(s).qnt_damaged_dir_1 = zeros(num_reals,height(comp_ds_list));
+    simulated_damage.story(s).qnt_damaged_dir_2 = zeros(num_reals,height(comp_ds_list));
+    simulated_damage.story(s).qnt_damaged_dir_3 = zeros(num_reals,height(comp_ds_list));
+    simulated_damage.story(s).num_comps = zeros(height(comp_ds_list),1);
        
     % Go through each ds in PELICUN outputs and assign to simualated damage
     % data structure
@@ -177,11 +228,15 @@ for s = 1:length(num_stories)
         frag_id = [DMG_id{1} DMG_id{2} DMG_id{3} '.' DMG_id{4}];
         frag_filt = strcmp(comp_ds_list.comp_id,frag_id);
         loc_id = str2double(DMG_id{end-2});
+        dir_id = str2double(DMG_id{end-1});
+        if dir_id == 0
+            dir_id = 3; % Change nondirection indexing
+        end
         ds_id = str2double(DMG_id{end});
         
         % Find the associated column in the repair time table
-        frag_id_repair = [DMG_id{1} '_' DMG_id{2} '_' DMG_id{3} '_' DMG_id{4} '_' num2str(ds_id) '_' DMG_id{5} '_' DMG_id{6}];
-        DV_rec_time_filt = contains(DV_rec_time.Properties.VariableNames,frag_id_repair);
+        frag_id_DV = [DMG_id{1} '_' DMG_id{2} '_' DMG_id{3} '_' DMG_id{4} '_' num2str(ds_id) '_' DMG_id{5} '_' DMG_id{6}];
+        DV_filt = contains(DV_time.Properties.VariableNames,frag_id_DV);
         
         % Assign simulated damage to new structure
         if loc_id == s  && ds_id > 0 && any(frag_filt) % Only if there are components on this story
@@ -189,14 +244,32 @@ for s = 1:length(num_stories)
             seq_ds_filt = comp_ds_list.ds_seq_id == comp_ds.ds_seq_id(ds_id);
             sub_ds_filt = comp_ds_list.ds_sub_id == comp_ds.ds_sub_id(ds_id);
             sim_dmg_idx_filt = (frag_filt & seq_ds_filt & sub_ds_filt)';
-            if sum(sim_dmg_idx_filt) == 1 && sum(DV_rec_time_filt) == 1 
+            if sum(sim_dmg_idx_filt) == 1 && sum(DV_filt) == 1 % if you find matching components
+                % Assign Damage data
                 dmg_data = DMG{:,c};
                 dmg_data(isnan(dmg_data)) = 0; % Change blank cases to no damage
-                simulated_damage(s).qnt_damaged(:,sim_dmg_idx_filt) = simulated_damage(s).qnt_damaged(:,sim_dmg_idx_filt) + dmg_data; % add number of damaged component amongst directions and multiple comps of the same frag id
+                simulated_damage.story(s).qnt_damaged(:,sim_dmg_idx_filt) = ...
+                    simulated_damage.story(s).qnt_damaged(:,sim_dmg_idx_filt) + dmg_data; % add number of damaged component amongst directions and multiple comps of the same frag id
                 
-                repair_time_data = DV_rec_time{:,DV_rec_time_filt};
+                % Assign Repair time data
+                repair_time_data = DV_time{:,DV_filt};
                 repair_time_data(isnan(repair_time_data)) = 0; % Change blank cases to no damage
-                simulated_damage(s).worker_days(:,sim_dmg_idx_filt) = simulated_damage(s).worker_days(:,sim_dmg_idx_filt) + repair_time_data; % add the repair time amongst directions and multiple comps of the same frag id
+                simulated_damage.story(s).worker_days(:,sim_dmg_idx_filt) = ...
+                    simulated_damage.story(s).worker_days(:,sim_dmg_idx_filt) + repair_time_data; % add the repair time amongst directions and multiple comps of the same frag id
+                
+                % Assign Repair Cost data
+                repair_cost_data = DV_cost{:,DV_filt};
+                repair_cost_data(isnan(repair_cost_data)) = 0; % Change blank cases to no damage
+                simulated_damage.story(s).repair_cost(:,sim_dmg_idx_filt) = ...
+                    simulated_damage.story(s).repair_cost(:,sim_dmg_idx_filt) + repair_cost_data; % add the repair time amongst directions and multiple comps of the same frag id
+                
+                % Assign Damage Data Per Direction
+                for dir = 1:3
+                    if dir_id == dir % only for the direction associated with this DMG column
+                        simulated_damage.story(s).(['qnt_damaged_dir_' num2str(dir)])(:,sim_dmg_idx_filt) = ...
+                        simulated_damage.story(s).(['qnt_damaged_dir_' num2str(dir)])(:,sim_dmg_idx_filt) + dmg_data; % add number of damaged component amongst directions and multiple comps of the same frag id
+                    end
+                end
             else
                 error('Location in new damage state structure could not be found for this compoennt DS')
             end
@@ -205,10 +278,14 @@ for s = 1:length(num_stories)
     
     % Randomly split damage between 4 sides, this will only matter
     % for cladding components
-    simulated_damage(s).qnt_damaged_side_1 = ratio_damage_per_side(:,1).*simulated_damage(s).qnt_damaged;
-    simulated_damage(s).qnt_damaged_side_2 = ratio_damage_per_side(:,2).*simulated_damage(s).qnt_damaged;
-    simulated_damage(s).qnt_damaged_side_3 = ratio_damage_per_side(:,3).*simulated_damage(s).qnt_damaged;
-    simulated_damage(s).qnt_damaged_side_4 = ratio_damage_per_side(:,4).*simulated_damage(s).qnt_damaged;
+    simulated_damage.story(s).qnt_damaged_side_1 = ...
+        ratio_damage_per_side(:,1).*simulated_damage.story(s).qnt_damaged;
+    simulated_damage.story(s).qnt_damaged_side_2 = ...
+        ratio_damage_per_side(:,2).*simulated_damage.story(s).qnt_damaged;
+    simulated_damage.story(s).qnt_damaged_side_3 = ...
+        ratio_damage_per_side(:,3).*simulated_damage.story(s).qnt_damaged;
+    simulated_damage.story(s).qnt_damaged_side_4 = ...
+        ratio_damage_per_side(:,4).*simulated_damage.story(s).qnt_damaged;
     
     % Assign component quantities
     for c = 1:height(comps)
@@ -229,7 +306,8 @@ for s = 1:length(num_stories)
             frag_id = comp.ID{1};
             frag_id([2,5]) = []; % Remove extra periods
             frag_filt = strcmp(comp_ds_list.comp_id,frag_id)';
-            simulated_damage(s).num_comps(frag_filt) = simulated_damage(s).num_comps(frag_filt) + comp.Theta_0;
+            simulated_damage.story(s).num_comps(frag_filt) = ...
+                simulated_damage.story(s).num_comps(frag_filt) + comp.Theta_0;
         end
     end
 end
