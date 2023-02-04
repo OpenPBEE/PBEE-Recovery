@@ -151,15 +151,26 @@ end
 % monte carlo simulation
 sim_damage = jsondecode(fileread('simulated_damage.json'));
 
-% Transform structural array to cell array to work with later code
-for s = 1:length(sim_damage.story)
-    damage.story{s} = sim_damage.story(s);
-    damage.story{s}.num_comps = damage.story{s}.num_comps'; 
+% Transform damage per story array to cell array to work with later code
+if isfield(sim_damage,'story')
+    for s = 1:length(sim_damage.story)
+        damage.story{s} = sim_damage.story(s);
+        if isfield(damage.story{s},'num_comps')
+            damage.story{s}.num_comps = damage.story{s}.num_comps'; 
+        end
+    end
 end
 
-% HARD CODED ASSUMPTION - Assume 1:1 relationship between tenant units and
-% stories
-damage.tenant_units = damage.story;
+% Transform damage per tenant unit array to cell array to work with later code
+if isfield(sim_damage,'tenant_units')
+    for tu = 1:length(sim_damage.tenant_units)
+        damage.tenant_units{tu} = sim_damage.tenant_units(tu);
+        if isfield(damage.tenant_units{tu},'num_comps')
+            damage.tenant_units{tu}.num_comps = damage.tenant_units{tu}.num_comps'; 
+        end
+    end
+end
+
 
 %% LOAD DEFAULT OPTIONAL INPUTS
 % various assessment otpions. Set to default options in the

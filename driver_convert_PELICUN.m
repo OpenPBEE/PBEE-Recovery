@@ -117,11 +117,6 @@ sim_replacement = DV_rec_cost_agg.collapse | DV_rec_cost_agg.irreparable;
 damage_consequences.repair_cost_ratio_total = sim_repair_cost / building_model.building_value;  % array, num real x 1
 damage_consequences.simulated_replacement = sim_replacement;
 
-% HARD CODED VARIABLES -- assumed no racked doors
-damage_consequences.racked_stair_doors_per_story = zeros(length(sim_repair_cost),building_model.num_stories); % array, num real x num stories
-damage_consequences.racked_entry_doors_side_1  = zeros(size(sim_repair_cost)); % array, num real x 1
-damage_consequences.racked_entry_doors_side_2  = zeros(size(sim_repair_cost)); % array, num real x 1
-
 % Write file
 fileID = fopen([model_dir filesep 'damage_consequences.json'],'w');
 fprintf(fileID,'%s',jsonencode(damage_consequences));
@@ -199,11 +194,6 @@ writetable(comp_ds_list, [model_dir filesep 'comp_ds_list.csv']);
 %% Develop simulated damage.json
 [num_reals,~] = size(DMG(:,2:end));
 
-% Make some rough assumptions to distribute damage to 4 sides (for external
-% falling hazards)
-ratio_damage_per_side = rand(num_reals,4); % assumes square footprint
-ratio_damage_per_side = ratio_damage_per_side ./ sum(ratio_damage_per_side,2); % force it to add to one
-
 % Set Variables
 count = 0;
 for s = 1:num_stories
@@ -211,10 +201,6 @@ for s = 1:num_stories
     simulated_damage.story(s).qnt_damaged = zeros(num_reals,height(comp_ds_list));
     simulated_damage.story(s).worker_days = zeros(num_reals,height(comp_ds_list));
     simulated_damage.story(s).repair_cost = zeros(num_reals,height(comp_ds_list));
-    simulated_damage.story(s).qnt_damaged_side_1 = zeros(num_reals,height(comp_ds_list));
-    simulated_damage.story(s).qnt_damaged_side_2 = zeros(num_reals,height(comp_ds_list));
-    simulated_damage.story(s).qnt_damaged_side_3 = zeros(num_reals,height(comp_ds_list));
-    simulated_damage.story(s).qnt_damaged_side_4 = zeros(num_reals,height(comp_ds_list));
     simulated_damage.story(s).qnt_damaged_dir_1 = zeros(num_reals,height(comp_ds_list));
     simulated_damage.story(s).qnt_damaged_dir_2 = zeros(num_reals,height(comp_ds_list));
     simulated_damage.story(s).qnt_damaged_dir_3 = zeros(num_reals,height(comp_ds_list));
@@ -275,17 +261,6 @@ for s = 1:num_stories
             end
         end
     end
-    
-    % Randomly split damage between 4 sides, this will only matter
-    % for cladding components
-    simulated_damage.story(s).qnt_damaged_side_1 = ...
-        ratio_damage_per_side(:,1).*simulated_damage.story(s).qnt_damaged;
-    simulated_damage.story(s).qnt_damaged_side_2 = ...
-        ratio_damage_per_side(:,2).*simulated_damage.story(s).qnt_damaged;
-    simulated_damage.story(s).qnt_damaged_side_3 = ...
-        ratio_damage_per_side(:,3).*simulated_damage.story(s).qnt_damaged;
-    simulated_damage.story(s).qnt_damaged_side_4 = ...
-        ratio_damage_per_side(:,4).*simulated_damage.story(s).qnt_damaged;
     
     % Assign component quantities
     for c = 1:height(comps)

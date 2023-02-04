@@ -44,13 +44,15 @@ function [functionality, damage_consequences] = main_PBEErecovery(damage, damage
 %   simulated repair schedule breakdowns and impeding times.
 
 %% Import Packages
+import preprocessing.main_preprocessing
 import recovery.impedance.main_impeding_factors
 import recovery.repair_schedule.main_repair_schedule
 import recovery.functionality.main_functionality
 
 %% Combine compoment attributes into recovery filters to expidite recovery assessment
-[damage, tmp_repair_class] = fn_preprocessing(damage.comp_ds_table, damage, ...
-    repair_time_options, tmp_repair_class);
+[damage, tmp_repair_class, damage_consequences] = main_preprocessing(...
+    damage.comp_ds_table, damage, repair_time_options, tmp_repair_class, ...
+    damage_consequences, building_model.num_stories);
 
 %% Calculate Red Tags
 [ damage_consequences.red_tag, damage_consequences.red_tag_impact, damage_consequences.inspection_trigger ] ...

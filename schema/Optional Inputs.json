@@ -344,9 +344,9 @@
 					"type": "table",
 					"description": "various component attributes by damage state. Can be populated from the component_attribites.csv and damage_state_attribute_mapping.csv databases in the static_tables directory"
 				},
-				"story": {
+				"tenant_units": {
 					"type": "array",
-					"description": "simulated component damage, broken down by each story in the building",
+					"description": "simulated component damage, broken down by each tenant unit in the building",
 					"items": {
 						"type": "object",
 						"properties": {
@@ -362,16 +362,20 @@
 								"description": "simulated worker days required to repair each component's damage state",
 								"$ref": "#/definitions/arrayOfArraysOfNumbers"
 							},
-							"qnt_damaged_dir_1": {
-								"description": "simulated number of damaged component damage states associated with damage in direction 1",
+							"qnt_damaged_side_1": {
+								"description": "simulated number of damaged component damage states associated with side 1",
 								"$ref": "#/definitions/arrayOfArraysOfNumbers"
 							},
-							"qnt_damaged_dir_2": {
-								"description": "simulated number of damaged component damage states associated with damage in direction 2",
+							"qnt_damaged_side_2": {
+								"description": "simulated number of damaged component damage states associated with side 2",
 								"$ref": "#/definitions/arrayOfArraysOfNumbers"
 							},
-							"qnt_damaged_dir_3": {
-								"description": "simulated number of damaged component damage states associated with nondirectional damage",
+							"qnt_damaged_side_3": {
+								"description": "simulated number of damaged component damage states associated with side 3",
+								"$ref": "#/definitions/arrayOfArraysOfNumbers"
+							},
+							"qnt_damaged_side_4": {
+								"description": "simulated number of damaged component damage states associated with side 4",
 								"$ref": "#/definitions/arrayOfArraysOfNumbers"
 							},
 							"num_comps": {
@@ -389,6 +393,18 @@
 			"properties": {
 				"simulated_replacement": {
 					"description": "simulated replacement time in days for all realizations where replacement is required, NaN = building does not need replaced and is scheduled for repairs. Note: to not consider building replacement, pass in an array of NaNs", 
+					"$ref": "#/definitions/arrayOfNumbers"
+				},
+				"racked_stair_doors_per_story": {
+					"description": "simulated number of racked stairway doors per story", 
+					"$ref": "#/definitions/arrayOfArraysOfNumbers"
+				},
+				"racked_entry_doors_side_1": {
+					"description": "simulated number of racked entry doors on one side of the building", 
+					"$ref": "#/definitions/arrayOfNumbers"
+				},
+				"racked_entry_doors_side_2": {
+					"description": "simulated number of racked entry doors on one side of the building", 
 					"$ref": "#/definitions/arrayOfNumbers"
 				},
 				"repair_cost_ratio_total": {
