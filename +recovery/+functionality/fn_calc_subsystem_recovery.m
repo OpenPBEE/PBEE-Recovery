@@ -52,7 +52,7 @@ if any_comps
         if subsystem_num_comps == 0 % No components at this level
             subsystem_failure = zeros(num_reals,1);
         elseif subsystem_num_comps == 1 % Not actually redundant
-            subsystem_failure = subsystem_num_damaged_comps == 0;
+            subsystem_failure = subsystem_num_damaged_comps == 1;
         elseif n1_redundancy
             % These components are designed to have N+1 redundncy rates,
             % meaning they are designed to lose one component and still operate at
