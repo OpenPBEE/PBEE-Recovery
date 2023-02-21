@@ -30,9 +30,9 @@ function [ damage ] = fn_restructure_repair_schedule( damage, system_schedule, .
 % -----
 % In the repair start day outputs:
 %    - Zero = Starts immediately
-%    - NaN = Repairs never started (likely because not damaged or has no temp repair)
+%    - NaN = Repairs never started (because not damaged, has no temp repair, or controlled by red tag)
 % In the repair complete day outputs:
-%    - NaN = No damage
+%    - NaN = No damage (or controlled by red tag)
 %    - Inf = Is damaged, but has no System/RepairClass assignment (or no temp repair)
 % 
 
