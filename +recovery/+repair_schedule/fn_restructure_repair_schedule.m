@@ -30,9 +30,9 @@ function [ damage ] = fn_restructure_repair_schedule( damage, system_schedule, .
 % -----
 % In the repair start day outputs:
 %    - Zero = Starts immediately
-%    - NaN = Repairs never started (likely because not damaged or has no temp repair)
+%    - NaN = Repairs never started (because not damaged, has no temp repair, or controlled by red tag)
 % In the repair complete day outputs:
-%    - NaN = No damage
+%    - NaN = No damage (or controlled by red tag)
 %    - Inf = Is damaged, but has no System/RepairClass assignment (or no temp repair)
 % 
 
@@ -75,7 +75,7 @@ for sys = 1:num_sys
     % Do not perform temporary repairs when building is red tagged
     if strcmp(repair_type,'temp') && any(simulated_red_tags)
         story_start_day(simulated_red_tags,:) = NaN;
-        story_complete_day(simulated_red_tags,:) = Inf;
+        story_complete_day(simulated_red_tags,:) = NaN;
     end
 
     % Re-distribute to each tenant unit
