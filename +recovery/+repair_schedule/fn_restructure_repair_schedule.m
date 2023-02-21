@@ -75,7 +75,7 @@ for sys = 1:num_sys
     % Do not perform temporary repairs when building is red tagged
     if strcmp(repair_type,'temp') && any(simulated_red_tags)
         story_start_day(simulated_red_tags,:) = NaN;
-        story_complete_day(simulated_red_tags,:) = Inf;
+        story_complete_day(simulated_red_tags,:) = NaN;
     end
 
     % Re-distribute to each tenant unit

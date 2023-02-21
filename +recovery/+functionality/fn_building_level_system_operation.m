@@ -78,18 +78,18 @@ for tu = 1:num_stories
     %% HVAC
     building_hvac_subsystems = fieldnames(damage.fnc_filters.hvac.building);
     for s = 1:length(building_hvac_subsystems)
-        bldg_hvac_system = building_hvac_subsystems{s};
+        subsys_label = building_hvac_subsystems{s};
         if not(isfield(system_operation_day, 'building')) ...
-                || not(isfield(system_operation_day.building, bldg_hvac_system))
+                || not(isfield(system_operation_day.building, subsys_label))
             % Initialize variables if not already initialized
-            system_operation_day.building.(bldg_hvac_system) = zeros(num_reals, 1);
-            system_operation_day.comp.(bldg_hvac_system) = zeros(num_reals, num_comps);
+            system_operation_day.building.(subsys_label) = zeros(num_reals, 1);
+            system_operation_day.comp.(subsys_label) = zeros(num_reals, num_comps);
         end
 
         % go through each subsystem and calculate how long entire building operation is impaired
-        subs = fieldnames(damage.fnc_filters.hvac.building.(bldg_hvac_system));
+        subs = fieldnames(damage.fnc_filters.hvac.building.(subsys_label));
         for b = 1:length(subs)
-            filt = damage.fnc_filters.hvac.building.(bldg_hvac_system).(subs{b})';
+            filt = damage.fnc_filters.hvac.building.(subsys_label).(subs{b})';
             
             [repair_day] = fn_calc_subsystem_recovery( filt, damage, ...
                  repair_complete_day, total_num_comps, damaged_comps );
@@ -97,11 +97,11 @@ for tu = 1:num_stories
             comps_breakdown = filt .* initial_damaged .* repair_day;
             
             % combine with previous stories
-            system_operation_day.building.(bldg_hvac_system) = ...
-                max(system_operation_day.building.(bldg_hvac_system), repair_day);
+            system_operation_day.building.(subsys_label) = ...
+                max(system_operation_day.building.(subsys_label), repair_day);
             
-            system_operation_day.comp.(bldg_hvac_system) = ...
-                max(system_operation_day.comp.(bldg_hvac_system), comps_breakdown);
+            system_operation_day.comp.(subsys_label) = ...
+                max(system_operation_day.comp.(subsys_label), comps_breakdown);
         end
     end
 end
