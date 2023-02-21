@@ -40,10 +40,27 @@ recovery_day.elevators = zeros(num_reals,num_units);
 recovery_day.exterior = zeros(num_reals,num_units);
 recovery_day.interior = zeros(num_reals,num_units);
 recovery_day.electrical = zeros(num_reals,num_units);
+recovery_day.flooding = zeros(num_reals,num_units);
 comp_breakdowns.elevators = zeros(num_reals,num_comps,num_units);
 comp_breakdowns.electrical = zeros(num_reals,num_comps,num_units);
 
-%% Go through each tenant unit, define system level performacne and determine tenant unit recovery time
+% Simulate flooding repair day (hard coded to 3 months and beta = 0.6)
+sim_flood_repair_day = lognrnd(log(90),0.6,num_reals,1);
+
+%% STORY FLOODING
+for tu = flip(1:num_stories) % Go from top to bottom
+    is_damaged = damage.tenant_units{tu}.qnt_damaged > 0;
+    flooding_this_story = any(is_damaged(:,damage.fnc_filters.causes_flooding),2); % Any major piping damage causes interior flooding
+    flooding_recovery_day = flooding_this_story .* sim_flood_repair_day;
+    
+    % Save clean up time per component causing flooding
+    comp_breakdowns.flooding(:,:,tu) = damage.fnc_filters.causes_flooding .* is_damaged .* flooding_recovery_day;
+    
+    % This story is not accessible if any story above has flooding
+    recovery_day.flooding(:,tu) = max([flooding_recovery_day,recovery_day.flooding(:,(tu+1):end)],[],2);
+end
+
+%% SYSTEM SPECIFIC CONSEQUENCES
 for tu = 1:num_units
     damaged_comps = damage.tenant_units{tu}.qnt_damaged;
     initial_damaged = damaged_comps > 0;

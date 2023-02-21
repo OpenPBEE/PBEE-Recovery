@@ -33,9 +33,23 @@ num_comps = height(damage.comp_ds_table);
 % Pre-allocate data
 recovery_day.stairs = zeros(num_reals,num_units);
 recovery_day.stair_doors = zeros(num_reals,num_units);
+recovery_day.flooding = zeros(num_reals,num_units);
 comp_breakdowns.stairs = zeros(num_reals,num_comps,num_units);
 
-%% Go through each story and check if there is sufficient story access (stairs and stairdoors)
+%% STORY FLOODING
+for tu = flip(1:num_stories) % Go from top to bottom
+    is_damaged = damage.tenant_units{tu}.qnt_damaged > 0;
+    flooding_this_story = any(is_damaged(:,damage.fnc_filters.causes_flooding),2); % Any major piping damage causes interior flooding
+    flooding_cleanup_day = flooding_this_story .* functionality_options.flooding_cleanup_day;
+    
+    % Save clean up time per component causing flooding
+    comp_breakdowns.flooding(:,:,tu) = damage.fnc_filters.causes_flooding .* is_damaged .* flooding_cleanup_day;
+    
+    % This story is not accessible if any story above has flooding
+    recovery_day.flooding(:,tu) = max([flooding_cleanup_day,recovery_day.flooding(:,(tu+1):end)],[],2);
+end
+
+%% STAIRS AND STAIRDOORS
 if num_stories == 1 
     return % Re-occupancy of one story buildigns is not affected by stairway access
 end
@@ -44,7 +58,7 @@ end
 damage.fnc_filters.stairs = logical([damage.fnc_filters.stairs, 0]);
 damage.fnc_filters.stair_doors = logical([zeros(1,num_comps), 1]);
 
-%% Stairs
+%% Go through each story and check if there is sufficient story access (stairs and stairdoors)
 % if stairs don't exist on a story, this will assume they are rugged (along with the stair doors)
 for tu = 1:num_stories
     % Augment damage matrix with door data
@@ -100,15 +114,15 @@ for tu = 1:num_stories
         damaged_comps(fixed_comps_filt) = 0;
     end
 
-    % This story is not accessible if any story below has insufficient stair egress
-    if tu == 1
-        recovery_day.stairs(:,tu) = max(stair_access_day,max(recovery_day.stairs(:,1:tu),[],2));
-    else
-        % also the story below is not accessible if there is insufficient
-        % stair egress at this story
-        recovery_day.stairs(:,(tu-1):tu) = ones(1,2) .* max(stair_access_day,max(recovery_day.stairs(:,1:tu),[],2));
+    % This story is not accessible if this or any story below has insufficient stair egress
+    recovery_day.stairs(:,tu) = max([stair_access_day,recovery_day.stairs(:,1:(tu-1))],[],2);
+    
+    % For the third story and above, the story below is not accessible if
+    % there is insufficient stair egress at this story
+    if tu >= 3
+        recovery_day.stairs(:,(tu-1)) = max([stair_access_day,recovery_day.stairs(:,(tu-1))],[],2);
     end
-
+    
     % Damage to doors only affects this story
     recovery_day.stair_doors(:,tu) = stairdoor_access_day;
 end

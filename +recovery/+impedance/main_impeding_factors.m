@@ -183,7 +183,6 @@ if impedance_options.include_impedance.long_lead
             );
         end
     end
-    
 end
 
 %% Aggregate experienced impedance time for each system/sequence and realization 
@@ -293,7 +292,7 @@ for s = 1:height(systems)
     impeding_factors.breakdowns.long_lead.(systems.name{s}).complete_day = complete_day.long_lead(:,s);
 end
 
-% Temporary Repairs - hard coded fixed to 5 temp repair class
+% Temporary Repairs
 for tmp = 1:height(tmp_repair_class)
     impeding_factors.breakdowns.temp.(tmp_repair_class.name_short{tmp}).start_day = zeros(num_reals,1);
     impeding_factors.breakdowns.temp.(tmp_repair_class.name_short{tmp}).complete_day = impeding_factors.temp_repair.time_sys(:,1);

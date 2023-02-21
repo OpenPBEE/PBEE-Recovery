@@ -20,7 +20,7 @@ function [ fnc_filters ] = fn_create_fnc_filters( comp_ds_table )
 %   simulated damage arrays.
 %
 
-%% Combine compoment attributes into recovery filters to expidite recovery assessment
+%% Building level filters
 % combine all damage state filters that have the potential to affect
 % function or reoccupancy, other than structural safety damage (for repair
 % prioritization)
@@ -34,15 +34,19 @@ fnc_filters.affects_reoccupancy = comp_ds_table.affects_envelope_safety | ...
 fnc_filters.affects_function = fnc_filters.affects_reoccupancy | ...
                                comp_ds_table.damages_envelope_seal | ...
                                comp_ds_table.obstructs_interior_space | ...
-                               comp_ds_table.impairs_system_operation; 
+                               comp_ds_table.impairs_system_operation;
 
 % Define when building has resolved its red tag (when all repairs are complete that may affect red tags)
 % get any components that have the potential to cause red tag
 fnc_filters.red_tag = comp_ds_table.safety_class > 0; 
 
+% Define when the building requires shoring from external falling hazards
 fnc_filters.requires_shoring = logical(comp_ds_table.requires_shoring);
 
+% Define when the building has issues with internal flooding
+fnc_filters.causes_flooding = logical(comp_ds_table.causes_flooding);
 
+%% System dependent filters
 % fire suppresion system damage that affects entire building
 fnc_filters.fire_building = comp_ds_table.system == 9 & strcmp(string(comp_ds_table.service_location),'building') & comp_ds_table.impairs_system_operation;
 

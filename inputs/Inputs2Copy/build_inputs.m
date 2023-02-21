@@ -94,8 +94,12 @@ comp_ds_list = readtable('comp_ds_list.csv');
 
 % List of component and damage states in the performance model
 comp_population = readtable('comp_population.csv');
-comp_header = readtable('comp_population.csv','ReadVariableNames',false);
-comp_list = strrep(comp_header{1,3:end},'_','.');
+
+% Read header row unaltered by matlab
+fid = fopen('comp_population.csv');
+comp_header = strsplit(fgetl(fid), ',');
+fclose(fid);
+comp_list = strrep(comp_header(3:end),'_','.');
 building_model.comps.comp_list = comp_list;
 
 % Go through each story and assign component populations
@@ -277,6 +281,7 @@ for c = 1:height(comp_ds_list)
     comp_ds_info.damages_envelope_seal(c,1) = ds_attr.damages_envelope_seal;
     comp_ds_info.obstructs_interior_space(c,1) = ds_attr.obstructs_interior_space;
     comp_ds_info.impairs_system_operation(c,1) = ds_attr.impairs_system_operation;
+    comp_ds_info.causes_flooding(c,1) = ds_attr.causes_flooding;
     comp_ds_info.fraction_area_affected(c,1) = ds_attr.fraction_area_affected;
     comp_ds_info.area_affected_unit(c,1) = ds_attr.area_affected_unit;
     comp_ds_info.crew_size(c,1) = ds_attr.crew_size;

@@ -43,6 +43,7 @@ functionality_options.red_tag_clear_time = 7;
 functionality_options.red_tag_clear_beta = 0.6;
 functionality_options.include_local_stability_impact = 1;
 functionality_options.door_racking_repair_day = 3;
+functionality_options.flooding_cleanup_day = 5;
 functionality_options.egress_threshold = 0.5;
 functionality_options.fire_watch = true;
 functionality_options.local_fire_damamge_threshold = 0.25;
