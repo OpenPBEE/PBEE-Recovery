@@ -18,6 +18,9 @@ function [ recovery_day, comp_breakdowns ] = fn_building_safety( ...
 %   data structure containing simulated utility downtimes
 % functionality_options: struct
 %   recovery time optional inputs such as various damage thresholds
+% impeding_temp_repairs: struct
+%   contains simulated temporary repairs the impede occuapancy and function
+%   but are calulated in parallel with the temp repair schedule
 %
 % Returns
 % -------
@@ -196,10 +199,10 @@ side_2_count = 0;
 for d = 1:building_model.num_entry_doors
     if door_side(d) == 1
         side_1_count = side_1_count + 1;
-        day_repair_racked(:,d) = functionality_options.door_racking_repair_day * (damage_consequences.racked_entry_doors_side_1 >= side_1_count);
+        day_repair_racked(:,d) = impeding_temp_repairs.door_racking_repair_day .* (damage_consequences.racked_entry_doors_side_1 >= side_1_count);
     else 
         side_2_count = side_2_count + 1;
-        day_repair_racked(:,d) = functionality_options.door_racking_repair_day * (damage_consequences.racked_entry_doors_side_2 >= side_2_count);
+        day_repair_racked(:,d) = impeding_temp_repairs.door_racking_repair_day .* (damage_consequences.racked_entry_doors_side_2 >= side_2_count);
     end
 end
 door_access_day = max(day_repair_racked,day_repair_fall_haz);

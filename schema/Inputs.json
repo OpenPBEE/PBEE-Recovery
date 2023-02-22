@@ -153,6 +153,14 @@
 				"scaffolding_erect_time": {
 					"type": "number",
 					"description": "The number of days it takes for workers to errect scaffolding to protect doorways and walkways from falling hazards",
+				},
+				"door_racking_repair_day": {
+					"type": "number",
+					"description": "days after the earthquake required to unjam all racked doorways"
+				},
+				"flooding_cleanup_day": {
+					"type": "number",
+					"description": "days after the earthquake required to shut off leaks and dry out water"
 				}
 			}
 		},
@@ -209,10 +217,6 @@
 				"include_local_stability_impact": {
 					"type": "logical",
 					"description": "flag to consider the effect of local structural stability issues (that would require shoring) on building occupancy"
-				},
-				"door_racking_repair_day": {
-					"type": "number",
-					"description": "days after the earthquake required to repaired all racked doorways"
 				},
 				"egress_threshold": {
 					"type": "number",

@@ -1,5 +1,5 @@
-function [ recovery_day, comp_breakdowns ] = fn_story_access(...
-    damage, building_model, damage_consequences, functionality_options )
+function [ recovery_day, comp_breakdowns ] = fn_story_access(damage, ...
+    building_model, damage_consequences, functionality_options, impeding_temp_repairs )
 % Check each story for damage that would cause that story to be shut down due to
 % issues of access
 %
@@ -15,6 +15,9 @@ function [ recovery_day, comp_breakdowns ] = fn_story_access(...
 %   tags and repair costs ratios
 % functionality_options: struct
 %   recovery time optional inputs such as various damage thresholds
+% impeding_temp_repairs: struct
+%   contains simulated temporary repairs the impede occuapancy and function
+%   but are calulated in parallel with the temp repair schedule
 %
 % Returns
 % -------
@@ -40,7 +43,7 @@ comp_breakdowns.stairs = zeros(num_reals,num_comps,num_units);
 for tu = flip(1:num_stories) % Go from top to bottom
     is_damaged = damage.tenant_units{tu}.qnt_damaged > 0;
     flooding_this_story = any(is_damaged(:,damage.fnc_filters.causes_flooding),2); % Any major piping damage causes interior flooding
-    flooding_cleanup_day = flooding_this_story .* functionality_options.flooding_cleanup_day;
+    flooding_cleanup_day = flooding_this_story .* impeding_temp_repairs.flooding_cleanup_day;
     
     % Save clean up time per component causing flooding
     comp_breakdowns.flooding(:,:,tu) = damage.fnc_filters.causes_flooding .* is_damaged .* flooding_cleanup_day;
@@ -64,7 +67,7 @@ for tu = 1:num_stories
     % Augment damage matrix with door data
     racked_stair_doors = min(damage_consequences.racked_stair_doors_per_story(:,tu),building_model.stairs_per_story(tu));
     damage.tenant_units{tu}.qnt_damaged = [damage.tenant_units{tu}.qnt_damaged, racked_stair_doors];
-    door_repair_day = (racked_stair_doors > 0) * functionality_options.door_racking_repair_day;
+    door_repair_day = (racked_stair_doors > 0) .* impeding_temp_repairs.door_racking_repair_day;
     damage.tenant_units{tu}.recovery.repair_complete_day = [damage.tenant_units{tu}.recovery.repair_complete_day, door_repair_day];
 
     % Quantify damaged stairs on this story

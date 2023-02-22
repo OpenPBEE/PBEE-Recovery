@@ -27,6 +27,8 @@ impedance_options.demand_surge.site_pga = 1;
 impedance_options.demand_surge.pga_de = 1;
 impedance_options.scaffolding_lead_time = 5;
 impedance_options.scaffolding_erect_time = 2;
+impedance_options.door_racking_repair_day = 3;
+impedance_options.flooding_cleanup_day = 5;
 
 % Repair Schedule Options
 repair_time_options.max_workers_per_sqft_story = 0.001;
@@ -42,8 +44,6 @@ functionality_options.calculate_red_tag = 1;
 functionality_options.red_tag_clear_time = 7;
 functionality_options.red_tag_clear_beta = 0.6;
 functionality_options.include_local_stability_impact = 1;
-functionality_options.door_racking_repair_day = 3;
-functionality_options.flooding_cleanup_day = 5;
 functionality_options.egress_threshold = 0.5;
 functionality_options.fire_watch = true;
 functionality_options.local_fire_damamge_threshold = 0.25;

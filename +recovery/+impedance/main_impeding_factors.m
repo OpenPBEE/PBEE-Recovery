@@ -260,6 +260,7 @@ tmp_impede_sys = tmp_impede_sys .* tmp_repair_class_trigger;
 % Assume impedance always takes a full day
 impeding_factors.temp_repair.time_sys = ceil(tmp_impede_sys);
 
+%% Simulate impeding factors and temp repair that occur in parallel with temp repair scheudl
 % Temporary scaffolding for falling hazards
 prob_sim = rand(num_reals, 1);
 x_vals_std_n = icdf(trunc_pd, prob_sim);% Truncated lognormal distribution (via standard normal simulation)
@@ -268,6 +269,16 @@ prob_sim = rand(num_reals, 1); % repair time is not correlated to impedance time
 x_vals_std_n = icdf(trunc_pd, prob_sim);% Truncated lognormal distribution (via standard normal simulation)
 scaffold_repair_time = exp(x_vals_std_n * beta + log(impedance_options.scaffolding_erect_time)); 
 impeding_factors.temp_repair.scaffold_day = ceil(scaffold_impede_time + scaffold_repair_time); % round up (dont resolve issue on the same day repairs are complete)
+
+% Door Unjamming
+prob_sim = rand(num_reals, 1);
+x_vals_std_n = icdf(trunc_pd, prob_sim);% Truncated lognormal distribution (via standard normal simulation)
+impeding_factors.temp_repair.door_racking_repair_day = ceil(surge_factor*exp(x_vals_std_n * beta + log(impedance_options.door_racking_repair_day))); % always round up
+
+% Interior Flooding
+prob_sim = rand(num_reals, 1);
+x_vals_std_n = icdf(trunc_pd, prob_sim);% Truncated lognormal distribution (via standard normal simulation)
+impeding_factors.temp_repair.flooding_cleanup_day = ceil(surge_factor*exp(x_vals_std_n * beta + log(impedance_options.flooding_cleanup_day))); % always round up
 
 %% Format Impedance times for Gantt Charts
 % Full repair
