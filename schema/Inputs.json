@@ -161,6 +161,10 @@
 				"flooding_cleanup_day": {
 					"type": "number",
 					"description": "days after the earthquake required to shut off leaks and dry out water"
+				},
+				"flooding_repair_day": {
+					"type": "number",
+					"description": "days after the earthquake required to repair all damage caused by interior flooding"
 				}
 			}
 		},

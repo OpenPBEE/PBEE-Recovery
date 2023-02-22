@@ -24,6 +24,9 @@ function [ recovery ] = main_functionality( damage, building_model, ...
 % subsystems: table
 %   attributes of building subsystems; data provided in static tables
 %   directory
+% impeding_temp_repairs: struct
+%   contains simulated temporary repairs the impede occuapancy and function
+%   but are calulated in parallel with the temp repair schedule
 %
 % Returns
 % -------
@@ -43,8 +46,9 @@ import recovery.functionality.fn_calculate_functionality
 [recovery.reoccupancy] = fn_calculate_reoccupancy( damage, damage_consequences, utilities, ...
     building_model, functionality_options, tenant_units, impeding_temp_repairs );
 
-[recovery.functional] =  fn_calculate_functionality( damage, damage_consequences, utilities,  ...
-    building_model, subsystems, recovery.reoccupancy, functionality_options, tenant_units );
+[recovery.functional] =  fn_calculate_functionality( damage, damage_consequences, ...
+    utilities, building_model, subsystems, recovery.reoccupancy, ...
+    functionality_options, tenant_units, impeding_temp_repairs);
 
 % delete all the extra per-realization data
 recovery.reoccupancy.breakdowns = rmfield(recovery.reoccupancy.breakdowns, 'component_breakdowns_all_reals');

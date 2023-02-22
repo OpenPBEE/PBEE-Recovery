@@ -1,5 +1,6 @@
 function [ recovery_day, comp_breakdowns ] = fn_tenant_function( damage, ...
-    building_model, system_operation_day, utilities, subsystems, tenant_units )
+    building_model, system_operation_day, utilities, subsystems, ...
+    tenant_units, impeding_temp_repairs )
 % Check each tenant unit for damage that would cause that tenant unit 
 % to not be functional
 %
@@ -22,6 +23,9 @@ function [ recovery_day, comp_breakdowns ] = fn_tenant_function( damage, ...
 %   data table containing information about each subsystem's attributes
 % tenant_units: table
 %   attributes of each tenant unit within the building
+% impeding_temp_repairs: struct
+%   contains simulated temporary repairs the impede occuapancy and function
+%   but are calulated in parallel with the temp repair schedule
 %
 % Returns
 % -------
@@ -44,14 +48,11 @@ recovery_day.flooding = zeros(num_reals,num_units);
 comp_breakdowns.elevators = zeros(num_reals,num_comps,num_units);
 comp_breakdowns.electrical = zeros(num_reals,num_comps,num_units);
 
-% Simulate flooding repair day (hard coded to 3 months and beta = 0.6)
-sim_flood_repair_day = lognrnd(log(90),0.6,num_reals,1);
-
 %% STORY FLOODING
 for tu = flip(1:num_stories) % Go from top to bottom
     is_damaged = damage.tenant_units{tu}.qnt_damaged > 0;
     flooding_this_story = any(is_damaged(:,damage.fnc_filters.causes_flooding),2); % Any major piping damage causes interior flooding
-    flooding_recovery_day = flooding_this_story .* sim_flood_repair_day;
+    flooding_recovery_day = flooding_this_story .* impeding_temp_repairs.flooding_repair_day;
     
     % Save clean up time per component causing flooding
     comp_breakdowns.flooding(:,:,tu) = damage.fnc_filters.causes_flooding .* is_damaged .* flooding_recovery_day;

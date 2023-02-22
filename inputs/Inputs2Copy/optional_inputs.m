@@ -29,6 +29,7 @@ impedance_options.scaffolding_lead_time = 5;
 impedance_options.scaffolding_erect_time = 2;
 impedance_options.door_racking_repair_day = 3;
 impedance_options.flooding_cleanup_day = 5;
+impedance_options.flooding_repair_day = 90;
 
 % Repair Schedule Options
 repair_time_options.max_workers_per_sqft_story = 0.001;
