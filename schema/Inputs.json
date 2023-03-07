@@ -261,6 +261,40 @@
 				"heat_utility": {
 					"type": "string",
 					"description": "string identifier of the type of utility that is used to heat the building; string should match on of the fields in functionality.utilities"
+				},
+				"habitability_requirements": {
+					"type": "object",
+					"description": "flags to add additional system check on the reoccupancy time",
+					"properties": {
+						"electrical": {
+							"type": "logical",
+							"description": "electrical power required for reoccupancy/habitability"
+						},
+						"water_potable": {
+							"type": "logical",
+							"description": "potable water required for reoccupancy/habitability"
+						},
+						"water_sanitary": {
+							"type": "logical",
+							"description": "sanitary waste system required for reoccupancy/habitability"
+						},
+						"hvac_ventilation": {
+							"type": "logical",
+							"description": "active ventilation required for reoccupancy/habitability"
+						},
+						"hvac_heating": {
+							"type": "logical",
+							"description": "heating required for reoccupancy/habitability"
+						},
+						"hvac_cooling": {
+							"type": "logical",
+							"description": "cooling required for reoccupancy/habitability"
+						},
+						"hvac_exhaust": {
+							"type": "logical",
+							"description": "exhaust systems required for reoccupancy/habitability"
+						}
+					}
 				}
 			}
 		},

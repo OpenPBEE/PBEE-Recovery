@@ -53,3 +53,11 @@ functionality_options.exterior_safety_threshold = 0.1;
 functionality_options.interior_safety_threshold = 0.25;
 functionality_options.door_access_width_ft = 9;
 functionality_options.heat_utility = 'gas';
+functionality_options.habitability_requirements.electrical = 0;
+functionality_options.habitability_requirements.water_potable = 0;
+functionality_options.habitability_requirements.water_sanitary = 0;
+functionality_options.habitability_requirements.hvac_ventilation = 0;
+functionality_options.habitability_requirements.hvac_heating = 0;
+functionality_options.habitability_requirements.hvac_cooling = 0;
+functionality_options.habitability_requirements.hvac_exhaust = 0;
+
