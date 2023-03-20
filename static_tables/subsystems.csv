@@ -24,3 +24,5 @@ id,name,parallel_operation,redundancy_threshold,n1_redundancy
 22,roof: weatherproofing,1,0.25,0
 23,fire sprinkler drops,1,0.25,0
 24,air distribution: duct mains,0,0,0
+25,data server main,0,0,0
+26,data rack unit,0,0,0

@@ -389,6 +389,20 @@ for tu = 1:num_units
         subsystem_recovery('hvac_exhaust', damage, repair_complete_day, ...
                      total_num_comps, damaged_comps, initial_damaged, dependancy);
                  
+    %% Data
+    if unit.is_data_required
+        % determine effect on funciton at this tenant unit
+        % any major damage to the unit level electrical equipment failes for this tenant unit
+        tenant_sys_recovery_day = max(repair_complete_day .* damage.fnc_filters.data_unit,[],2);
+        recovery_day.data(:,tu) = max(system_operation_day.building.data_main,tenant_sys_recovery_day);
+        
+        % Consider effect of external water network
+        power_supply_recovery_day = max(system_operation_day.building.electrical_main,utilities.electrical);
+        recovery_day.data = max(recovery_day.data,power_supply_recovery_day);
+        
+        % distribute effect to the components
+        comp_breakdowns.data(:,:,tu) = max(system_operation_day.comp.data_main, repair_complete_day .* damage.fnc_filters.data_unit);
+    end      
                  
     %% Post process for tenant-specific requirements 
     % Zero out systems that are not required by the tenant

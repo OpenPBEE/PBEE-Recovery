@@ -1,11 +1,12 @@
 id,name,priority,num_du_per_crew,max_crews_per_comp_type
 1,structural,1,10,10
 2,exterior,8,10,2
-3,interior,9,999,1
+3,interior,10,999,1
 4,stairs,2,999,1
 5,elevators,7,999,1
 6,plumbing,4,999,1
 7,electrical,5,999,1
 8,hvac,6,999,1
 9,fire,3,999,1
-10,contents,10,999,1
+10,contents,11,999,1
+11,data,9,999,1

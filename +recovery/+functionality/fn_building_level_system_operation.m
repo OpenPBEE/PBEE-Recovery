@@ -42,6 +42,7 @@ system_operation_day.comp.electrical_main = zeros(num_reals,num_comps);
 system_operation_day.comp.water_potable_main = zeros(num_reals,num_comps);
 system_operation_day.comp.water_sanitary_main = zeros(num_reals,num_comps);
 system_operation_day.comp.elevator_mcs = zeros(num_reals,num_comps);
+system_operation_day.comp.data_main = zeros(num_reals,num_comps);
 
 
 %% Loop through each story/TU and quantify the building-level performance of each system (e.g. equipment that severs the entire building)
@@ -104,6 +105,10 @@ for tu = 1:num_stories
                 max(system_operation_day.comp.(subsys_label), comps_breakdown);
         end
     end
+    
+    %% Data
+    system_operation_day.comp.data_main = ...
+        max(system_operation_day.comp.data_main, repair_complete_day .* damage.fnc_filters.data_main);
 end
 
 %% Calculate building level consequences for systems where any major main damage leads to system failure
@@ -111,6 +116,7 @@ system_operation_day.building.electrical_main = max(system_operation_day.comp.el
 system_operation_day.building.water_potable_main = max(system_operation_day.comp.water_potable_main,[],2);  % any major damage to the main pipes fails the system for the entire building
 system_operation_day.building.water_sanitary_main = max(system_operation_day.comp.water_sanitary_main,[],2);  % any major damage to the main pipes fails the system for the entire building
 system_operation_day.building.elevator_mcs = max(system_operation_day.comp.elevator_mcs,[],2); % any major damage fails the system for the whole building so take the max
+system_operation_day.building.data_main = max(system_operation_day.comp.data_main,[],2);  % any major damage to the main equipment fails the system for the entire building
 
 %% Account for Extermal Utilities impact on system Operation
 % Potable water
