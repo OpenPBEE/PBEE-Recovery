@@ -196,6 +196,7 @@ tenant_units.is_hvac_ventilation_required = zeros(height(tenant_units),1);
 tenant_units.is_hvac_heating_required = zeros(height(tenant_units),1);
 tenant_units.is_hvac_cooling_required = zeros(height(tenant_units),1);
 tenant_units.is_hvac_exhaust_required = zeros(height(tenant_units),1);
+tenant_units.is_data_required = zeros(height(tenant_units),1);
 
 % Pull default tenant unit attributes for each tenant unit listed in the
 % tenant_unit_list
@@ -220,6 +221,7 @@ for tu = 1:height(tenant_unit_list)
     tenant_units.is_hvac_heating_required(tu) = tenant_function_requirements.is_hvac_heating_required(fnc_requirements_filt);
     tenant_units.is_hvac_cooling_required(tu) = tenant_function_requirements.is_hvac_cooling_required(fnc_requirements_filt);
     tenant_units.is_hvac_exhaust_required(tu) = tenant_function_requirements.is_hvac_exhaust_required(fnc_requirements_filt);
+    tenant_units.is_data_required(tu) = tenant_function_requirements.is_data_required(fnc_requirements_filt);
 end
 
 

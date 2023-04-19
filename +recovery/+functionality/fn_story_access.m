@@ -40,18 +40,19 @@ recovery_day.flooding = zeros(num_reals,num_units);
 comp_breakdowns.stairs = zeros(num_reals,num_comps,num_units);
 
 %% STORY FLOODING
-for tu = flip(1:num_stories) % Go from top to bottom
-    is_damaged = damage.tenant_units{tu}.qnt_damaged > 0;
-    flooding_this_story = any(is_damaged(:,damage.fnc_filters.causes_flooding),2); % Any major piping damage causes interior flooding
-    flooding_cleanup_day = flooding_this_story .* impeding_temp_repairs.flooding_cleanup_day;
-    
-    % Save clean up time per component causing flooding
-    comp_breakdowns.flooding(:,:,tu) = damage.fnc_filters.causes_flooding .* is_damaged .* flooding_cleanup_day;
-    
-    % This story is not accessible if any story above has flooding
-    recovery_day.flooding(:,tu) = max([flooding_cleanup_day,recovery_day.flooding(:,(tu+1):end)],[],2);
-end
+if functionality_options.include_flooding_impact
+    for tu = flip(1:num_stories) % Go from top to bottom
+        is_damaged = damage.tenant_units{tu}.qnt_damaged > 0;
+        flooding_this_story = any(is_damaged(:,damage.fnc_filters.causes_flooding),2); % Any major piping damage causes interior flooding
+        flooding_cleanup_day = flooding_this_story .* impeding_temp_repairs.flooding_cleanup_day;
 
+        % Save clean up time per component causing flooding
+        comp_breakdowns.flooding(:,:,tu) = damage.fnc_filters.causes_flooding .* is_damaged .* flooding_cleanup_day;
+
+        % This story is not accessible if any story above has flooding
+        recovery_day.flooding(:,tu) = max([flooding_cleanup_day,recovery_day.flooding(:,(tu+1):end)],[],2);
+    end
+end
 %% STAIRS AND STAIRDOORS
 if num_stories == 1 
     return % Re-occupancy of one story buildigns is not affected by stairway access

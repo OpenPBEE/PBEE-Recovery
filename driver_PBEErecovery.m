@@ -25,8 +25,6 @@ outputs_dir = ['outputs' filesep model_name]; % Directory where the assessment o
 %% Load FEMA P-58 performance model data and simulated damage and loss
 load([model_dir filesep model_name filesep 'simulated_inputs.mat'])
 
-tenant_units.is_data_required = zeros(height(tenant_units),1); % temp zero out data requirement
-
 %% Load required static data
 systems = readtable(['static_tables' filesep 'systems.csv']);
 subsystems = readtable(['static_tables' filesep 'subsystems.csv']);

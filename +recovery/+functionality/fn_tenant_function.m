@@ -1,6 +1,6 @@
 function [ recovery_day, comp_breakdowns ] = fn_tenant_function( damage, ...
     building_model, system_operation_day, utilities, subsystems, ...
-    tenant_units, impeding_temp_repairs )
+    tenant_units, impeding_temp_repairs, functionality_options )
 % Check each tenant unit for damage that would cause that tenant unit 
 % to not be functional
 %
@@ -26,6 +26,8 @@ function [ recovery_day, comp_breakdowns ] = fn_tenant_function( damage, ...
 % impeding_temp_repairs: struct
 %   contains simulated temporary repairs the impede occuapancy and function
 %   but are calulated in parallel with the temp repair schedule
+% functionality_options: struct
+%   recovery time optional inputs such as various damage thresholds
 %
 % Returns
 % -------
@@ -49,16 +51,18 @@ comp_breakdowns.elevators = zeros(num_reals,num_comps,num_units);
 comp_breakdowns.electrical = zeros(num_reals,num_comps,num_units);
 
 %% STORY FLOODING
-for tu = flip(1:num_stories) % Go from top to bottom
-    is_damaged = damage.tenant_units{tu}.qnt_damaged > 0;
-    flooding_this_story = any(is_damaged(:,damage.fnc_filters.causes_flooding),2); % Any major piping damage causes interior flooding
-    flooding_recovery_day = flooding_this_story .* impeding_temp_repairs.flooding_repair_day;
-    
-    % Save clean up time per component causing flooding
-    comp_breakdowns.flooding(:,:,tu) = damage.fnc_filters.causes_flooding .* is_damaged .* flooding_recovery_day;
-    
-    % This story is not accessible if any story above has flooding
-    recovery_day.flooding(:,tu) = max([flooding_recovery_day,recovery_day.flooding(:,(tu+1):end)],[],2);
+if functionality_options.include_flooding_impact
+    for tu = flip(1:num_stories) % Go from top to bottom
+        is_damaged = damage.tenant_units{tu}.qnt_damaged > 0;
+        flooding_this_story = any(is_damaged(:,damage.fnc_filters.causes_flooding),2); % Any major piping damage causes interior flooding
+        flooding_recovery_day = flooding_this_story .* impeding_temp_repairs.flooding_repair_day;
+
+        % Save clean up time per component causing flooding
+        comp_breakdowns.flooding(:,:,tu) = damage.fnc_filters.causes_flooding .* is_damaged .* flooding_recovery_day;
+
+        % This story is not accessible if any story above has flooding
+        recovery_day.flooding(:,tu) = max([flooding_recovery_day,recovery_day.flooding(:,(tu+1):end)],[],2);
+    end
 end
 
 %% SYSTEM SPECIFIC CONSEQUENCES
