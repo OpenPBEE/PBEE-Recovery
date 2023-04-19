@@ -20,6 +20,11 @@ function [ fnc_filters ] = fn_create_fnc_filters( comp_ds_table )
 %   simulated damage arrays.
 %
 
+%% Impedance filters
+fnc_filters.permit_rapid = strcmp(comp_ds_table.permit_type, 'rapid');
+fnc_filters.permit_full = strcmp(comp_ds_table.permit_type, 'full');
+fnc_filters.redesign = comp_ds_table.redesign == 1;
+
 %% Building level filters
 % combine all damage state filters that have the potential to affect
 % function or reoccupancy, other than structural safety damage (for repair
@@ -140,8 +145,8 @@ fnc_filters.hvac.tenant.hvac_cooling.vav = comp_ds_table.system == 8 & comp_ds_t
 fnc_filters.hvac.tenant.hvac_exhaust.exhaust_fan = comp_ds_table.system == 8 & comp_ds_table.subsystem_id == 18 & comp_ds_table.impairs_system_operation;
 
 % Data system
-fnc_filters.data_main = comp_ds_table.system == 11 & comp_ds_table.subsystem_id == 25 & strcmp(string(comp_ds_table.service_location),'building') & comp_ds_table.impairs_system_operation;
-fnc_filters.data_unit = comp_ds_table.system == 11 & comp_ds_table.subsystem_id == 26 & strcmp(string(comp_ds_table.service_location),'unit') & comp_ds_table.impairs_system_operation;
+fnc_filters.data_main = comp_ds_table.system == 11 & strcmp(string(comp_ds_table.service_location),'building') & comp_ds_table.impairs_system_operation;
+fnc_filters.data_unit = comp_ds_table.system == 11 & strcmp(string(comp_ds_table.service_location),'unit') & comp_ds_table.impairs_system_operation;
 
 %% Flip orientation of fnc_filters to match orientation of damage data [reals x ds]
 names = fieldnames(fnc_filters);
