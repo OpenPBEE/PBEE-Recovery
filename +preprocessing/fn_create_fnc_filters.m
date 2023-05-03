@@ -148,6 +148,9 @@ fnc_filters.hvac.tenant.hvac_exhaust.exhaust_fan = comp_ds_table.system == 8 & c
 fnc_filters.data_main = comp_ds_table.system == 11 & strcmp(string(comp_ds_table.service_location),'building') & comp_ds_table.impairs_system_operation;
 fnc_filters.data_unit = comp_ds_table.system == 11 & strcmp(string(comp_ds_table.service_location),'unit') & comp_ds_table.impairs_system_operation;
 
+% Horizontal Egress: Fire break partitions
+fnc_filters.fire_break = comp_ds_table.system == 3 & comp_ds_table.weakens_fire_break; % only collect interior fire break partitions
+
 %% Flip orientation of fnc_filters to match orientation of damage data [reals x ds]
 names = fieldnames(fnc_filters);
 for fn = 1:length(names)

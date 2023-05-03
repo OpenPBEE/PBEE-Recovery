@@ -279,6 +279,7 @@ for c = 1:height(comp_ds_list)
     comp_ds_info.int_falling_hazard(c,1) = ds_attr.interior_falling_hazard;
     comp_ds_info.global_hazardous_material(c,1) = ds_attr.global_hazardous_material;
     comp_ds_info.local_hazardous_material(c,1) = ds_attr.local_hazardous_material;
+    comp_ds_info.weakens_fire_break(c,1) = ds_attr.weakens_fire_break;
     comp_ds_info.affects_access(c,1) = ds_attr.affects_access;
     comp_ds_info.damages_envelope_seal(c,1) = ds_attr.damages_envelope_seal;
     comp_ds_info.obstructs_interior_space(c,1) = ds_attr.obstructs_interior_space;

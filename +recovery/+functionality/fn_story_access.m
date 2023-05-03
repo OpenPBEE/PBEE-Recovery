@@ -37,7 +37,25 @@ num_comps = height(damage.comp_ds_table);
 recovery_day.stairs = zeros(num_reals,num_units);
 recovery_day.stair_doors = zeros(num_reals,num_units);
 recovery_day.flooding = zeros(num_reals,num_units);
+recovery_day.horizontal_egress = zeros(num_reals,num_units);
 comp_breakdowns.stairs = zeros(num_reals,num_comps,num_units);
+comp_breakdowns.horizontal_egress = zeros(num_reals,num_comps,num_units);
+
+%% Horizontal Egress - Fire breaks
+if any(damage.fnc_filters.fire_break)
+    for tu = 1:num_stories
+        % Grab tenant and damage info for this tenant unit
+        repair_complete_day_w_tmp = damage.tenant_units{tu}.recovery.repair_complete_day_w_tmp;
+
+        % Any significant damage to fire breaks in the story impairs the horizontal egress
+        recovery_day.horizontal_egress(:,tu) = ...
+            max(recovery_day.horizontal_egress(:,tu),...
+                max(repair_complete_day_w_tmp(:,damage.fnc_filters.fire_break),[],2)); 
+
+        % Componet Breakdowns
+        comp_breakdowns.horizontal_egress(:,:,tu) = damage.fnc_filters.fire_break .* repair_complete_day_w_tmp;
+    end
+end
 
 %% STORY FLOODING
 if functionality_options.include_flooding_impact
@@ -53,6 +71,7 @@ if functionality_options.include_flooding_impact
         recovery_day.flooding(:,tu) = max([flooding_cleanup_day,recovery_day.flooding(:,(tu+1):end)],[],2);
     end
 end
+
 %% STAIRS AND STAIRDOORS
 if num_stories == 1 
     return % Re-occupancy of one story buildigns is not affected by stairway access
