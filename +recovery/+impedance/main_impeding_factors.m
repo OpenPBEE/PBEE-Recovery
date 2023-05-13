@@ -1,6 +1,6 @@
 function [impeding_factors] = main_impeding_factors(damage, ...
     impedance_options, repair_cost_ratio_total, repair_cost_ratio_engineering, ...
-    inpsection_trigger, systems, tmp_repair_class, building_value, impeding_factor_medians)
+    inpsection_trigger, systems, tmp_repair_class, building_value, impeding_factor_medians, include_flooding_impact)
 % Calculate ATC-138 impeding times for each system given simulation of damage
 %
 % Parameters
@@ -291,6 +291,12 @@ x_vals_std_n = icdf(trunc_pd, prob_sim);% Truncated lognormal distribution (via 
 impeding_factors.temp_repair.flooding_repair_day = ...
     sys_repair_trigger.flooding .* ...
     ceil(surge_factor*exp(x_vals_std_n * beta + log(impedance_options.flooding_repair_day))); % always round up
+
+if not(include_flooding_impact)
+	% zero out the flooding impedance (cleanup and repair)
+    impeding_factors.temp_repair.flooding_cleanup_day = impeding_factors.temp_repair.flooding_cleanup_day * 0;
+    impeding_factors.temp_repair.flooding_repair_day = impeding_factors.temp_repair.flooding_repair_day * 0;
+end
 
 %% Format Impedance times for Gantt Charts
 % Full repair

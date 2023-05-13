@@ -51,18 +51,16 @@ comp_breakdowns.elevators = zeros(num_reals,num_comps,num_units);
 comp_breakdowns.electrical = zeros(num_reals,num_comps,num_units);
 
 %% STORY FLOODING
-if functionality_options.include_flooding_impact
-    for tu = flip(1:num_stories) % Go from top to bottom
-        is_damaged = damage.tenant_units{tu}.qnt_damaged > 0;
-        flooding_this_story = any(is_damaged(:,damage.fnc_filters.causes_flooding),2); % Any major piping damage causes interior flooding
-        flooding_recovery_day = flooding_this_story .* impeding_temp_repairs.flooding_repair_day;
+for tu = flip(1:num_stories) % Go from top to bottom
+    is_damaged = damage.tenant_units{tu}.qnt_damaged > 0;
+    flooding_this_story = any(is_damaged(:,damage.fnc_filters.causes_flooding),2); % Any major piping damage causes interior flooding
+    flooding_recovery_day = flooding_this_story .* impeding_temp_repairs.flooding_repair_day;
 
-        % Save clean up time per component causing flooding
-        comp_breakdowns.flooding(:,:,tu) = damage.fnc_filters.causes_flooding .* is_damaged .* flooding_recovery_day;
+    % Save clean up time per component causing flooding
+    comp_breakdowns.flooding(:,:,tu) = damage.fnc_filters.causes_flooding .* is_damaged .* flooding_recovery_day;
 
-        % This story is not accessible if any story above has flooding
-        recovery_day.flooding(:,tu) = max([flooding_recovery_day,recovery_day.flooding(:,(tu+1):end)],[],2);
-    end
+    % This story is not accessible if any story above has flooding
+    recovery_day.flooding(:,tu) = max([flooding_recovery_day,recovery_day.flooding(:,(tu+1):end)],[],2);
 end
 
 %% SYSTEM SPECIFIC CONSEQUENCES
