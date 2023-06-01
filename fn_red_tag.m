@@ -1,5 +1,5 @@
 function [ red_tag, red_tag_impact, inspection_tag ] = ...
-    fn_red_tag( calculate_red_tag, damage, comps, simulated_replacement )
+    fn_red_tag( calculate_red_tag, damage, comps, simulated_replacement_time )
 % Perform the ATC-138 functional recovery time assessement given similation
 % of component damage for a single shaking intensity
 %
@@ -13,8 +13,10 @@ function [ red_tag, red_tag_impact, inspection_tag ] = ...
 %   contains per damage state damage and loss data for each component in the building
 % comps: struct
 %   data structure component population info
-% simulated_replacement: array [num reals x 1]
-%   Time 
+% simulated_replacement_time: array [num_reals x 1]
+%   simulated time when the building needs to be replaced, and how long it
+%   will take (in days). NaN represents no replacement needed (ie
+%   building will be repaired)
 %
 % Returns
 % -------
@@ -52,7 +54,7 @@ else
 end
 
 % Account for global red tag cases
-replace_case = ~isnan(simulated_replacement);
+replace_case = ~isnan(simulated_replacement_time);
 red_tag(replace_case) = 1;
 
 end

@@ -19,7 +19,7 @@ function [ damage_consequences ] = fn_define_door_racking( damage_consequences, 
 %   simulated number of racked entry doors on the other side of the building
 
 %% Set door racking damage if not provided by user
-[num_reals, ~] = size(damage_consequences.simulated_replacement);
+[num_reals, ~] = size(damage_consequences.simulated_replacement_time);
 
 % Assume there are no racked doors if not specified by the user
 if ~isfield(damage_consequences,'racked_stair_doors_per_story')

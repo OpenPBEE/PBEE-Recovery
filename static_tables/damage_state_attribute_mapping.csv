@@ -46,7 +46,7 @@ B1033\.06[1-3][a-c],OCBF designed to ductile slenderness limits,Buckling of brac
 B1033\.06[1-3][a-c],OCBF designed to ductile slenderness limits,Buckling of brace in excess of 2 times brace depth. Yielding and out-of-plane deformation of gusset. Cracking and tearing of welds and gussets adjacent to welds but crack length is less than critical for fracture. Significant yielding and local buckling in beams and columns adjacent to gusset.,2,NA,2,0,0,0,0,0,0,0,0,0,0,0,0.0,NA,6,full,1,0,0,0,0,0.0,0.0,0,3,7,1,0,NA,0
 B1033\.06[1-3][a-c],OCBF designed to ductile slenderness limits,Fracture of brace or gusset.  Buckling of gusset.  Severe yielding of beams and columns adjacent to the gusset with possibility of local buckling and cracking in the yielded areas.  Nearly total loss of lateral resistance.,3,NA,2,0,0,0,0,0,0,0,0,0,0,0,0.0,NA,6,full,1,0,0,0,0,0.0,0.0,0,3,7,1,0,NA,0
 B1033\.07\w+,Non Seismic Braces,Fracture of brace or gusset.  Buckling of gusset.  Substantial loss of lateral resistance.,1,NA,2,0,0,0,0,0,0,0,0,0,0,0,0.0,NA,6,full,1,0,0,0,0,0.0,0.0,0,3,7,1,0,NA,0
-B1033\.3.*,Simpson YLBC Braces,Fracture of YLBC fuses.,1,NA,2,0,0,0,0,0,0,0,0,0,0,0,0.0,NA,6,full,1,0,0,0,0,0.0,0.0,0,5,20,1,0,NA,0
+B1033\.[34].*,Simpson YLBC Braces,"Fracture of brace fuse component(s), and resulting loss of lateral resistance.",1,NA,2,0,0,0,0,0,0,0,0,0,0,0,0.0,NA,6,full,1,0,0,0,0,0.0,0.0,0,5,20,1,0,NA,0
 B1035\.0[0123]\w+,Post Northridge Steel Beam Connection,Local beam flange and web buckling.,1,NA,0,0,0,0,0,0,0,0,0,0,0,0,0.0,NA,4,full,1,0,0,0,0,0.0,0.0,0,3,7,1,0,NA,0
 B1035\.0[0123]\w+,Post Northridge Steel Beam Connection,DS1 plus lateral-torsional distortion of beam in hinge region.,2,NA,1,0,0,0,0,0,0,0,0,0,0,0,0.0,NA,6,full,1,0,0,0,0,0.0,0.0,0,3,7,1,0,NA,0
 B1035\.0[0123]\w+,Post Northridge Steel Beam Connection,Low-cycle fatigue fracture in buckled region of RBS.,3,NA,2,0,0,0,0,0,0,0,0,0,0,0,0.0,NA,6,full,1,0,0,0,0,0.0,0.0,0,3,7,1,0,NA,0
@@ -188,6 +188,9 @@ B1071\.3\w+,Interior Walls: Wood Light Frame,Local and global buckling out-of-pl
 B1071\.3\w+,Interior Walls: Wood Light Frame,"Local and global buckling out-of-plane and crushing of gypsum wallboards.  Studs are typically not damaged by failure of the gypsum wallboard, but framing adjustments possible for this damage state.",3,NA,0,0,0,0,0,0,0,0,0,0,0,0,0.0,NA,6,full,1,0,0,0,0,0.0,0.0,0,3,8,1,0,NA,0
 B1071\.3\w+,Interior Walls: Wood Light Frame,"Permanent rotation of sheathing, tear out of nails or sheathing.",4,NA,2,0,0,0,0,0,0,0,0,0,0,0,0.0,NA,6,full,1,0,0,0,0,0.0,0.0,0,3,8,1,0,NA,0
 B1071\.3\w+,Interior Walls: Wood Light Frame,"Fracture of studs, major sill plate cracking.",5,NA,3,0,0,1,0,0,0,0,0,1,0,0,1.0,component,6,full,1,0,1,0,1,0.0625,0.0625,10,3,8,1,0,NA,0
+B1081\.0[1-3][12],Taylor Viscous Damper,No damage,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0.0,NA,6,full,0,0,0,0,0,0.0,0.0,0,4,12,1,0,NA,0
+B1081\.0[1-3][12],Taylor Viscous Damper,Leaking of seal,1,2,2,0,0,0,0,0,0,0,0,1,0,0,1.0,bay,6,full,1,1,0,0,0,0.0,0.0,0,4,12,1,0,NA,0
+B1081\.0[1-3][12],Taylor Viscous Damper,Damper severely damaged,2,NA,2,0,0,0,0,0,0,0,0,1,0,0,1.0,bay,6,full,1,1,0,0,0,0.0,0.0,0,4,12,1,0,NA,0
 B1100\.301,DuraFuse Repair Excessive Residual Drift,Repairable residual drift (1%),1,NA,0,0,0,0,0,0,0,0,0,0,0,0,0.0,NA,6,full,1,0,0,0,0,0.0,0.0,0,3,7,1,0,NA,0
 B1100\.301,DuraFuse Repair Excessive Residual Drift,Repairable residual drift (2%),2,NA,0,0,0,0,0,0,0,0,0,0,0,0,0.0,NA,6,full,1,0,0,0,0,0.0,0.0,0,3,7,1,0,NA,0
 B1100\.301,DuraFuse Repair Excessive Residual Drift,Repairable residual drift (2.5%),3,NA,0,0,0,0,0,0,0,0,0,0,0,0,0.0,NA,6,full,1,0,0,0,0,0.0,0.0,0,3,7,1,0,NA,0
@@ -353,9 +356,8 @@ D2021\.11[12]a,Unbraced Cold Domestic Piping - Small diameter (branches) (ATC-13
 D2021\.11[12]a,Unbraced Cold Domestic Piping - Small diameter (branches) (ATC-138 Update),Pipe Break - 1 break per 1000 feet of pipe.,2,NA,0,0,0,1,0,0,0,0,0,1,1,1,0.01,component,5,rapid,0,0,0,0,2,0.5,0.5,2,1,4,6,8,unit,0
 D2021\.11[12]c,Braced Cold Domestic Piping - Small diameter (branches) (ATC-138 Update),Minor leakage at flange connections - 1 leak per 1000 feet of pipe.,1,NA,0,0,0,0,0,0,0,0,0,0,0,0,0.0,NA,3,rapid,0,0,0,0,0,0.0,0.0,0,1,4,6,8,unit,0
 D2021\.11[12]c,Braced Cold Domestic Piping - Small diameter (branches) (ATC-138 Update),Pipe Break - 1 break per 1000 feet of pipe.,2,NA,0,0,0,1,0,0,0,0,0,1,1,1,0.01,component,5,rapid,0,0,0,0,2,0.5,0.5,2,1,4,6,8,unit,0
-D2021\.11[1-4]b,Cold Domestic Piping - Small diameter bracing only (ATC-138 Update),Lateral Brace Failure - 1 failure per 1000 feet of pipe.,1,NA,0,0,0,0,0,0,0,0,0,0,0,0,0.0,NA,3,rapid,0,0,0,0,0,0.0,0.0,0,"dup 1-2: 1
-dup 3-4: 3","dup 1-2: 4
-dup 3-4: 10",6,8,unit,0
+D2021\.11[12]b,Cold Domestic Piping - Small diameter bracing only (ATC-138 Update),Lateral Brace Failure - 1 failure per 1000 feet of pipe.,1,NA,0,0,0,0,0,0,0,0,0,0,0,0,0.0,NA,3,rapid,0,0,0,0,0,0.0,0.0,0,1,4,6,8,unit,0
+D2021\.11[34]b,Cold Domestic Piping - Small diameter bracing only (ATC-138 Update),Lateral Brace Failure - 1 failure per 1000 feet of pipe.,1,NA,0,0,0,0,0,0,0,0,0,0,0,0,0.0,NA,3,rapid,0,0,0,0,0,0.0,0.0,0,3,10,6,8,unit,0
 D2021\.11[34]a,Unbraced Cold Domestic Piping - Small diameter (branches) (ATC-138 Update),Minor leakage at flange connections - 1 leak per 1000 feet of pipe.,1,NA,0,0,0,0,0,0,0,0,0,0,0,0,0.0,NA,3,rapid,0,0,0,0,0,0.0,0.0,0,3,10,6,8,unit,0
 D2021\.11[34]a,Unbraced Cold Domestic Piping - Small diameter (branches) (ATC-138 Update),Pipe Break - 1 break per 1000 feet of pipe.,2,NA,0,0,0,1,0,0,0,0,0,1,1,1,0.01,component,5,rapid,0,0,0,0,2,0.5,0.5,2,3,10,6,8,unit,0
 D2021\.11[34]c,Braced Cold Domestic Piping - Small diameter (branches) (ATC-138 Update),Minor leakage at flange connections - 1 leak per 1000 feet of pipe.,1,NA,0,0,0,0,0,0,0,0,0,0,0,0,0.0,NA,3,rapid,0,0,0,0,0,0.0,0.0,0,3,10,6,8,unit,0

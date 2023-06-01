@@ -111,11 +111,15 @@ fclose(fileID);
 %% Develop damage_consequences.json
 % Pull data from Pelicun structure 
 sim_repair_cost = DV_rec_cost_agg.repair_cost_;
-sim_replacement = DV_rec_cost_agg.collapse | DV_rec_cost_agg.irreparable;
+sim_replacement_time = NaN(height(DV_rec_cost_agg),1);
+sim_replacement_filt = DV_rec_cost_agg.collapse | DV_rec_cost_agg.irreparable;
+sim_replacement_time(sim_replacement_filt) = ...
+    mean([DV_rec_cost_agg.repair_time_parallel(sim_replacement_filt),...
+    DV_rec_cost_agg.repair_time_parallel(sim_replacement_filt)],2); % Take the average of parallel and series rep times (they should be the same)
 
 % Set Variables
 damage_consequences.repair_cost_ratio_total = sim_repair_cost / building_model.building_value;  % array, num real x 1
-damage_consequences.simulated_replacement = sim_replacement;
+damage_consequences.simulated_replacement_time = sim_replacement_time;
 
 % Write file
 fileID = fopen([model_dir filesep 'damage_consequences.json'],'w');

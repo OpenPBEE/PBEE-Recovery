@@ -1,5 +1,5 @@
 function [ recovery ] = fn_extract_recovery_metrics( tentant_unit_recovery_day, ...
-   recovery_day, comp_breakdowns, comp_id, simulated_replacement )
+   recovery_day, comp_breakdowns, comp_id, simulated_replacement_time )
 % Reformant tenant level recovery outcomes into outcomes at the building level, 
 % system level, and compoennt level
 %
@@ -16,7 +16,7 @@ function [ recovery ] = fn_extract_recovery_metrics( tentant_unit_recovery_day, 
 %   list of each fragility id associated with the per component damage
 %   state structure of the damage object. With of array is the same as the
 %   arrays in the comp_breakdowns structure
-% simulated_replacement: array [num_reals x 1]
+% simulated_replacement_time: array [num_reals x 1]
 %   simulated time when the building needs to be replaced, and how long it
 %   will take (in days). NaN represents no replacement needed (ie
 %   building will be repaired)
@@ -55,7 +55,7 @@ num_units = size(tentant_unit_recovery_day,2);
 perform_targ_days = [0, 3, 7, 14, 30, 60, 90, 120, 182, 270, 365]; % Number of days for each performance target stripe
 
 % Determine replacement cases
-replace_cases = ~isnan(simulated_replacement);
+replace_cases = ~isnan(simulated_replacement_time);
 
 %% Post process tenant-level recovery times
 % Overwrite NaNs in tenant_unit_day_functional
@@ -63,7 +63,7 @@ replace_cases = ~isnan(simulated_replacement);
 tentant_unit_recovery_day(isnan(tentant_unit_recovery_day)) = 0;
 
 % Overwrite building replacment cases to replacement time
-tentant_unit_recovery_day(replace_cases,:) = simulated_replacement(replace_cases)*ones(1,num_units);
+tentant_unit_recovery_day(replace_cases,:) = simulated_replacement_time(replace_cases)*ones(1,num_units);
 
 %% Save building-level outputs to occupancy structure
 % Tenant Unit level outputs
@@ -78,7 +78,7 @@ recovery.building_level.prob_of_target = mean(recovery.building_level.recovery_d
 % Save specific breakdowns for red tags
 if isfield(recovery_day, 'building_safety')
     red_tag_day = recovery_day.building_safety.red_tag;
-    red_tag_day(replace_cases,:) = simulated_replacement(replace_cases);
+    red_tag_day(replace_cases,:) = simulated_replacement_time(replace_cases);
     recovery.building_level.recovery_day_red_tag = red_tag_day;
 end
 

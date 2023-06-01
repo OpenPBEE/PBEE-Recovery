@@ -53,7 +53,7 @@ end
 % Reformat outputs into reoccupancy data strucutre
 [ reoccupancy ] = fn_extract_recovery_metrics( day_tentant_unit_reoccupiable, ...
     recovery_day, comp_breakdowns, damage.comp_ds_table.comp_id', ...
-    damage_consequences.simulated_replacement );
+    damage_consequences.simulated_replacement_time );
 
 end
 

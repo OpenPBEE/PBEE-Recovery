@@ -429,7 +429,7 @@
 			"type": "object",
 			"description": "general impedance assessment inputs such as mitigation factors",
 			"properties": {
-				"simulated_replacement": {
+				"simulated_replacement_time": {
 					"description": "simulated replacement time in days for all realizations where replacement is required, NaN = building does not need replaced and is scheduled for repairs. Note: to not consider building replacement, pass in an array of NaNs", 
 					"$ref": "#/definitions/arrayOfNumbers"
 				},
