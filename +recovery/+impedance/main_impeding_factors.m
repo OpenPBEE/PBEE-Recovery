@@ -1,6 +1,6 @@
 function [impeding_factors] = main_impeding_factors(damage, ...
     impedance_options, repair_cost_ratio_total, repair_cost_ratio_engineering, ...
-    inpsection_trigger, systems, tmp_repair_class, building_value, impeding_factor_medians)
+    inpsection_trigger, systems, tmp_repair_class, building_value, impeding_factor_medians, include_flooding_impact)
 % Calculate ATC-138 impeding times for each system given simulation of damage
 %
 % Parameters
@@ -280,17 +280,24 @@ x_vals_std_n = icdf(trunc_pd, prob_sim);% Truncated lognormal distribution (via 
 impeding_factors.temp_repair.door_racking_repair_day = ceil(surge_factor*exp(x_vals_std_n * beta + log(impedance_options.door_racking_repair_day))); % always round up
 
 % Interior Flooding
-prob_sim = rand(num_reals, 1);
-x_vals_std_n = icdf(trunc_pd, prob_sim);% Truncated lognormal distribution (via standard normal simulation)
-impeding_factors.temp_repair.flooding_cleanup_day = ...
-    sys_repair_trigger.flooding .* ...
-    ceil(surge_factor*exp(x_vals_std_n * beta + log(impedance_options.flooding_cleanup_day))); % always round up
-
-prob_sim = rand(num_reals, 1);
-x_vals_std_n = icdf(trunc_pd, prob_sim);% Truncated lognormal distribution (via standard normal simulation)
-impeding_factors.temp_repair.flooding_repair_day = ...
-    sys_repair_trigger.flooding .* ...
-    ceil(surge_factor*exp(x_vals_std_n * beta + log(impedance_options.flooding_repair_day))); % always round up
+if include_flooding_impact
+	% Flooding Cleanup
+	prob_sim = rand(num_reals, 1);
+	x_vals_std_n = icdf(trunc_pd, prob_sim);% Truncated lognormal distribution (via standard normal simulation)
+	impeding_factors.temp_repair.flooding_cleanup_day = ...
+	    sys_repair_trigger.flooding .* ...
+	    ceil(surge_factor*exp(x_vals_std_n * beta + log(impedance_options.flooding_cleanup_day))); % always round up
+	
+	% Repair Flooding Damage
+	prob_sim = rand(num_reals, 1);
+	x_vals_std_n = icdf(trunc_pd, prob_sim);% Truncated lognormal distribution (via standard normal simulation)
+	impeding_factors.temp_repair.flooding_repair_day = ...
+	    sys_repair_trigger.flooding .* ...
+	    ceil(surge_factor*exp(x_vals_std_n * beta + log(impedance_options.flooding_repair_day))); % always round up
+else % zero out the flooding impedance (cleanup and repair)
+    impeding_factors.temp_repair.flooding_cleanup_day = zeros(num_reals, 1); % Flooding Cleanup
+    impeding_factors.temp_repair.flooding_repair_day = zeros(num_reals, 1); % Repair Flooding Damage
+end
 
 %% Format Impedance times for Gantt Charts
 % Full repair
