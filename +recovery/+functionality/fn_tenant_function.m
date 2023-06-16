@@ -1,5 +1,5 @@
 function [ recovery_day, comp_breakdowns ] = fn_tenant_function( damage, ...
-    building_model, system_operation_day, utilities, subsystems, ...
+    building_model, system_operation_day, subsystems, ...
     tenant_units, impeding_temp_repairs, functionality_options )
 % Check each tenant unit for damage that would cause that tenant unit 
 % to not be functional
@@ -17,8 +17,6 @@ function [ recovery_day, comp_breakdowns ] = fn_tenant_function( damage, ...
 % system_operation_day.comp: struct
 %   simulation number of days each component is affecting building system
 %   operations
-% utilities: struct
-%   data structure containing simulated utility downtimes
 % subsystems: table
 %   data table containing information about each subsystem's attributes
 % tenant_units: table
@@ -123,7 +121,7 @@ for tu = 1:num_units
             fixed_comps_filt = isnan(comps_day_repaired);
             comps_quant_damaged(fixed_comps_filt) = 0;
         end
-        power_supply_recovery_day = max(max(system_operation_day.building.elevator_mcs,system_operation_day.building.electrical_main),utilities.electrical);
+        power_supply_recovery_day = max(system_operation_day.building.elevator_mcs,system_operation_day.building.electrical_main);
         recovery_day.elevators(:,tu) = max(elev_function_recovery_day,power_supply_recovery_day); % electrical system and utility
         power_supply_recovery_day_comp = max(system_operation_day.comp.elevator_mcs,system_operation_day.comp.electrical_main);
         comp_breakdowns.elevators(:,:,tu) = max(elev_comps_day_fnc,power_supply_recovery_day_comp);
@@ -328,6 +326,15 @@ for tu = 1:num_units
     % distribute effect to the components
     comp_breakdowns.water_potable(:,:,tu) = max(system_operation_day.comp.water_potable_main, repair_complete_day .* damage.fnc_filters.water_unit);
     
+    % In taller buildings, water needs to be pumped to reach upper stories
+    % and therefore requires electrical power
+    if unit.story > functionality_options.water_pressure_max_story
+        electrical_failure_controls = system_operation_day.building.electrical_main > recovery_day.water_potable(:,tu);
+        recovery_day.water_potable(:,tu) = max(recovery_day.water_potable(:,tu),system_operation_day.building.electrical_main);
+        comp_breakdowns.water_potable(:,:,tu) = max(comp_breakdowns.water_potable(:,:,tu) .* ~electrical_failure_controls,...
+                                                    system_operation_day.comp.electrical_main .* electrical_failure_controls);
+    end
+    
     %% Sanitary Waste System
     % determine effect on funciton at this tenant unit
     % any major damage to the branch pipes (small diameter) failes for this tenant unit
@@ -344,15 +351,13 @@ for tu = 1:num_units
     
     %% Electrical Power System
     % Does not consider effect of backup systems
+    % Just electical power within the tenant unit (building power is
+    % assessed in fn_builing_level_system_operation)
     if unit.is_electrical_required
-        % determine effect on funciton at this tenant unit
-        % any major damage to the unit level electrical equipment failes for this tenant unit
+        % determine effect on funciton at this tenant unit 
+        % any major damage to the unit level electrical equipment fails for this tenant unit
         tenant_sys_recovery_day = max(repair_complete_day .* damage.fnc_filters.electrical_unit,[],2);
         recovery_day.electrical(:,tu) = max(system_operation_day.building.electrical_main,tenant_sys_recovery_day);
-        
-        % Consider effect of external water network
-        utility_repair_day = utilities.electrical;
-        recovery_day.electrical = max(recovery_day.electrical,utility_repair_day);
         
         % distribute effect to the components
         comp_breakdowns.electrical(:,:,tu) = max(system_operation_day.comp.electrical_main, repair_complete_day .* damage.fnc_filters.electrical_unit);
@@ -360,7 +365,7 @@ for tu = 1:num_units
     
     %% HVAC System
     % HVAC: Control System
-    recovery_day_hvac_control = system_operation_day.building.hvac_control;
+    recovery_day_hvac_control = system_operation_day.building.hvac_control; % Electrical power is counted in here 
     comp_breakdowns_hvac_control = system_operation_day.comp.hvac_control;
 
     % HVAC: Ventilation
@@ -399,8 +404,7 @@ for tu = 1:num_units
         recovery_day.data(:,tu) = max(system_operation_day.building.data_main,tenant_sys_recovery_day);
         
         % Consider effect of external water network
-        power_supply_recovery_day = max(system_operation_day.building.electrical_main,utilities.electrical);
-        recovery_day.data = max(recovery_day.data,power_supply_recovery_day);
+        recovery_day.data = max(recovery_day.data,system_operation_day.building.electrical_main);
         
         % distribute effect to the components
         comp_breakdowns.data(:,:,tu) = max(system_operation_day.comp.data_main, repair_complete_day .* damage.fnc_filters.data_unit);

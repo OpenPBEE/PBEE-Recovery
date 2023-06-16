@@ -119,11 +119,15 @@ system_operation_day.building.elevator_mcs = max(system_operation_day.comp.eleva
 system_operation_day.building.data_main = max(system_operation_day.comp.data_main,[],2);  % any major damage to the main equipment fails the system for the entire building
 
 %% Account for Extermal Utilities impact on system Operation
+% Electricity
+system_operation_day.building.electrical_main = max(system_operation_day.building.electrical_main,utilities.electrical);
+
 % Potable water
 system_operation_day.building.water_potable_main = max(system_operation_day.building.water_potable_main,utilities.water);
 
 % Assume hvac control runs on electricity and heating system runs on gas
-system_operation_day.building.hvac_control = max(system_operation_day.building.hvac_control,utilities.electrical);
+system_operation_day.building.hvac_control = max(system_operation_day.building.hvac_control,system_operation_day.building.electrical_main);
 system_operation_day.building.hvac_heating = max(system_operation_day.building.hvac_heating,utilities.(functionality_options.heat_utility));
+
 end
 
