@@ -86,6 +86,20 @@ end
 recovery.recovery_trajectory.recovery_day = sort([tentant_unit_recovery_day, tentant_unit_recovery_day],2);
 recovery.recovery_trajectory.percent_recovered = sort([(0:(num_units-1)), (1:num_units)])/num_units;
 
+% partial recovery
+pct_recovered_targets = [0.1, 0.5, 0.8, 1];
+for i_pct = 1:length(pct_recovered_targets)
+    pct_recovered = pct_recovered_targets(i_pct);
+    recovery.partial{i_pct}.pct_recovered = pct_recovered;
+    recovery.partial{i_pct}.perform_targ_days = perform_targ_days;
+    for i_targ_day = 1:length(perform_targ_days)
+        targ_day = perform_targ_days(i_targ_day);
+        % get the percentage of tenant units recovered at the given day
+        pct_recovered_per_real = mean(sum(tentant_unit_recovery_day <= targ_day, 2) / num_units, 2);
+        recovery.partial{i_pct}.prob_of_target(i_targ_day) = mean(pct_recovered_per_real < pct_recovered);
+    end
+end
+
 %% Format and Save Component-level breakdowns
 % Find the day each ds of each component stops affecting recovery for any story
 
