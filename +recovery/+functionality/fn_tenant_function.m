@@ -397,7 +397,7 @@ for tu = 1:num_units
                      total_num_comps, damaged_comps, initial_damaged, dependancy);
                  
     %% Data
-    if unit.is_data_required
+    if unit.is_data_required && any(damage.fnc_filters.data_unit | damage.fnc_filters.data_main)
         % determine effect on funciton at this tenant unit
         % any major damage to the unit level electrical equipment failes for this tenant unit
         tenant_sys_recovery_day = max(repair_complete_day .* damage.fnc_filters.data_unit,[],2);
