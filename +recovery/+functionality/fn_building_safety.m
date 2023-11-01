@@ -184,7 +184,8 @@ for i = 1:num_repair_time_increments
         day_repair_fall_haz(:,d) = day_repair_fall_haz(:,d) + affects_door .* delta_day;
 
         % Add days to components that are affecting occupancy
-        fall_haz_comps_day_rep(:,:,:,d) = fall_haz_comps_day_rep(:,:,:,d) + comp_affected_area .* damage.fnc_filters.ext_fall_haz_all .* affects_door .* delta_day;
+        comp_posing_falling_hazard = comp_affected_area > 0;
+        fall_haz_comps_day_rep(:,:,:,d) = fall_haz_comps_day_rep(:,:,:,d) + comp_posing_falling_hazard .* affects_door .* delta_day;
     end
     
     % Change the comps for the next increment
