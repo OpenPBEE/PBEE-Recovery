@@ -86,20 +86,34 @@ end
 recovery.recovery_trajectory.recovery_day = sort([tentant_unit_recovery_day, tentant_unit_recovery_day],2);
 recovery.recovery_trajectory.percent_recovered = sort([(0:(num_units-1)), (1:num_units)])/num_units;
 
-% partial recovery
-pct_recovered_targets = [0.1, 0.5, 0.8, 1];
+%% Partial recovery
+pct_recovered_targets = [0.1, 0.5, 0.75, 0.8, 1];
+
+% order the tennant recovery days so it's easier to see at what time the required numnber of units
+% are required
+ordered_tennant_repair_days = sort(tentant_unit_recovery_day, 2);
+
 for i_pct = 1:length(pct_recovered_targets)
-    pct_recovered = pct_recovered_targets(i_pct);
-    recovery.partial{i_pct}.pct_recovered = pct_recovered;
-    recovery.partial{i_pct}.perform_targ_days = perform_targ_days;
+    target_recovery_ratio_units = pct_recovered_targets(i_pct);
+    recovery.partial{i_pct}.target_recovery_ratio_units = target_recovery_ratio_units;
+    recovery.partial{i_pct}.target_recovery_day = perform_targ_days;
     for i_targ_day = 1:length(perform_targ_days)
         targ_day = perform_targ_days(i_targ_day);
+        
         % get the percentage of tenant units recovered at the given day
         pct_recovered_per_real = mean(sum(tentant_unit_recovery_day <= targ_day, 2) / num_units, 2);
-        recovery.partial{i_pct}.prob_of_target(i_targ_day) = mean(pct_recovered_per_real < pct_recovered);
+        recovery.partial{i_pct}.prob_of_target(i_targ_day) = mean(pct_recovered_per_real < target_recovery_ratio_units);
+        
+        % how many units need to be repaired to meet the percent required 
+        reqd_units = ceil(num_units * target_recovery_ratio_units);
+        recovery.partial{i_pct}.reqd_units = reqd_units;
+        recovery.partial{i_pct}.mean = mean(ordered_tennant_repair_days(:, reqd_units));
+        recovery.partial{i_pct}.median = median(ordered_tennant_repair_days(:, reqd_units));
+        recovery.partial{i_pct}.fractile_75 = prctile(ordered_tennant_repair_days(:, reqd_units), 75);
+        recovery.partial{i_pct}.fractile_90 = prctile(ordered_tennant_repair_days(:, reqd_units), 90);
     end
 end
-
+        
 %% Format and Save Component-level breakdowns
 % Find the day each ds of each component stops affecting recovery for any story
 
