@@ -82,8 +82,8 @@ fnc_filters.exterior_seal_sf = strcmp(string(comp_ds_table.unit),'sf') & comp_ds
 fnc_filters.exterior_seal_all = fnc_filters.exterior_seal_lf | fnc_filters.exterior_seal_sf;
 
 % Roofing components
-fnc_filters.roof_structure =       comp_ds_table.subsystem_id == 21 & comp_ds_table.damages_envelope_seal;
-fnc_filters.roof_weatherproofing = comp_ds_table.subsystem_id == 22 & comp_ds_table.damages_envelope_seal;
+fnc_filters.roof_structure =       comp_ds_table.subsystem_id == 21 & comp_ds_table.affects_roof_function;
+fnc_filters.roof_weatherproofing = comp_ds_table.subsystem_id == 22 & comp_ds_table.affects_roof_function;
 
 % Interior falling hazards
 fnc_filters.int_fall_haz_lf = comp_ds_table.int_falling_hazard & strcmp(string(comp_ds_table.unit),'lf'); % Interior components with perimeter feet units

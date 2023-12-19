@@ -42,6 +42,7 @@ num_units = length(damage.tenant_units);
 num_stories = building_model.num_stories;
 recovery_day.elevators = zeros(num_reals,num_units);
 recovery_day.exterior = zeros(num_reals,num_units);
+recovery_day.roof = zeros(num_reals,num_units);
 recovery_day.interior = zeros(num_reals,num_units);
 recovery_day.electrical = zeros(num_reals,num_units);
 recovery_day.flooding = zeros(num_reals,num_units);
@@ -167,90 +168,32 @@ for tu = 1:num_units
         fixed_comps_filt = isnan(comps_day_repaired);
         comp_affected_area(fixed_comps_filt) = 0;
     end
-    
-    if unit.story == num_stories % If this is the top story, check the roof for functio
-        % Roof structure (currently assuming all roofing components have equal unit
-        % areas)
-        damage_threshold = subsystems.redundancy_threshold(subsystems.id == 21);
-        num_comp_damaged = damage.fnc_filters.roof_structure .* damage.tenant_units{tu}.qnt_damaged;
-        num_roof_comps = damage.fnc_filters.roof_structure .* damage.tenant_units{tu}.num_comps;
 
-        comps_day_repaired = repair_complete_day_w_tmp;
-        roof_structure_recovery_day = zeros(num_reals,1);
-        all_comps_day_roof_struct = zeros(num_reals,num_comps);
-        num_repair_time_increments = sum(damage.fnc_filters.roof_structure); % possible unique number of loop increments
-        % Loop through each unique repair time increment and determine when stops affecting function
-        for i = 1:num_repair_time_increments
-            % Determine the area of roof affected 
-            percent_area_affected = sum(num_comp_damaged,2) / sum(num_roof_comps,2); % Assumes roof components do not occupy the same area of roof
+    recovery_day.exterior(:,tu) = ext_function_recovery_day;
+    comp_breakdowns.exterior(:,:,tu) = all_comps_day_ext;
 
-            % Determine if current damage affects function for this tenant unit
-            % if the area of exterior wall damage is greater than what is
-            % acceptable by the tenant 
-            affects_function = percent_area_affected >= damage_threshold; 
+    if unit.story == num_stories % If this is the top story, check the roof for function
+        % Roof structure check
+        [ all_comps_day_roof_struct, roof_structure_recovery_day ] = check_roof_function( ...
+            damage.fnc_filters.roof_structure, ...
+            subsystems.redundancy_threshold(subsystems.id == 21), ...  % structure threshold
+            repair_complete_day_w_tmp, ...
+            damage.tenant_units{tu}.qnt_damaged, ...
+            damage.tenant_units{tu}.num_comps ...
+        );
 
-            % Add days in this increment to the tally
-            delta_day = min(comps_day_repaired(:,damage.fnc_filters.roof_structure),[],2);
-            delta_day(isnan(delta_day)) = 0;
-            roof_structure_recovery_day = roof_structure_recovery_day + affects_function .* delta_day;
-
-            % Add days to components that are affecting function
-            any_area_affected_all_comps = num_comp_damaged > 0; % Count any component that contributes to the loss of function regardless of by how much
-            all_comps_day_roof_struct = all_comps_day_roof_struct + any_area_affected_all_comps .* affects_function .* delta_day;
-
-            % Change the comps for the next increment
-            % reducing damage for what has been repaired in this time increment
-            comps_day_repaired = comps_day_repaired - delta_day;
-            comps_day_repaired(comps_day_repaired <= 0) = NaN;
-            fixed_comps_filt = isnan(comps_day_repaired);
-            num_comp_damaged(fixed_comps_filt) = 0;
-        end
-
-        % Roof weatherproofing (currently assuming all roofing components have 
-        % equal unit areas)
-        damage_threshold = subsystems.redundancy_threshold(subsystems.id == 22);
-        num_comp_damaged = damage.fnc_filters.roof_weatherproofing .* damage.tenant_units{tu}.qnt_damaged;
-        num_roof_comps = damage.fnc_filters.roof_weatherproofing .* damage.tenant_units{tu}.num_comps;
-
-        comps_day_repaired = repair_complete_day_w_tmp;
-        roof_weather_recovery_day = zeros(num_reals,1);
-        all_comps_day_roof_weather = zeros(num_reals,num_comps);
-        num_repair_time_increments = sum(damage.fnc_filters.roof_weatherproofing); % possible unique number of loop increments
-        % Loop through each unique repair time increment and determine when stops affecting function
-        for i = 1:num_repair_time_increments
-            % Determine the area of roof affected 
-            percent_area_affected = sum(num_comp_damaged,2) / sum(num_roof_comps,2); % Assumes roof components do not occupy the same area of roof
-
-            % Determine if current damage affects function for this tenant unit
-            % if the area of exterior wall damage is greater than what is
-            % acceptable by the tenant 
-            affects_function = percent_area_affected >= damage_threshold; 
-
-            % Add days in this increment to the tally
-            delta_day = min(comps_day_repaired(:,damage.fnc_filters.roof_weatherproofing),[],2);
-            delta_day(isnan(delta_day)) = 0;
-            roof_weather_recovery_day = roof_weather_recovery_day + affects_function .* delta_day;
-
-            % Add days to components that are affecting function
-            any_area_affected_all_comps = num_comp_damaged > 0; % Count any component that contributes to the loss of function regardless of by how much
-            all_comps_day_roof_weather = all_comps_day_roof_weather + any_area_affected_all_comps .* affects_function .* delta_day;
-
-            % Change the comps for the next increment
-            % reducing damage for what has been repaired in this time increment
-            comps_day_repaired = comps_day_repaired - delta_day;
-            comps_day_repaired(comps_day_repaired <= 0) = NaN;
-            fixed_comps_filt = isnan(comps_day_repaired);
-            num_comp_damaged(fixed_comps_filt) = 0;
-        end
+        % Roof seatherproofing check
+        [ all_comps_day_roof_weather, roof_weather_recovery_day] = check_roof_function( ...
+            damage.fnc_filters.roof_weatherproofing, ...
+            subsystems.redundancy_threshold(subsystems.id == 22), ...  % seal threshold
+            repair_complete_day_w_tmp, ...
+            damage.tenant_units{tu}.qnt_damaged, ...
+            damage.tenant_units{tu}.num_comps ...
+        );
 
         % Combine branches
-        recovery_day.exterior(:,tu) = max(ext_function_recovery_day,...
-            max(roof_structure_recovery_day,roof_weather_recovery_day));
-        comp_breakdowns.exterior(:,:,tu) = max(all_comps_day_ext,...
-            max(all_comps_day_roof_struct,all_comps_day_roof_weather));
-    else % this is not the top story so just use the cladding for tenant function
-        recovery_day.exterior(:,tu) = ext_function_recovery_day;
-        comp_breakdowns.exterior(:,:,tu) = all_comps_day_ext;
+        recovery_day.roof(:,tu) = max(roof_structure_recovery_day, roof_weather_recovery_day);
+        comp_breakdowns.roof(:,:,tu) = max(all_comps_day_roof_struct, all_comps_day_roof_weather);
     end
     
     %% Interior Area
@@ -470,4 +413,45 @@ for b = 1:length(subs)
     comp_breakdowns_all = max(comp_breakdowns_all,comps_breakdown);
 end
 
-end % Function
+end % subfunction
+
+
+function [ all_comps_day_roof, roof_recovery_day ] = check_roof_function(roof_sys_filter, damage_threshold, repair_complete_day_w_tmp, qnt_damaged, num_comps)
+% Check the roof area for function (seal and function)
+
+num_comp_damaged = roof_sys_filter .* qnt_damaged;
+num_roof_comps = roof_sys_filter .* num_comps;
+
+comps_day_repaired = repair_complete_day_w_tmp;
+roof_recovery_day = zeros(size(repair_complete_day_w_tmp, 1), 1);
+all_comps_day_roof = zeros(size(repair_complete_day_w_tmp));
+num_repair_time_increments = sum(roof_sys_filter); % possible unique number of loop increments
+
+% Loop through each unique repair time increment and determine when stops affecting function
+for i = 1:num_repair_time_increments
+    % Determine the area of roof affected 
+    percent_area_affected = sum(num_comp_damaged,2) / sum(num_roof_comps,2); % Assumes roof components do not occupy the same area of roof
+
+    % Determine if current damage affects function for this tenant unit
+    % if the area of exterior wall damage is greater than what is
+    % acceptable by the tenant 
+    affects_function = percent_area_affected >= damage_threshold; 
+
+    % Add days in this increment to the tally
+    delta_day = min(comps_day_repaired(:, roof_sys_filter),[],2);
+    delta_day(isnan(delta_day)) = 0;
+    roof_recovery_day = roof_recovery_day + affects_function .* delta_day;
+
+    % Add days to components that are affecting function
+    any_area_affected_all_comps = num_comp_damaged > 0; % Count any component that contributes to the loss of function regardless of by how much
+    all_comps_day_roof = all_comps_day_roof + any_area_affected_all_comps .* affects_function .* delta_day;
+
+    % Change the comps for the next increment
+    % reducing damage for what has been repaired in this time increment
+    comps_day_repaired = comps_day_repaired - delta_day;
+    comps_day_repaired(comps_day_repaired <= 0) = NaN;
+    fixed_comps_filt = isnan(comps_day_repaired);
+    num_comp_damaged(fixed_comps_filt) = 0;
+end
+
+end % subfunction
