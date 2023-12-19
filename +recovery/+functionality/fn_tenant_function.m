@@ -130,12 +130,13 @@ for tu = 1:num_units
     
     %% Exterior Enclosure 
     % Perimeter Cladding (assuming all exterior components have either lf or sf units)
-    area_affected_lf_all_comps = damage.comp_ds_table.fraction_area_affected' .* damage.comp_ds_table.unit_qty' .* building_model.ht_per_story_ft(tu) .* damage.tenant_units{tu}.qnt_damaged;
-    area_affected_sf_all_comps = damage.comp_ds_table.fraction_area_affected' .* damage.comp_ds_table.unit_qty' .* damage.tenant_units{tu}.qnt_damaged;
+    area_affected_lf_all_comps = damage.comp_ds_table.exterior_surface_area_factor' .* damage.comp_ds_table.unit_qty' .* building_model.ht_per_story_ft(tu) .* damage.tenant_units{tu}.qnt_damaged;
+    area_affected_direct_scale_all_comps = damage.comp_ds_table.exterior_surface_area_factor' .* damage.comp_ds_table.unit_qty' .* damage.tenant_units{tu}.qnt_damaged;
    
     comp_affected_area = zeros(num_reals,num_comps);
     comp_affected_area(:,damage.fnc_filters.exterior_seal_lf) = area_affected_lf_all_comps(:,damage.fnc_filters.exterior_seal_lf);
-    comp_affected_area(:,damage.fnc_filters.exterior_seal_sf) = area_affected_sf_all_comps(:,damage.fnc_filters.exterior_seal_sf);
+    comp_affected_area(:,damage.fnc_filters.exterior_seal_sf) = area_affected_direct_scale_all_comps(:,damage.fnc_filters.exterior_seal_sf);
+    comp_affected_area(:,damage.fnc_filters.exterior_seal_ea) = area_affected_direct_scale_all_comps(:,damage.fnc_filters.exterior_seal_ea);
     
     comps_day_repaired = repair_complete_day;
     ext_function_recovery_day = zeros(num_reals,1);
@@ -168,10 +169,10 @@ for tu = 1:num_units
         fixed_comps_filt = isnan(comps_day_repaired);
         comp_affected_area(fixed_comps_filt) = 0;
     end
-
+    
     recovery_day.exterior(:,tu) = ext_function_recovery_day;
-    comp_breakdowns.exterior(:,:,tu) = all_comps_day_ext;
-
+        comp_breakdowns.exterior(:,:,tu) = all_comps_day_ext;
+        
     if unit.story == num_stories % If this is the top story, check the roof for function
         % Roof structure check
         [ all_comps_day_roof_struct, roof_structure_recovery_day ] = check_roof_function( ...
@@ -181,7 +182,7 @@ for tu = 1:num_units
             damage.tenant_units{tu}.qnt_damaged, ...
             damage.tenant_units{tu}.num_comps ...
         );
-
+        
         % Roof seatherproofing check
         [ all_comps_day_roof_weather, roof_weather_recovery_day] = check_roof_function( ...
             damage.fnc_filters.roof_weatherproofing, ...
@@ -197,14 +198,14 @@ for tu = 1:num_units
     end
     
     %% Interior Area
-    area_affected_lf_all_comps    = damage.comp_ds_table.fraction_area_affected' .* damage.comp_ds_table.unit_qty' .* building_model.ht_per_story_ft(tu) .* damage.tenant_units{tu}.qnt_damaged;
-    area_affected_sf_all_comps    = damage.comp_ds_table.fraction_area_affected' .* damage.comp_ds_table.unit_qty' .* damage.tenant_units{tu}.qnt_damaged;
-    area_affected_bay_all_comps   = damage.comp_ds_table.fraction_area_affected' .* building_model.struct_bay_area_per_story(tu) .* damage.tenant_units{tu}.qnt_damaged;
-    area_affected_build_all_comps = damage.comp_ds_table.fraction_area_affected' .* sum(building_model.area_per_story_sf) .* damage.tenant_units{tu}.qnt_damaged;
+    area_affected_lf_all_comps           = damage.comp_ds_table.interior_area_factor' .* damage.comp_ds_table.unit_qty' .* building_model.ht_per_story_ft(tu) .* damage.tenant_units{tu}.qnt_damaged;
+    area_affected_direct_scale_all_comps = damage.comp_ds_table.interior_area_factor' .* damage.comp_ds_table.unit_qty' .* damage.tenant_units{tu}.qnt_damaged;
+    area_affected_bay_all_comps          = damage.comp_ds_table.interior_area_factor' .* building_model.struct_bay_area_per_story(tu) .* damage.tenant_units{tu}.qnt_damaged;
+    area_affected_build_all_comps        = damage.comp_ds_table.interior_area_factor' .* sum(building_model.area_per_story_sf) .* damage.tenant_units{tu}.qnt_damaged;
     
     repair_complete_day_w_tmp_w_instabilities = repair_complete_day_w_tmp;
     if tu > 1
-        area_affected_below = damage.comp_ds_table.fraction_area_affected' .* building_model.struct_bay_area_per_story(tu-1) .* damage.tenant_units{tu-1}.qnt_damaged;
+        area_affected_below = damage.comp_ds_table.interior_area_factor' .* building_model.struct_bay_area_per_story(tu-1) .* damage.tenant_units{tu-1}.qnt_damaged;
         area_affected_bay_all_comps(:,damage.fnc_filters.vert_instabilities) ...
             = max(area_affected_below(:,damage.fnc_filters.vert_instabilities),area_affected_bay_all_comps(:,damage.fnc_filters.vert_instabilities));
         repair_time_below = damage.tenant_units{tu-1}.recovery.repair_complete_day_w_tmp;
@@ -214,7 +215,8 @@ for tu = 1:num_units
 
     comp_affected_area = zeros(num_reals,num_comps);
     comp_affected_area(:,damage.fnc_filters.interior_function_lf) = area_affected_lf_all_comps(:,damage.fnc_filters.interior_function_lf);
-    comp_affected_area(:,damage.fnc_filters.interior_function_sf) = area_affected_sf_all_comps(:,damage.fnc_filters.interior_function_sf);
+    comp_affected_area(:,damage.fnc_filters.interior_function_sf) = area_affected_direct_scale_all_comps(:,damage.fnc_filters.interior_function_sf);
+    comp_affected_area(:,damage.fnc_filters.interior_function_ea) = area_affected_direct_scale_all_comps(:,damage.fnc_filters.interior_function_ea);
     comp_affected_area(:,damage.fnc_filters.interior_function_bay) = area_affected_bay_all_comps(:,damage.fnc_filters.interior_function_bay);
     comp_affected_area(:,damage.fnc_filters.interior_function_build) = area_affected_build_all_comps(:,damage.fnc_filters.interior_function_build);
 
@@ -413,7 +415,7 @@ for b = 1:length(subs)
     comp_breakdowns_all = max(comp_breakdowns_all,comps_breakdown);
 end
 
-end % subfunction
+end % Function
 
 
 function [ all_comps_day_roof, roof_recovery_day ] = check_roof_function(roof_sys_filter, damage_threshold, repair_complete_day_w_tmp, qnt_damaged, num_comps)
@@ -454,4 +456,4 @@ for i = 1:num_repair_time_increments
     num_comp_damaged(fixed_comps_filt) = 0;
 end
 
-end % subfunction
+end

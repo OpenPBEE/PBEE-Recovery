@@ -37,13 +37,13 @@ for tu = 1:num_units
     %% Exterior Enclosure 
     % Calculated the affected perimeter area of exterior components
     % (assuming all exterior components have either lf or sf units)
-    area_affected_all_linear_comps = damage.comp_ds_table.fraction_area_affected' .* damage.comp_ds_table.unit_qty' .* building_model.ht_per_story_ft(tu) .* damage.tenant_units{tu}.qnt_damaged;
-    area_affected_all_area_comps = damage.comp_ds_table.fraction_area_affected' .* damage.comp_ds_table.unit_qty' .* damage.tenant_units{tu}.qnt_damaged;
+    area_affected_all_linear_comps       = damage.comp_ds_table.exterior_surface_area_factor' .* damage.comp_ds_table.unit_qty' .* building_model.ht_per_story_ft(tu) .* damage.tenant_units{tu}.qnt_damaged;
+    area_affected_all_direct_scale_comps = damage.comp_ds_table.exterior_surface_area_factor' .* damage.comp_ds_table.unit_qty' .* damage.tenant_units{tu}.qnt_damaged;
     
     % construct a matrix of affected areas from the various damaged component types
     comp_affected_area = zeros(num_reals,num_comps);
     comp_affected_area(:,damage.fnc_filters.exterior_safety_lf) = area_affected_all_linear_comps(:,damage.fnc_filters.exterior_safety_lf);
-    comp_affected_area(:,damage.fnc_filters.exterior_safety_sf) = area_affected_all_area_comps(:,damage.fnc_filters.exterior_safety_sf);
+    comp_affected_area(:,damage.fnc_filters.exterior_safety_sf) = area_affected_all_direct_scale_comps(:,damage.fnc_filters.exterior_safety_sf);
     
     % Go each possible unique repair time contributing to interior safety check
     % Find when enough repairs are complete such that interior damage no
@@ -87,15 +87,15 @@ for tu = 1:num_units
     
     %% Interior Falling Hazards
     % Convert all component into affected areas
-    area_affected_all_linear_comps = damage.comp_ds_table.fraction_area_affected' .* damage.comp_ds_table.unit_qty' .* building_model.ht_per_story_ft(tu) .* damage.tenant_units{tu}.qnt_damaged;
-    area_affected_all_area_comps   = damage.comp_ds_table.fraction_area_affected' .* damage.comp_ds_table.unit_qty' .* damage.tenant_units{tu}.qnt_damaged;
-    area_affected_all_bay_comps    = damage.comp_ds_table.fraction_area_affected' .* building_model.struct_bay_area_per_story(tu) .* damage.tenant_units{tu}.qnt_damaged;
-    area_affected_all_build_comps  = damage.comp_ds_table.fraction_area_affected' .* sum(building_model.area_per_story_sf) .* damage.tenant_units{tu}.qnt_damaged;
+    area_affected_all_linear_comps       = damage.comp_ds_table.interior_area_factor' .* damage.comp_ds_table.unit_qty' .* building_model.ht_per_story_ft(tu) .* damage.tenant_units{tu}.qnt_damaged;
+    area_affected_all_direct_scale_comps = damage.comp_ds_table.interior_area_factor' .* damage.comp_ds_table.unit_qty' .* damage.tenant_units{tu}.qnt_damaged;
+    area_affected_all_bay_comps          = damage.comp_ds_table.interior_area_factor' .* building_model.struct_bay_area_per_story(tu) .* damage.tenant_units{tu}.qnt_damaged;
+    area_affected_all_build_comps        = damage.comp_ds_table.interior_area_factor' .* sum(building_model.area_per_story_sf) .* damage.tenant_units{tu}.qnt_damaged;
     
     % Checking damage that affects components in story below
     repair_complete_day_w_tmp_w_instabilities = repair_complete_day_w_tmp;
     if tu > 1
-        area_affected_below = damage.comp_ds_table.fraction_area_affected' .* building_model.struct_bay_area_per_story(tu-1) .* damage.tenant_units{tu-1}.qnt_damaged;
+        area_affected_below = damage.comp_ds_table.interior_area_factor' .* building_model.struct_bay_area_per_story(tu-1) .* damage.tenant_units{tu-1}.qnt_damaged;
         area_affected_all_bay_comps(:,damage.fnc_filters.vert_instabilities) ...
             = max(area_affected_below(:,damage.fnc_filters.vert_instabilities),area_affected_all_bay_comps(:,damage.fnc_filters.vert_instabilities));
         repair_time_below = damage.tenant_units{tu-1}.recovery.repair_complete_day_w_tmp;
@@ -106,7 +106,8 @@ for tu = 1:num_units
     % construct a matrix of affected areas from the various damaged component types
     comp_affected_area = zeros(num_reals,num_comps);
     comp_affected_area(:,damage.fnc_filters.int_fall_haz_lf) = area_affected_all_linear_comps(:,damage.fnc_filters.int_fall_haz_lf);
-    comp_affected_area(:,damage.fnc_filters.int_fall_haz_sf) = area_affected_all_area_comps(:,damage.fnc_filters.int_fall_haz_sf);
+    comp_affected_area(:,damage.fnc_filters.int_fall_haz_sf) = area_affected_all_direct_scale_comps(:,damage.fnc_filters.int_fall_haz_sf);
+    comp_affected_area(:,damage.fnc_filters.int_fall_haz_ea) = area_affected_all_direct_scale_comps(:,damage.fnc_filters.int_fall_haz_ea);
     comp_affected_area(:,damage.fnc_filters.int_fall_haz_bay) = area_affected_all_bay_comps(:,damage.fnc_filters.int_fall_haz_bay);
     comp_affected_area(:,damage.fnc_filters.int_fall_haz_build) = area_affected_all_build_comps(:,damage.fnc_filters.int_fall_haz_build);
     

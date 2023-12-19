@@ -117,7 +117,7 @@ door_side(rem(door_numbers, 2) == 0) = 2;
 % resolved
 day_repair_fall_haz = zeros(num_reals,building_model.num_entry_doors);
 fall_haz_comps_day_rep = zeros(num_reals,num_comps,num_units,building_model.num_entry_doors);
-comp_affected_area = zeros(num_reals,num_comps,num_units);
+comp_affected_lf = zeros(num_reals,num_comps,num_units);
 scaffold_filt = logical(damage.comp_ds_table.resolved_by_scaffolding');
 for tu = 1:num_units
     tmp_or_full_complete_day = damage.tenant_units{tu}.recovery.repair_complete_day_w_tmp;
@@ -141,16 +141,21 @@ for i = 1:num_repair_time_increments
     % Calculate the falling hazards per side
     for tu = 1:num_units
         for side = 1:4 % assumes there are 4 sides
-            area_affected_lf_all_comps = damage.comp_ds_table.fraction_area_affected' .* ...
-                damage.comp_ds_table.unit_qty' .* building_model.ht_per_story_ft(tu) .* damage.tenant_units{tu}.(['qnt_damaged_side_' num2str(side)]);
-            area_affected_sf_all_comps = damage.comp_ds_table.fraction_area_affected' .* ...
+            lf_affected_direct_scale_all_comps = damage.comp_ds_table.exterior_falling_length_factor' .* ...
                 damage.comp_ds_table.unit_qty' .* damage.tenant_units{tu}.(['qnt_damaged_side_' num2str(side)]);
+            
+            lf_affected_sf_all_comps = damage.comp_ds_table.exterior_falling_length_factor' .* ...
+                damage.comp_ds_table.unit_qty' .* damage.tenant_units{tu}.(['qnt_damaged_side_' num2str(side)]) ...
+                ./ building_model.ht_per_story_ft(tu);
 
-            comp_affected_area(:,damage.fnc_filters.ext_fall_haz_lf,tu) = area_affected_lf_all_comps(:,damage.fnc_filters.ext_fall_haz_lf);
-            comp_affected_area(:,damage.fnc_filters.ext_fall_haz_sf,tu) = area_affected_sf_all_comps(:,damage.fnc_filters.ext_fall_haz_sf);
+            comp_affected_lf(:,damage.fnc_filters.ext_fall_haz_lf, tu) = lf_affected_direct_scale_all_comps(:,damage.fnc_filters.ext_fall_haz_lf);
+            comp_affected_lf(:,damage.fnc_filters.ext_fall_haz_sf, tu) = lf_affected_sf_all_comps(:,damage.fnc_filters.ext_fall_haz_sf);
+            comp_affected_lf(:,damage.fnc_filters.ext_fall_haz_ea, tu) = lf_affected_direct_scale_all_comps(:,damage.fnc_filters.ext_fall_haz_ea);
 
-            comp_affected_ft_this_story = comp_affected_area(:,:,tu) ./ building_model.ht_per_story_ft(tu);
-            affected_ft_this_story = sum(comp_affected_ft_this_story,2); % Assumes cladding components do not occupy the same perimeter space
+            comp_affected_ft_this_story = comp_affected_lf(:,:,tu);
+            % Assumes cladding components do not occupy the same perimeter space
+            % Don't exxceed edge lengths (can happen for things like chimneys)
+            affected_ft_this_story = min(sum(comp_affected_ft_this_story,2), edge_lengths(side,tu));
 
             affected_ratio.(['side_' num2str(side)])(:,tu) = min((affected_ft_this_story) ./ edge_lengths(side,tu),1);
         end
@@ -184,8 +189,7 @@ for i = 1:num_repair_time_increments
         day_repair_fall_haz(:,d) = day_repair_fall_haz(:,d) + affects_door .* delta_day;
 
         % Add days to components that are affecting occupancy
-        comp_posing_falling_hazard = comp_affected_area > 0;
-        fall_haz_comps_day_rep(:,:,:,d) = fall_haz_comps_day_rep(:,:,:,d) + comp_posing_falling_hazard .* affects_door .* delta_day;
+        fall_haz_comps_day_rep(:,:,:,d) = fall_haz_comps_day_rep(:,:,:,d) + (comp_affected_lf > 0) .* damage.fnc_filters.ext_fall_haz_all .* affects_door .* delta_day;
     end
     
     % Change the comps for the next increment

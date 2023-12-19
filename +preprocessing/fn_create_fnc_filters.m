@@ -53,10 +53,10 @@ fnc_filters.causes_flooding = logical(comp_ds_table.causes_flooding);
 
 %% System dependent filters
 % fire suppresion system damage that affects entire building
-fnc_filters.fire_building = comp_ds_table.system == 9 & strcmp(string(comp_ds_table.service_location),'building') & comp_ds_table.impairs_system_operation;
+fnc_filters.fire_building = comp_ds_table.system == 9 & strcmp(comp_ds_table.service_location,'building') & comp_ds_table.impairs_system_operation;
 
 % fire suppresion damage that affects each tenant unit
-fnc_filters.fire_unit = comp_ds_table.system == 9 & ~comp_ds_table.subsystem_id == 23 & strcmp(string(comp_ds_table.service_location),'unit') & comp_ds_table.impairs_system_operation; % pipe and brace branches (not spinkler heads)
+fnc_filters.fire_unit = comp_ds_table.system == 9 & ~comp_ds_table.subsystem_id == 23 & strcmp(comp_ds_table.service_location,'unit') & comp_ds_table.impairs_system_operation; % pipe and brace branches (not spinkler heads)
 fnc_filters.fire_drops = comp_ds_table.subsystem_id == 23 & comp_ds_table.impairs_system_operation;
 
 % Hazardous materials
@@ -73,61 +73,76 @@ fnc_filters.exterior_safety_all = fnc_filters.exterior_safety_lf | fnc_filters.e
 
 % Exterior Falling hazards
 fnc_filters.ext_fall_haz_lf = strcmp(string(comp_ds_table.unit),'lf') & comp_ds_table.ext_falling_hazard; % Components with perimeter linear feet units
-fnc_filters.ext_fall_haz_sf = strcmp(string(comp_ds_table.unit),'sf') & comp_ds_table.ext_falling_hazard; % Components with perimeter square feet units
-fnc_filters.ext_fall_haz_all = fnc_filters.ext_fall_haz_lf | fnc_filters.ext_fall_haz_sf;
+fnc_filters.ext_fall_haz_sf = strcmp(string(comp_ds_table.unit),'sf') & comp_ds_table.ext_falling_hazard; % Components with square feet units
+fnc_filters.ext_fall_haz_ea = strcmp(string(comp_ds_table.unit),'each') & comp_ds_table.ext_falling_hazard; % Components with "each" units
+fnc_filters.ext_fall_haz_all = fnc_filters.ext_fall_haz_lf | ...
+                                fnc_filters.ext_fall_haz_sf | ...
+                                fnc_filters.ext_fall_haz_ea;
 
 % Exterior enclosure envelope seal damage
 fnc_filters.exterior_seal_lf = strcmp(string(comp_ds_table.unit),'lf') & comp_ds_table.damages_envelope_seal; % Components with perimeter linear feet units
 fnc_filters.exterior_seal_sf = strcmp(string(comp_ds_table.unit),'sf') & comp_ds_table.damages_envelope_seal; % Components with perimeter square feet units
-fnc_filters.exterior_seal_all = fnc_filters.exterior_seal_lf | fnc_filters.exterior_seal_sf;
+fnc_filters.exterior_seal_ea = strcmp(string(comp_ds_table.unit),'each') & comp_ds_table.damages_envelope_seal; % Components with perimeter square feet units
+fnc_filters.exterior_seal_all = fnc_filters.exterior_seal_lf | ...
+                                fnc_filters.exterior_seal_sf | ...
+                                fnc_filters.exterior_seal_ea;
 
 % Roofing components
-fnc_filters.roof_structure =       comp_ds_table.subsystem_id == 21 & comp_ds_table.affects_roof_function;
+fnc_filters.roof_structure       = comp_ds_table.subsystem_id == 21 & comp_ds_table.affects_roof_function;
 fnc_filters.roof_weatherproofing = comp_ds_table.subsystem_id == 22 & comp_ds_table.affects_roof_function;
 
 % Interior falling hazards
-fnc_filters.int_fall_haz_lf = comp_ds_table.int_falling_hazard & strcmp(string(comp_ds_table.unit),'lf'); % Interior components with perimeter feet units
-fnc_filters.int_fall_haz_sf = comp_ds_table.int_falling_hazard & (strcmp(string(comp_ds_table.unit),'sf') | strcmp(comp_ds_table.unit,'each')); % Interior components with area feet units (or each, which is just lights, which we take care of with the fraction affected area, which is probably not the best way to do it)
-fnc_filters.int_fall_haz_bay = comp_ds_table.int_falling_hazard & strcmp(string(comp_ds_table.area_affected_unit),'bay'); % structural damage that does not cause red tags but affects function
-fnc_filters.int_fall_haz_build = comp_ds_table.int_falling_hazard & strcmp(string(comp_ds_table.area_affected_unit),'building'); % structural damage that does not cause red tags but affects funciton (this one should only be tilt-ups)
-fnc_filters.int_fall_haz_all = fnc_filters.int_fall_haz_lf | fnc_filters.int_fall_haz_sf | fnc_filters.int_fall_haz_bay | fnc_filters.int_fall_haz_build; 
-fnc_filters.vert_instabilities = comp_ds_table.system == 1 & comp_ds_table.int_falling_hazard; % Flag structural damage that causes interior falling hazards
+fnc_filters.int_fall_haz_lf = comp_ds_table.int_falling_hazard & strcmp(string(comp_ds_table.unit), 'lf') & strcmp(comp_ds_table.interior_area_conversion_type, 'component'); % Interior components with perimeter feet units
+fnc_filters.int_fall_haz_sf = comp_ds_table.int_falling_hazard & strcmp(string(comp_ds_table.unit), 'sf') & strcmp(comp_ds_table.interior_area_conversion_type, 'component'); % Interior components with area feet units
+fnc_filters.int_fall_haz_ea = comp_ds_table.int_falling_hazard & strcmp(string(comp_ds_table.unit), 'each') & strcmp(comp_ds_table.interior_area_conversion_type, 'component'); % Interior components with "each" for units (just scale directly)
+fnc_filters.int_fall_haz_bay = comp_ds_table.int_falling_hazard & strcmp(comp_ds_table.interior_area_conversion_type, 'bay'); % structural damage that does not cause red tags but affects function
+fnc_filters.int_fall_haz_build = comp_ds_table.int_falling_hazard & strcmp(comp_ds_table.interior_area_conversion_type, 'building'); % structural damage that does not cause red tags but affects funciton (this one should only be tilt-ups)
+fnc_filters.int_fall_haz_all = fnc_filters.int_fall_haz_lf | ...
+                                fnc_filters.int_fall_haz_sf | ...
+                                fnc_filters.int_fall_haz_ea | ...
+                                fnc_filters.int_fall_haz_bay | ...
+                                fnc_filters.int_fall_haz_build;
+
+% Flag structural damage that causes interior falling hazards
+fnc_filters.vert_instabilities = comp_ds_table.system == 1 & comp_ds_table.int_falling_hazard;
 
 % Interior function damage 
-fnc_filters.interior_function_lf = comp_ds_table.obstructs_interior_space & strcmp(string(comp_ds_table.unit),'lf'); 
-fnc_filters.interior_function_sf = comp_ds_table.obstructs_interior_space & (strcmp(string(comp_ds_table.unit),'sf') | strcmp(comp_ds_table.unit,'each'));  
-fnc_filters.interior_function_bay = comp_ds_table.obstructs_interior_space & strcmp(string(comp_ds_table.area_affected_unit),'bay') ;
-fnc_filters.interior_function_build = comp_ds_table.obstructs_interior_space & strcmp(string(comp_ds_table.area_affected_unit),'building');  
+fnc_filters.interior_function_lf = comp_ds_table.obstructs_interior_space & strcmp(string(comp_ds_table.unit), 'lf') & strcmp(comp_ds_table.interior_area_conversion_type, 'component'); 
+fnc_filters.interior_function_sf = comp_ds_table.obstructs_interior_space & (strcmp(string(comp_ds_table.unit), 'sf')) & strcmp(comp_ds_table.interior_area_conversion_type, 'component');  
+fnc_filters.interior_function_ea = comp_ds_table.obstructs_interior_space & (strcmp(string(comp_ds_table.unit), 'each')) & strcmp(comp_ds_table.interior_area_conversion_type, 'component'); 
+fnc_filters.interior_function_bay = comp_ds_table.obstructs_interior_space & strcmp(comp_ds_table.interior_area_conversion_type, 'bay');
+fnc_filters.interior_function_build = comp_ds_table.obstructs_interior_space & strcmp(comp_ds_table.interior_area_conversion_type,'building');  
 fnc_filters.interior_function_all = fnc_filters.interior_function_lf | ...
-                                           fnc_filters.interior_function_sf | ...
-                                           fnc_filters.interior_function_bay | ...
-                                           fnc_filters.interior_function_build;  
+                                    fnc_filters.interior_function_sf | ...
+                                    fnc_filters.interior_function_ea | ...
+                                    fnc_filters.interior_function_bay | ...
+                                    fnc_filters.interior_function_build;  
 
 % Elevators
 fnc_filters.elevators    = comp_ds_table.system == 5 & comp_ds_table.impairs_system_operation & comp_ds_table.subsystem_id ~= 2;
 fnc_filters.elevator_mcs = comp_ds_table.system == 5 & comp_ds_table.impairs_system_operation & comp_ds_table.subsystem_id == 2;
 
 % Electrical system
-fnc_filters.electrical_main = comp_ds_table.system == 7 & comp_ds_table.subsystem_id == 1 & strcmp(string(comp_ds_table.service_location),'building') & comp_ds_table.impairs_system_operation;
-fnc_filters.electrical_unit = comp_ds_table.system == 7 & comp_ds_table.subsystem_id == 1 & strcmp(string(comp_ds_table.service_location),'unit') & comp_ds_table.impairs_system_operation;
+fnc_filters.electrical_main = comp_ds_table.system == 7 & comp_ds_table.subsystem_id == 1 & strcmp(comp_ds_table.service_location,'building') & comp_ds_table.impairs_system_operation;
+fnc_filters.electrical_unit = comp_ds_table.system == 7 & comp_ds_table.subsystem_id == 1 & strcmp(comp_ds_table.service_location,'unit') & comp_ds_table.impairs_system_operation;
 
 % Potable Water Plumbing
-fnc_filters.water_main = comp_ds_table.system == 6 & comp_ds_table.subsystem_id == 8 & strcmp(string(comp_ds_table.service_location),'building') & comp_ds_table.impairs_system_operation;
-fnc_filters.water_unit = comp_ds_table.system == 6 & comp_ds_table.subsystem_id == 8 & strcmp(string(comp_ds_table.service_location),'unit') & comp_ds_table.impairs_system_operation; 
+fnc_filters.water_main = comp_ds_table.system == 6 & comp_ds_table.subsystem_id == 8 & strcmp(comp_ds_table.service_location,'building') & comp_ds_table.impairs_system_operation;
+fnc_filters.water_unit = comp_ds_table.system == 6 & comp_ds_table.subsystem_id == 8 & strcmp(comp_ds_table.service_location,'unit') & comp_ds_table.impairs_system_operation; 
 
 % Sanitary Plumbing
-fnc_filters.sewer_main = comp_ds_table.system == 6 & comp_ds_table.subsystem_id == 9 & strcmp(string(comp_ds_table.service_location),'building') & comp_ds_table.impairs_system_operation;
-fnc_filters.sewer_unit = comp_ds_table.system == 6 & comp_ds_table.subsystem_id == 9 & strcmp(string(comp_ds_table.service_location),'unit') & comp_ds_table.impairs_system_operation; 
+fnc_filters.sewer_main = comp_ds_table.system == 6 & comp_ds_table.subsystem_id == 9 & strcmp(comp_ds_table.service_location,'building') & comp_ds_table.impairs_system_operation;
+fnc_filters.sewer_unit = comp_ds_table.system == 6 & comp_ds_table.subsystem_id == 9 & strcmp(comp_ds_table.service_location,'unit') & comp_ds_table.impairs_system_operation; 
 
 % HVAC: Control System
 fnc_filters.hvac.building.hvac_control.mcs = comp_ds_table.system == 8 & comp_ds_table.subsystem_id == 2 & comp_ds_table.impairs_system_operation;
 fnc_filters.hvac.building.hvac_control.control_panel = comp_ds_table.system == 8 & comp_ds_table.subsystem_id == 20 & comp_ds_table.impairs_system_operation ;
 
 % HVAC: Ventilation
-fnc_filters.hvac.tenant.hvac_ventilation.duct_mains = comp_ds_table.system == 8 & comp_ds_table.subsystem_id == 24 & strcmp(string(comp_ds_table.service_location),'unit') & comp_ds_table.impairs_system_operation;
-fnc_filters.hvac.tenant.hvac_ventilation.duct_braches = comp_ds_table.system == 8 & comp_ds_table.subsystem_id == 4 & strcmp(string(comp_ds_table.service_location),'unit') & comp_ds_table.impairs_system_operation;
-fnc_filters.hvac.tenant.hvac_ventilation.in_line_fan = comp_ds_table.system == 8 & comp_ds_table.subsystem_id == 5 & strcmp(string(comp_ds_table.service_location),'unit') & comp_ds_table.impairs_system_operation; 
-fnc_filters.hvac.tenant.hvac_ventilation.duct_drops = comp_ds_table.system == 8 & comp_ds_table.subsystem_id == 6 & strcmp(string(comp_ds_table.service_location),'unit') & comp_ds_table.impairs_system_operation;
+fnc_filters.hvac.tenant.hvac_ventilation.duct_mains = comp_ds_table.system == 8 & comp_ds_table.subsystem_id == 24 & strcmp(comp_ds_table.service_location,'unit') & comp_ds_table.impairs_system_operation;
+fnc_filters.hvac.tenant.hvac_ventilation.duct_braches = comp_ds_table.system == 8 & comp_ds_table.subsystem_id == 4 & strcmp(comp_ds_table.service_location,'unit') & comp_ds_table.impairs_system_operation;
+fnc_filters.hvac.tenant.hvac_ventilation.in_line_fan = comp_ds_table.system == 8 & comp_ds_table.subsystem_id == 5 & strcmp(comp_ds_table.service_location,'unit') & comp_ds_table.impairs_system_operation; 
+fnc_filters.hvac.tenant.hvac_ventilation.duct_drops = comp_ds_table.system == 8 & comp_ds_table.subsystem_id == 6 & strcmp(comp_ds_table.service_location,'unit') & comp_ds_table.impairs_system_operation;
 fnc_filters.hvac.tenant.hvac_ventilation.ahu = comp_ds_table.system == 8 & comp_ds_table.subsystem_id == 19 & comp_ds_table.impairs_system_operation;
 fnc_filters.hvac.tenant.hvac_ventilation.rtu = comp_ds_table.system == 8 & comp_ds_table.subsystem_id == 17 & comp_ds_table.impairs_system_operation;
 
@@ -145,8 +160,8 @@ fnc_filters.hvac.tenant.hvac_cooling.vav = comp_ds_table.system == 8 & comp_ds_t
 fnc_filters.hvac.tenant.hvac_exhaust.exhaust_fan = comp_ds_table.system == 8 & comp_ds_table.subsystem_id == 18 & comp_ds_table.impairs_system_operation;
 
 % Data system
-fnc_filters.data_main = comp_ds_table.system == 11 & strcmp(string(comp_ds_table.service_location),'building') & comp_ds_table.impairs_system_operation;
-fnc_filters.data_unit = comp_ds_table.system == 11 & strcmp(string(comp_ds_table.service_location),'unit') & comp_ds_table.impairs_system_operation;
+fnc_filters.data_main = comp_ds_table.system == 11 & strcmp(comp_ds_table.service_location,'building') & comp_ds_table.impairs_system_operation;
+fnc_filters.data_unit = comp_ds_table.system == 11 & strcmp(comp_ds_table.service_location,'unit') & comp_ds_table.impairs_system_operation;
 
 % Horizontal Egress: Fire break partitions
 fnc_filters.fire_break = comp_ds_table.system == 3 & comp_ds_table.weakens_fire_break; % only collect interior fire break partitions
