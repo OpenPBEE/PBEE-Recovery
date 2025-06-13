@@ -53,16 +53,16 @@ import recovery.functionality.fn_check_habitability
     utilities, building_model, subsystems, recovery.reoccupancy, ...
     functionality_options, tenant_units, impeding_temp_repairs);
 
-% delete all the extra per-realization data
-recovery.reoccupancy.breakdowns = rmfield(recovery.reoccupancy.breakdowns, 'component_breakdowns_all_reals');
-recovery.functional.breakdowns = rmfield(recovery.functional.breakdowns, 'component_breakdowns_all_reals');
-
 %% Habitability Checks
 % Overwrite reocuppancy with additional checks from the functionality check
 if isfield(functionality_options,'habitability_requirements')
     [ recovery.reoccupancy ] = fn_check_habitability( damage, damage_consequences, ...
          reoc_meta, func_meta, functionality_options.habitability_requirements );
 end
+
+% delete all the extra per-realization data
+recovery.reoccupancy.breakdowns = rmfield(recovery.reoccupancy.breakdowns, 'component_breakdowns_all_reals');
+recovery.functional.breakdowns = rmfield(recovery.functional.breakdowns, 'component_breakdowns_all_reals');
 
 end
 

@@ -41,9 +41,9 @@ end
 
 % Go through each of the tenant function branches and combines checks
 day_tentant_unit_reoccupiable = 0;
-fault_tree_events_LV1 = fieldnames(comp_breakdowns);
+fault_tree_events_LV1 = fieldnames(recovery_day);
 for i = 1:length(fault_tree_events_LV1)
-    fault_tree_events_LV2 = fieldnames(comp_breakdowns.(fault_tree_events_LV1{i}));
+    fault_tree_events_LV2 = fieldnames(recovery_day.(fault_tree_events_LV1{i}));
     for j = 1:length(fault_tree_events_LV2)
         day_tentant_unit_reoccupiable = max(day_tentant_unit_reoccupiable,...
             recovery_day.(fault_tree_events_LV1{i}).(fault_tree_events_LV2{j}));

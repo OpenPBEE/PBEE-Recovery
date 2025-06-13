@@ -16,7 +16,10 @@ clc
 rehash
 
 %% Define User Inputs
-model_name = 'ICSB'; % Name of the model;
+% model_name = 'haseltonRCMF_4story'; % Name of the model;
+% model_name = 'haseltonRCMF_12story'; % Name of the model;
+% model_name = 'ICSB'; % Name of the model;
+% model_name = 'RCSW_1story'; % Name of the model;
                      % inputs are expected to be in a directory with this name
                      % outputs will save to a directory with this name
 model_dir = ['inputs' filesep 'example_inputs']; % Directory where the simulated inputs are located

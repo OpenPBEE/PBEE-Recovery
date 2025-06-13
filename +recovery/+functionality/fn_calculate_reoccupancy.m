@@ -56,22 +56,35 @@ import recovery.functionality.fn_extract_recovery_metrics
 
 %% Combine Check to determine the day the each tenant unit is reoccupiable
 % Check the day the building is Safe
-day_building_safe = max(recovery_day.building_safety.red_tag, ...
-                    max(recovery_day.building_safety.shoring, ...
-                    max(recovery_day.building_safety.hazardous_material, ...
-                    max(recovery_day.building_safety.entry_door_access, ...
-                        recovery_day.building_safety.fire_suppression))));
+building_safety_fields = fieldnames(recovery_day.building_safety);
+% the old hard coded ones excluded 'falling_hazard' and 'entry_door_racking'
+% building_safety_fields = {'red_tag', 'shoring', 'hazardous_material', 'entry_door_access', 'fire_suppression'};  
+day_building_safe = 0;
+
+for i_field = 1:length(building_safety_fields)
+    building_safety_field = building_safety_fields{i_field};
+    day_building_safe = max(day_building_safe, recovery_day.building_safety.(building_safety_field));
+end
 
 % Check the day each story is accessible
-day_story_accessible = max(recovery_day.story_access.stairs, ...
-                       max(recovery_day.story_access.stair_doors, ...
-                       max(recovery_day.story_access.flooding,...
-                           recovery_day.story_access.horizontal_egress)));
+story_access_fields = fieldnames(recovery_day.story_access);
+% story_access_fields = {'stairs', 'stair_doors', 'flooding', 'horizontal_egress'};  % old hard coded ones
+day_story_accessible = 0;
+
+for i_field = 1:length(story_access_fields)
+    story_access_field = story_access_fields{i_field};
+    day_story_accessible = max(day_story_accessible, recovery_day.story_access.(story_access_field));
+end
 
 % Check the day each tenant unit is safe
-day_tenant_unit_safe = max(recovery_day.tenant_safety.interior, ...
-                       max(recovery_day.tenant_safety.exterior, ...
-                       recovery_day.tenant_safety.hazardous_material));
+tu_safety_fields = fieldnames(recovery_day.tenant_safety);
+% tu_safety_fields = {'interior', 'exterior', 'hazardous_material'};  % old hard coded ones
+day_tenant_unit_safe = 0;
+
+for i_field = 1:length(tu_safety_fields)
+    tu_safety_field = tu_safety_fields{i_field};
+    day_tenant_unit_safe = max(day_tenant_unit_safe, recovery_day.tenant_safety.(tu_safety_field));
+end
 
 % Combine checks to determine when each tenant unit is re-occupiable
 day_tentant_unit_reoccupiable = max(max(day_building_safe, day_story_accessible), day_tenant_unit_safe); 
