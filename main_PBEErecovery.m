@@ -49,6 +49,24 @@ import recovery.impedance.main_impeding_factors
 import recovery.repair_schedule.main_repair_schedule
 import recovery.functionality.main_functionality
 
+%% Set default red tag options for backward compatibility
+if ~isfield(functionality_options,'red_tag_options') || isempty(functionality_options.red_tag_options)
+    functionality_options.red_tag_options = struct();
+end
+
+if ~isfield(functionality_options.red_tag_options,'ignore_coupling_beam_for_red_tag')
+    functionality_options.red_tag_options.ignore_coupling_beam_for_red_tag = false;
+end
+
+if ~isfield(functionality_options.red_tag_options,'tag_coupling_beams_over_height')
+    functionality_options.red_tag_options.tag_coupling_beams_over_height = false;
+end
+
+%% Calculate Red Tags
+[ damage_consequences.red_tag, damage_consequences.red_tag_impact, damage_consequences.inspection_trigger ] ...
+    = fn_red_tag( functionality_options.calculate_red_tag, damage, building_model.comps,...
+    damage_consequences.simulated_replacement_time, functionality_options.red_tag_options );
+
 %% Combine compoment attributes into recovery filters to expidite recovery assessment
 [damage, tmp_repair_class, damage_consequences] = main_preprocessing(...
     damage.comp_ds_table, damage, repair_time_options, tmp_repair_class, ...
