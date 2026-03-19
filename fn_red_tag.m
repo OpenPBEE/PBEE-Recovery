@@ -85,7 +85,11 @@ for sc = 1:length(sc_ids)
         
         for dir = 1:3 % Fix assume there are three direction, where direction 3 = nondirectional
             sc_dmg = damage.story{s}.(['qnt_damaged_dir_' num2str(dir)]) .* sc_filt;
-            num_comps = comps.story(s).(['qty_dir_' num2str(dir)]);
+            if iscell(comps.story)
+                num_comps = comps.story{s}.(['qty_dir_' num2str(dir)]);
+            else
+                num_comps = comps.story(s).(['qty_dir_' num2str(dir)]);
+            end
 
             % For each structural system
             structural_systems = unique([damage.comp_ds_table.structural_system; damage.comp_ds_table.structural_system_alt]);
