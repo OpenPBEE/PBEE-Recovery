@@ -1,5 +1,5 @@
-function contractor_mob_imped = fn_contractor( num_sys, num_reals, ...
-    surge_factor, sys_repair_trigger, systems, is_contractor_on_retainer )
+function contractor_mob_imped = fn_contractor( num_reals, surge_factor, ...
+    sys_repair_trigger, trunc_pd, contractor_options )
 % Simulute contractor mobilization time
 %
 % Parameters
@@ -13,34 +13,42 @@ function contractor_mob_imped = fn_contractor( num_sys, num_reals, ...
 %   in demand for skilled trades and construction supplies
 % sys_repair_trigger: logical array [num_reals x num_systems]
 %   systems that require repair for each realization
-% systems: table
-%   data table containing information about each system's attributes
-% is_contractor_on_retainer: logical
-%   is there a pre-arranged agreement with a contractor for priorization of repairs
+% trunc_pd: matlab normal distribution object
+%   standard normal distrubtion, truncated at upper and lower bounds
+% contractor_options: struct
+%   various options that controll the contracting impedance time
 %
 % Returns
 % -------
 % contractor_mob_imped: array [num_reals x num_sys]
 %   Simulated contractor mobilization time for each system
 
-%% Define financing distribution parameters
-if is_contractor_on_retainer
-    contr_min = surge_factor * systems.imped_contractor_min_days';
-    contr_max = surge_factor * systems.imped_contractor_max_days';
-else
-    contr_min = surge_factor * systems.imped_contractor_min_days_retainer';
-    contr_max = surge_factor * systems.imped_contractor_max_days_retainer';
+%% Define contractor distribution parameters
+switch contractor_options.contractor_relationship
+    case 'retainer'
+        med = surge_factor * contractor_options.contractor_retainer_time;
+        beta = 0.4;
+    case 'good'
+        med = (1 + 0.5*(surge_factor-1)) * 3;
+        beta = 0.4;
+    case 'none'
+        med = surge_factor * 42;
+        beta = 0.8;
+    otherwise
+        error('PBEE_Recovery:RepairSchedule', 'Invalid contractor relationship type, "%s", for impedance factor simulation', contractor_relationship)
 end
 
-%% Simulate 
-% uniform distribution between min and max
-% This assumes systems are independant
-contractor_mob_imped = unifrnd(contr_min.*ones(num_reals,1),...
-    contr_max.*ones(num_reals,1),num_reals,num_sys);
+%% Set median for each realization
+contr_med = med * ones(num_reals,1);
+
+%% Simulate Impedance Time
+prob_sim = rand(num_reals, 1); % This assumes systems are correlated
+x_vals_std_n = icdf(trunc_pd, prob_sim);% Truncated lognormal distribution (via standard normal simulation)
+contractor_mob_imped = exp(x_vals_std_n * beta + log(contr_med));
 
 % Only use the simulated values for the realzation and system that
 % require permitting
-contractor_mob_imped(~sys_repair_trigger) = 0;
+contractor_mob_imped = contractor_mob_imped .* sys_repair_trigger;
 
 % Amplify by the surge factor
 % Assume impedance always takes a full day

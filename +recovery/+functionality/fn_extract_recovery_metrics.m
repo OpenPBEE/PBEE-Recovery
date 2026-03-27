@@ -1,5 +1,5 @@
 function [ recovery ] = fn_extract_recovery_metrics( tentant_unit_recovery_day, ...
-   recovery_day, comp_breakdowns, comp_id )
+   recovery_day, comp_breakdowns, comp_id, simulated_replacement_time )
 % Reformant tenant level recovery outcomes into outcomes at the building level, 
 % system level, and compoennt level
 %
@@ -16,6 +16,10 @@ function [ recovery ] = fn_extract_recovery_metrics( tentant_unit_recovery_day, 
 %   list of each fragility id associated with the per component damage
 %   state structure of the damage object. With of array is the same as the
 %   arrays in the comp_breakdowns structure
+% simulated_replacement_time: array [num_reals x 1]
+%   simulated time when the building needs to be replaced, and how long it
+%   will take (in days). NaN represents no replacement needed (ie
+%   building will be repaired)
 %
 % Returns
 % -------
@@ -47,10 +51,19 @@ function [ recovery ] = fn_extract_recovery_metrics( tentant_unit_recovery_day, 
 %% Initial Setup
 num_units = size(tentant_unit_recovery_day,2);
 
+% Define performance targets
+perform_targ_days = [0, 3, 7, 14, 30, 60, 90, 120, 182, 270, 365]; % Number of days for each performance target stripe
+
+% Determine replacement cases
+replace_cases = ~isnan(simulated_replacement_time);
+
 %% Post process tenant-level recovery times
 % Overwrite NaNs in tenant_unit_day_functional
 % Only NaN where never had functional loss, therefore set to zero
 tentant_unit_recovery_day(isnan(tentant_unit_recovery_day)) = 0;
+
+% Overwrite building replacment cases to replacement time
+tentant_unit_recovery_day(replace_cases,:) = simulated_replacement_time(replace_cases)*ones(1,num_units);
 
 %% Save building-level outputs to occupancy structure
 % Tenant Unit level outputs
@@ -58,11 +71,63 @@ recovery.tenant_unit.recovery_day = tentant_unit_recovery_day;
 
 % Building level outputs
 recovery.building_level.recovery_day = max(tentant_unit_recovery_day,[],2);
-recovery.building_level.initial_percent_affected = mean(tentant_unit_recovery_day > 0,2);
+recovery.building_level.initial_percent_affected = mean(tentant_unit_recovery_day > 0,2); % percent of building affected, not the percent of realizations
+recovery.building_level.perform_targ_days = perform_targ_days;
+recovery.building_level.prob_of_target = mean(recovery.building_level.recovery_day > perform_targ_days);
+
+% Save specific breakdowns for red tags
+if isfield(recovery_day, 'building_safety')
+    red_tag_day = recovery_day.building_safety.red_tag;
+    red_tag_day(replace_cases,:) = simulated_replacement_time(replace_cases);
+    recovery.building_level.recovery_day_red_tag = red_tag_day;
+end
 
 %% Recovery Trajectory -- calcualte from the tenant breakdowns
 recovery.recovery_trajectory.recovery_day = sort([tentant_unit_recovery_day, tentant_unit_recovery_day],2);
 recovery.recovery_trajectory.percent_recovered = sort([(0:(num_units-1)), (1:num_units)])/num_units;
+
+% partial recovery
+pct_recovered_targets = [0.1, 0.5, 0.75, 0.8, 1];
+
+% order the tennant recovery days so it's easier to see at what time the required numnber of units
+% are required
+ordered_tennant_repair_days = sort(tentant_unit_recovery_day, 2);
+        
+for i_pct = 1:length(pct_recovered_targets)
+    pct_recovered = pct_recovered_targets(i_pct);
+    recovery.partial{i_pct}.pct_recovered = pct_recovered;
+    recovery.partial{i_pct}.perform_targ_days = perform_targ_days;
+    for i_targ_day = 1:length(perform_targ_days)
+        targ_day = perform_targ_days(i_targ_day);
+        % get the percentage of tenant units recovered at the given day
+        pct_recovered_per_real = mean(sum(tentant_unit_recovery_day <= targ_day, 2) / num_units, 2);
+        recovery.partial{i_pct}.prob_of_target(i_targ_day) = mean(pct_recovered_per_real < pct_recovered);
+        
+        % how many units need to be repaired to meet the percent required 
+        reqd_units = ceil(num_units * pct_recovered);
+        
+        recovery.partial{i_pct}.reqd_units = reqd_units;
+        recovery.partial{i_pct}.mean = mean(ordered_tennant_repair_days(:, reqd_units));
+        recovery.partial{i_pct}.median = median(ordered_tennant_repair_days(:, reqd_units));
+        recovery.partial{i_pct}.fractile_75 = prctile(ordered_tennant_repair_days(:, reqd_units), 75);
+        recovery.partial{i_pct}.fractile_90 = prctile(ordered_tennant_repair_days(:, reqd_units), 90);
+        
+    end
+end
+
+% histogram information - this is really complicated set up of the bins and labels, but it works
+[ hist_bins, hist_labels ] = get_hist_bins_and_labels(24);
+
+n_bins = size(hist_bins, 1);
+hist_freqs = zeros(n_bins, 1);
+all_days = recovery.building_level.recovery_day;
+for i_bin = 1:n_bins
+    hist_freqs(i_bin) = mean(all_days > hist_bins(i_bin, 1) & all_days <= hist_bins(i_bin, 2));
+end
+
+recovery.building_level.hist_data.labels = hist_labels;
+recovery.building_level.hist_data.bins = hist_bins;
+recovery.building_level.hist_data.freqs = hist_freqs;
 
 %% Format and Save Component-level breakdowns
 % Find the day each ds of each component stops affecting recovery for any story
@@ -82,6 +147,9 @@ end
 % aka time each component's DS affects recovery anywhere in the building
 component_breakdowns = max(component_breakdowns_per_story,[],3);
 
+% Ignore repalcement cases
+component_breakdowns(replace_cases,:) = []; 
+
 %% Format and Save System-level breakdowns
 % Find the day each system stops affecting recovery for any story
 
@@ -94,6 +162,9 @@ for i = 1:length(fault_tree_events_LV1)
         % Combine among all stories or tenant units to represent the events
         % effect anywhere in the building 
         building_recovery_day = max(recovery_day.(fault_tree_events_LV1{i}).(fault_tree_events_LV2{j}),[],2);
+        
+        % Ignore repalcement cases
+        building_recovery_day(replace_cases,:) = []; 
         
         % Save per "system", which typically represents the fault tree level 2
         if isfield(system_breakdowns,fault_tree_events_LV2{j})
@@ -109,8 +180,6 @@ for i = 1:length(fault_tree_events_LV1)
 end
 
 %% Format breakdowns as performance targets
-% Define performance targets
-perform_targ_days = [0, 3, 7, 14, 30, 182, 365]; % Number of days for each performance target stripe
 system_names = fieldnames(system_breakdowns);
 
 % pre-allocating variables
@@ -124,6 +193,47 @@ for s = 1:length(system_names)
     recovery.breakdowns.system_breakdowns(s,:) = mean(system_breakdowns.(system_names{s}) > perform_targ_days);
 end
 
+% get the "Level 2" (and "Level 1") breakdowns (aggregating them up into more broad categories for 
+% ATC-138 report by committee)
+
+system_grouping_L2.structural = {
+    'red_tag';
+    'shoring';
+};
+
+system_grouping_L2.mep = {
+    'hazardous_material';
+    'fire_suppression';
+    'flooding';  % reocc and func
+    'electrical';
+    'water_potable';
+    'water_sanitary';
+    'hvac_ventilation';
+    'hvac_heating';
+    'hvac_cooling';
+    'hvac_exhaust';
+    'roof';
+};
+
+system_grouping_L2.architectural = { ...
+    'elevators';  % reocc and func
+    'entry_door_access';
+    'falling_hazard';
+    'entry_door_racking';
+    'stairs';
+    'stair_doors';
+    'horizontal_egress';
+    'exterior';  % reocc and func
+    'interior';  % reocc and func
+};
+
+[ recovery.breakdowns.system_breakdowns_L2, system_names_L2 ] = get_grouped_system_metrics(system_grouping_L2, system_breakdowns, perform_targ_days);
+
+system_grouping_L1.structural = system_grouping_L2.structural;
+system_grouping_L1.non_struct = [system_grouping_L2.mep; system_grouping_L2.architectural];
+
+[ recovery.breakdowns.system_breakdowns_L1, system_names_L1 ] = get_grouped_system_metrics(system_grouping_L1, system_breakdowns, perform_targ_days);
+
 % Calculate fraction of realization each component affects recovery for each
 % performance target time
 for c = 1:length(comps)
@@ -131,10 +241,97 @@ for c = 1:length(comps)
     recovery.breakdowns.component_breakdowns(c,:) = mean(max(component_breakdowns(:,comp_filt'),[],2) > perform_targ_days);
 end
 
+% store this so we can properly overalap the reoccupancy and functionality
+recovery.breakdowns.component_breakdowns_all_reals = component_breakdowns;
+
 % Save other variables
 recovery.breakdowns.perform_targ_days = perform_targ_days;
 recovery.breakdowns.system_names = system_names;
+recovery.breakdowns.system_names_L1 = system_names_L1;
+recovery.breakdowns.system_names_L2 = system_names_L2;
 recovery.breakdowns.comp_names = comps';
+
+end
+
+
+function [hist_bins, bin_labels] = get_hist_bins_and_labels(max_months)
+% get the bins with an isolated bin for 0 days up to the max months specified (last interval is
+% (max_months, 1e6]
+
+months = round((1:max_months) * 365 / 12, 2);
+days = [3, 7, 14];
+inclusive_uppers = [days, months];
+n_bins_tot = length(inclusive_uppers) + 2;  % include zero and greater than 2 years
+
+hist_bins = zeros(n_bins_tot, 2);
+hist_bins(1, 1) = -1;  % first bin catches zeros only
+bin_labels = cell(n_bins_tot, 1);
+bin_labels{1} = '0 Days';
+
+for i_day = 1:length(days)
+    if i_day == 1
+        lower_day = 0;
+    else
+        lower_day = inclusive_uppers(i_day - 1);
+    end
+    upper_day = inclusive_uppers(i_day);
+    bin_labels{i_day + 1} = sprintf('(%.0fd, %.0fd]', lower_day, upper_day);
+end
+
+for i_month = 1:length(months)
+    if i_month == 1
+        upper_month = round(months(i_month) / (365 / 12));
+        bin_labels{i_month + length(days) + 1} = sprintf('(%.0fd, %.0fm]', days(end), upper_month);
+    else
+        lower_month = round(months(i_month - 1) / (365 / 12));
+        upper_month = round(months(i_month) / (365 / 12));
+        bin_labels{i_month + length(days) + 1} = sprintf('(%.0fm, %.0fm]', lower_month, upper_month);
+    end
+end
+
+bin_labels{end} = sprintf('>%.0fm', max_months);
+
+% make the bins and labels
+for i_upper = 1:length(inclusive_uppers)
+    upper_bin = inclusive_uppers(i_upper);
+    hist_bins(i_upper + 1, 2) = upper_bin;
+    hist_bins(i_upper + 2, 1) = upper_bin;
+end
+
+hist_bins(n_bins_tot, 2) = 1e6;
+
+end
+
+
+function [system_breakdowns_per_day, system_names] = get_grouped_system_metrics(system_grouping, system_breakdowns, perform_targ_days)
+% aggregate to different levels
+
+system_names = fieldnames(system_grouping);
+grouped_system_breakdowns = struct();
+for i_group = 1:length(system_names)
+    group_name = system_names{i_group};
+    group_systems = system_grouping.(group_name);
+    for i_sub_field = 1:length(group_systems)
+        system = group_systems{i_sub_field};
+        
+        if not(isfield(grouped_system_breakdowns, group_name))
+            % initialize
+            grouped_system_breakdowns.(group_name) = 0;
+        end
+        
+        if isfield(system_breakdowns, system)
+            % take the enveolpe of all the systems in this group
+            grouped_system_breakdowns.(group_name) = max(grouped_system_breakdowns.(group_name), system_breakdowns.(system));
+        end
+        
+    end
+    
+end
+
+system_breakdowns_per_day = zeros(length(system_names), length(perform_targ_days));
+for s = 1:length(system_names)
+    system_breakdowns_per_day(s,:) = mean(grouped_system_breakdowns.(system_names{s}) > perform_targ_days);
+end
 
 end
 

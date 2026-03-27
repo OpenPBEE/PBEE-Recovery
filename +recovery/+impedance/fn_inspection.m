@@ -34,8 +34,7 @@ inspection_medians = ...
     
 if is_borp_equivalent
     filt = strcmp(inspection_medians.category,'borp');
-    % BORP equivalent is not affected by surge
-    median = inspection_medians.time_days(filt); 
+    median = inspection_medians.time_days(filt) * surge_factor; 
 elseif is_essential_facility
     filt = strcmp(inspection_medians.category,'essential');
     median = inspection_medians.time_days(filt) * surge_factor;

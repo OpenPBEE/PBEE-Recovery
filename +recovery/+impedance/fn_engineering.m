@@ -23,10 +23,10 @@ function [ eng_mob_imped, eng_design_imped ] = fn_engineering( ...
 %   redesign
 % user_options: struct
 %   contains paramters of system design time function, set by user
-% design_min: row vector [1 x n_systems]
-%   lower bound on the median for each system
-% design_max: row vector [1 x n_systems]
-%   upper bound on the median for each system
+% design_min: number
+%   lower bound on the median design time
+% design_max: number
+%   upper bound on the median design time
 % trunc_pd: matlab normal distribution object
 %   standard normal distrubtion, truncated at upper and lower bounds
 % beta: number
@@ -49,11 +49,6 @@ function [ eng_mob_imped, eng_design_imped ] = fn_engineering( ...
 % need design time, but the time it takes to spin up an engineer is not
 % related to the time it takes for them to complete the re-design.
 
-%% Calculate System Design Time
-RC_total = repair_cost_ratio .* building_value;
-SDT = RC_total * user_options.f / ...
-    (user_options.r * user_options.t * user_options.w);
-
 %% Engineering Mobilization Time
 % Mobilization medians
 eng_mob_medians = ...
@@ -74,11 +69,14 @@ eng_mob_time = exp(x_vals_std_n * beta + log(median_eng_mob));
 eng_mob_imped = ceil(eng_mob_time .* redesign_trigger);
 
 %% Engineering Design Time
+% Calculate System Design Time
+RC_total = repair_cost_ratio .* building_value;
+SDT = RC_total * user_options.f / ...
+    (user_options.r * user_options.t * user_options.w);
 design_med = min(max(SDT, design_min), design_max);
 
 % Truncated lognormal distribution (via standard normal simulation)
 % Assumes engineering design time is independant of mobilization time
-beta = 0.6;
 prob_sim = rand(num_reals,1); % This assumes systems are correlated
 x_vals_std_n = icdf(trunc_pd ,prob_sim);
 eng_design_time = exp(x_vals_std_n * beta + log(design_med));
