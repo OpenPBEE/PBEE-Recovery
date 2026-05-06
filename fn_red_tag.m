@@ -85,7 +85,11 @@ for sc = 1:length(sc_ids)
         
         for dir = 1:3 % Fix assume there are three direction, where direction 3 = nondirectional
             sc_dmg = damage.story{s}.(['qnt_damaged_dir_' num2str(dir)]) .* sc_filt;
-            num_comps = comps.story{s}.(['qty_dir_' num2str(dir)]);
+            if iscell(comps.story)
+                num_comps = comps.story{s}.(['qty_dir_' num2str(dir)]);
+            else
+                num_comps = comps.story(s).(['qty_dir_' num2str(dir)]);
+            end
 
             % For each structural system
             structural_systems = unique([damage.comp_ds_table.structural_system; damage.comp_ds_table.structural_system_alt]);
@@ -95,6 +99,7 @@ for sc = 1:length(sc_ids)
                 % just ignore system 12 (coupling beams)
                 structural_systems(structural_systems == 12) = [];
             end
+            sys_tag = false(num_reals, length(structural_systems));
             
             for sys = 1:length(structural_systems)
                 ss_filt_ds = damage.comp_ds_table.structural_system' == structural_systems(sys) | damage.comp_ds_table.structural_system_alt' == structural_systems(sys);
@@ -103,10 +108,11 @@ for sc = 1:length(sc_ids)
                 % Check damage among each series within this structural system
                 
                 % Initialize so the sub-series is reset for each structural system
-                ser_dmg = [];
-                ser_qty = [];
-                
                 series = unique(damage.comp_ds_table.structural_series_id(ss_filt_ds));
+                
+                ser_dmg = zeros(num_reals, length(series));
+                ser_qty = zeros(num_reals, length(series));
+                
                 for ser = 1:length(series)
                     ser_filt_ds = damage.comp_ds_table.structural_series_id' == series(ser); 
                     ser_filt_comp = comps.comp_table.structural_series_id' == series(ser); 
