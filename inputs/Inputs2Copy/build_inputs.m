@@ -100,16 +100,15 @@ fid = fopen('comp_population.csv');
 comp_header = strsplit(fgetl(fid), ',');
 fclose(fid);
 comp_list = strrep(comp_header(3:end),'_','.');
+comp_list = erase(strtrim(comp_list), '"'); % sanitize component IDs
 
-% sanitize component IDs
-comp_list = strtrim(comp_list);
-comp_list = erase(comp_list, '"');
+% FIX: ...
 comp_list = regexprep(comp_list, '[^\x20-\x7E]', '');
 
 % FIX: remove trailing instance suffixes (e.g., ".1")
 comp_list = regexprep(comp_list, '^(.*\..*)\.\d+$', '$1');
 
-% Default: skip components that do not have attributes
+% SKIP: components that do not have attributes and warn user
 frag_ids = strtrim(string(component_attributes.fragility_id));
 comp_ids = strtrim(string(comp_list));
 
@@ -119,15 +118,15 @@ missing_comp_ids = unique(comp_ids(~valid_comp_mask));
 if ~isempty(missing_comp_ids)
     warning('Skipping components with missing component attributes: %s', ...
         strjoin(cellstr(missing_comp_ids), ', '));
+    
+    % Filter comp_population columns and comp_list
+    comp_population = comp_population(:, [true true valid_comp_mask]);
+    comp_list = cellstr(comp_ids(valid_comp_mask));
+
+    % Filter comp_ds_list to keep only valid components
+    comp_ds_keep_mask = ismember(strtrim(string(comp_ds_list.comp_id)), string(comp_list));
+    comp_ds_list = comp_ds_list(comp_ds_keep_mask, :);
 end
-
-% Filter comp_population columns and comp_list
-comp_population = comp_population(:, [true true valid_comp_mask]);
-comp_list = cellstr(comp_ids(valid_comp_mask));
-
-% Filter comp_ds_list to keep only valid components
-comp_ds_keep_mask = ismember(strtrim(string(comp_ds_list.comp_id)), string(comp_list));
-comp_ds_list = comp_ds_list(comp_ds_keep_mask, :);
 
 building_model.comps.comp_list = comp_list;
 
@@ -199,7 +198,7 @@ sim_damage = jsondecode(fileread('simulated_damage.json'));
 
 
 % Filter simulated damage arrays to match filtered comp_ds_list
-if any(~comp_ds_keep_mask)
+if ~isempty(missing_comp_ids) % if there are missing components
 
     tenant_keys = {'repair_cost', 'num_comps', 'qnt_damaged', ...
         'qnt_damaged_side_1', 'qnt_damaged_side_2', ...
