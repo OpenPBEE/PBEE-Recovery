@@ -100,21 +100,62 @@ fid = fopen('comp_population.csv');
 comp_header = strsplit(fgetl(fid), ',');
 fclose(fid);
 comp_list = strrep(comp_header(3:end),'_','.');
+comp_list = erase(strtrim(comp_list), '"'); % sanitize component IDs
+
+% FIX: ...
+comp_list = regexprep(comp_list, '[^\x20-\x7E]', '');
+
+% FIX: remove trailing instance suffixes (e.g., ".1")
+comp_list = regexprep(comp_list, '^(.*\..*)\.\d+$', '$1');
+
+% SKIP: components that do not have attributes and warn user
+frag_ids = strtrim(string(component_attributes.fragility_id));
+comp_ids = strtrim(string(comp_list));
+
+valid_comp_mask = ismember(comp_ids, frag_ids);
+missing_comp_ids = unique(comp_ids(~valid_comp_mask));
+
+if ~isempty(missing_comp_ids)
+    warning('Skipping components with missing component attributes: %s', ...
+        strjoin(cellstr(missing_comp_ids), ', '));
+    
+    % Filter comp_population columns and comp_list
+    comp_population = comp_population(:, [true true valid_comp_mask]);
+    comp_list = cellstr(comp_ids(valid_comp_mask));
+
+    % Filter comp_ds_list to keep only valid components
+    comp_ds_keep_mask = ismember(strtrim(string(comp_ds_list.comp_id)), string(comp_list));
+    comp_ds_list = comp_ds_list(comp_ds_keep_mask, :);
+end
+
 building_model.comps.comp_list = comp_list;
 
 % Go through each story and assign component populations
 drs = unique(comp_population.dir);
+
 for s = 1:building_model.num_stories
     for d = 1:length(drs)
         filt = comp_population.story == s & comp_population.dir == drs(d);
-        building_model.comps.story{s}.(['qty_dir_' num2str(drs(d))]) = comp_population{filt,3:end};
+        qty = comp_population{filt, 3:end};
+        fieldName = ['qty_dir_' num2str(drs(d))];
+
+        if ~isfield(building_model.comps, 'story') || ...
+                iscell(building_model.comps.story)
+            building_model.comps.story{s}.(fieldName) = qty;
+        else
+            building_model.comps.story(s).(fieldName) = qty;
+        end
     end
 end
 
  % Set comp info table
 for c = 1:length(comp_list)
     % Find the component attributes of this component
-    comp_attr_filt = strcmp(string(component_attributes.fragility_id),comp_list{c});
+    frag_ids = strtrim(string(component_attributes.fragility_id));
+    this_id  = strtrim(string(comp_list{c}));
+    
+    comp_attr_filt = strcmp(frag_ids, this_id);
+
     if sum(comp_attr_filt) ~= 1
         error('Could not find component attrubutes')
     else
@@ -154,6 +195,48 @@ end
 % Simulated component damage per tenant unit for each realization of the
 % monte carlo simulation
 sim_damage = jsondecode(fileread('simulated_damage.json'));
+
+
+% Filter simulated damage arrays to match filtered comp_ds_list
+if ~isempty(missing_comp_ids) % if there are missing components
+
+    tenant_keys = {'repair_cost', 'num_comps', 'qnt_damaged', ...
+        'qnt_damaged_side_1', 'qnt_damaged_side_2', ...
+        'qnt_damaged_side_3', 'qnt_damaged_side_4', ...
+        'worker_days'};
+
+    story_keys = {'qnt_damaged_dir_1', 'qnt_damaged_dir_2', 'qnt_damaged_dir_3'};
+
+    if isfield(sim_damage, 'tenant_units')
+        for tu = 1:length(sim_damage.tenant_units)
+            for k = 1:length(tenant_keys)
+                key = tenant_keys{k};
+                if isfield(sim_damage.tenant_units(tu), key)
+                    arr = sim_damage.tenant_units(tu).(key);
+
+                    if isvector(arr)
+                        sim_damage.tenant_units(tu).(key) = arr(comp_ds_keep_mask);
+                    else
+                        sim_damage.tenant_units(tu).(key) = arr(:, comp_ds_keep_mask);
+                    end
+                end
+            end
+        end
+    end
+
+    if isfield(sim_damage, 'story')
+        for s = 1:length(sim_damage.story)
+            for k = 1:length(story_keys)
+                key = story_keys{k};
+                if isfield(sim_damage.story(s), key)
+                    arr = sim_damage.story(s).(key);
+                    sim_damage.story(s).(key) = arr(:, comp_ds_keep_mask);
+                end
+            end
+        end
+    end
+end
+
 
 % Transform damage per story array to cell array to work with later code
 if isfield(sim_damage,'story')
