@@ -101,11 +101,9 @@ comp_header = strsplit(fgetl(fid), ',');
 fclose(fid);
 comp_list = strrep(comp_header(3:end),'_','.');
 comp_list = erase(strtrim(comp_list), '"'); % sanitize component IDs
-
-% FIX: ...
 comp_list = regexprep(comp_list, '[^\x20-\x7E]', '');
 
-% FIX: remove trailing instance suffixes (e.g., ".1")
+% Inputs may append instance suffixes to duplicate component IDs, (e.g., "B1041.002a.1"). Remove these before matching static attributes
 comp_list = regexprep(comp_list, '^(.*\..*)\.\d+$', '$1');
 
 % SKIP: components that do not have attributes and warn user
@@ -139,6 +137,7 @@ for s = 1:building_model.num_stories
         qty = comp_population{filt, 3:end};
         fieldName = ['qty_dir_' num2str(drs(d))];
 
+        % SP3 inputs may store comps.story as a struct array rather than a cell array
         if ~isfield(building_model.comps, 'story') || ...
                 iscell(building_model.comps.story)
             building_model.comps.story{s}.(fieldName) = qty;
@@ -224,6 +223,7 @@ if ~isempty(missing_comp_ids) % if there are missing components
         end
     end
 
+    % When missing components are skipped, filter story-level damage arrays to remain aligned with comp_ds_list
     if isfield(sim_damage, 'story')
         for s = 1:length(sim_damage.story)
             for k = 1:length(story_keys)
